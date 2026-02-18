@@ -1,0 +1,1345 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kırıkkale Çölyak Derneği</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .page-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link.active { background-color: #059669; color: white; }
+        #map { height: 500px; width: 100%; border-radius: 0.75rem; }
+        .info-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .info-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .hero-bg {
+            background-image: linear-gradient(rgba(5, 150, 105, 0.50), rgba(20, 184, 166, 0.1)), url('arka.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* RSS News Slider Styles */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .snap-x { scroll-snap-type: x mandatory; }
+        .snap-center { scroll-snap-align: center; }
+        .news-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .news-card:hover { transform: translateY(-8px) scale(1.02); }
+        .headline { font-family: 'Playfair Display', serif; }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton {
+            animation: shimmer 2s infinite linear;
+            background: linear-gradient(to right, #e5e7eb 4%, #f3f4f6 25%, #e5e7eb 36%);
+            background-size: 1000px 100%;
+        }
+        .grab-cursor { cursor: grab; }
+        .grab-cursor:active { cursor: grabbing; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer" onclick="showPage('home')">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-3 overflow-hidden bg-emerald-600">
+                        <img src="logo.png" alt="Kırıkkale Çölyak Derneği Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart\'></i>';">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 leading-tight">Kırıkkale</h1>
+                        <p class="text-xs text-gray-700 font-medium">Çölyak Derneği</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="showPage('home')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors active" data-page="home">Ana Sayfa</button>
+                    <button onclick="showPage('about')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors" data-page="about">Derneğimiz</button>
+                    <button onclick="showPage('guide')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors" data-page="guide">Yerel Rehber</button>
+                    <button onclick="showPage('life')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors" data-page="life">Glutensiz Yaşam</button>
+                    <button onclick="showPage('donate')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors" data-page="donate">Bağış Yap</button>
+                    <button onclick="showPage('contact')" class="nav-link px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors" data-page="contact">İletişim</button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-700 hover:text-emerald-600 focus:outline-none" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="showPage('home')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Ana Sayfa</button>
+                <button onclick="showPage('about')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Derneğimiz</button>
+                <button onclick="showPage('guide')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Yerel Rehber</button>
+                <button onclick="showPage('life')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Glutensiz Yaşam</button>
+                <button onclick="showPage('donate')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Bağış Yap</button>
+                <button onclick="showPage('contact')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">İletişim</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-[1100px] mx-auto min-h-screen p-4 sm:p-6 lg:p-8">
+
+        <!-- ANA SAYFA -->
+        <section id="home" class="page-section active">
+            <!-- Hero with Background Image -->
+            <div class="hero-bg rounded-2xl shadow-xl overflow-hidden mb-10 text-white relative">
+                <div class="relative p-8 md:p-12 flex flex-col md:flex-row items-center">
+                    <div class="md:w-2/3 mb-6 md:mb-0">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">Sağlıklı Bir Yaşam İçin Birlikteyiz</h2>
+                        <p class="text-emerald-50 text-lg mb-6">Kırıkkale Çölyak Derneği olarak, çölyak hastalarının haklarını korumak ve glutensiz yaşamı kolaylaştırmak için çalışıyoruz.</p>
+                        <button onclick="showPage('about')" class="bg-white text-emerald-600 px-6 py-3 rounded-full font-semibold hover:bg-emerald-50 transition shadow-lg">Derneğimizi Tanıyın</button>
+                    </div>
+                    <div class="md:w-1/3 flex justify-center">
+                        <div class="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/30">
+                            <img src="logo.png" alt="Logo" class="w-24 h-24 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-4xl\'></i>';">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RSS News Feed Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+                <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                    <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-newspaper text-emerald-600 mr-3"></i> Güncel Haberler
+                    </h3>
+                    <button onclick="refreshNews()" class="text-emerald-600 hover:text-emerald-800 transition-colors" title="Yenile">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- Horizontal Scroll News Container -->
+                <div class="relative group">
+                    <!-- Navigation Arrows -->
+                    <button onclick="scrollContainer('left')" class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 border border-gray-200 text-emerald-600 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-emerald-50">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button onclick="scrollContainer('right')" class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 border border-gray-200 text-emerald-600 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-emerald-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <!-- Scroll Container -->
+                    <div id="newsScrollContainer" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar grab-cursor py-4 space-x-6 px-2" style="scroll-behavior: smooth;">
+                        <!-- Loading Skeletons -->
+                        <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[400px] snap-center bg-gray-200"></div>
+                        <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[400px] snap-center bg-gray-200"></div>
+                        <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[400px] snap-center bg-gray-200"></div>
+                    </div>
+
+                    <!-- Scroll Indicator -->
+                    <div class="text-center mt-4 text-gray-400 text-sm">
+                        <i class="fas fa-arrows-alt-h mr-2"></i> Kaydırmak için sürükleyin veya okları kullanın
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden text-center py-12">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-600">Haber bulunamadı</h3>
+                    <p class="text-gray-500">RSS beslemesi boş veya erişilemez durumda.</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats Section -->
+            <div class="grid md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-emerald-600 text-white p-6 rounded-xl text-center shadow-lg">
+                    <i class="fas fa-users text-3xl mb-2 opacity-80"></i>
+                    <div class="text-3xl font-bold">450+</div>
+                    <div class="text-sm opacity-90">Kayıtlı Üye</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl text-center shadow-sm border border-gray-100">
+                    <i class="fas fa-hand-holding-heart text-3xl mb-2 text-emerald-600"></i>
+                    <div class="text-3xl font-bold text-gray-800">100+</div>
+                    <div class="text-sm text-gray-600">Desteklenen Aile</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl text-center shadow-sm border border-gray-100">
+                    <i class="fas fa-store text-3xl mb-2 text-emerald-600"></i>
+                    <div class="text-3xl font-bold text-gray-800">15+</div>
+                    <div class="text-sm text-gray-600">İş Ortağı</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl text-center shadow-sm border border-gray-100">
+                    <i class="fas fa-calendar-check text-3xl mb-2 text-emerald-600"></i>
+                    <div class="text-3xl font-bold text-gray-800">50+</div>
+                    <div class="text-sm text-gray-600">Etkinlik</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DERNEĞİMİZ -->
+        <section id="about" class="page-section">
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 mx-auto mb-6 rounded-full overflow-hidden shadow-lg bg-emerald-100 flex items-center justify-center">
+                    <img src="logo.png" alt="Kırıkkale Çölyak Derneği Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-4xl text-emerald-600\'></i>';">
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Derneğimiz</h2>
+                <div class="w-20 h-1 bg-emerald-500 mx-auto rounded"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                <div class="order-2 md:order-1">
+                    <h3 class="text-2xl font-bold text-emerald-700 mb-4">Vizyonumuz</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Kırıkkale'de çölyak hastalığına sahip bireylerin, sağlıklı, bilinçli ve sosyal bir yaşam sürdürebilecekleri, glutensiz ürünlere kolayca erişebilecekleri, toplumsal farkındalığın tam olduğu bir ortam yaratmaktır.
+                    </p>
+                    <h3 class="text-2xl font-bold text-emerald-700 mb-4">Misyonumuz</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start"><i class="fas fa-check-circle text-emerald-500 mt-1 mr-2"></i> Hastalar ve aileleri arasında dayanışma ve bilgi paylaşımı sağlamak.</li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-emerald-500 mt-1 mr-2"></i> Glutensiz yaşam konusunda toplumsal bilinç oluşturmak.</li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-emerald-500 mt-1 mr-2"></i> Hastaların haklarını korumak ve ilgili kurumlarla diyalog kurmak.</li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-emerald-500 mt-1 mr-2"></i> Yerel işletmeleri glutensiz ürün konusunda teşvik etmek.</li>
+                    </ul>
+                </div>
+                <div class="order-1 md:order-2 bg-emerald-50 p-8 rounded-2xl border border-emerald-100">
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <div class="text-3xl font-bold text-emerald-600 mb-1">450+</div>
+                            <div class="text-sm text-gray-600">İlimizdeki Çölyaklı</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <div class="text-3xl font-bold text-emerald-600 mb-1">100+</div>
+                            <div class="text-sm text-gray-600">Ulaşılan Aile</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <div class="text-3xl font-bold text-emerald-600 mb-1">50+</div>
+                            <div class="text-sm text-gray-600">Üye Sayısı</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <div class="text-3xl font-bold text-emerald-600 mb-1">24/7</div>
+                            <div class="text-sm text-gray-600">Destek</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Amaç ve Gayelerimiz</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-gray-50 rounded-xl hover:bg-emerald-50 transition-colors text-center">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl mx-auto">
+                            <i class="fas fa-book-medical"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Bilgilendirme</h4>
+                        <p class="text-sm text-gray-600">Çölyak hastalığı, diyeti ve güncel tedavi yöntemleri hakkında toplumu bilinçlendirmek.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 rounded-xl hover:bg-emerald-50 transition-colors text-center">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl mx-auto">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Destek</h4>
+                        <p class="text-sm text-gray-600">Yeni tanı alan birey ve ailelere psikososyal ve diyetisyen desteği sağlamak.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 rounded-xl hover:bg-emerald-50 transition-colors text-center">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl mx-auto">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">Hak Mücadelesi</h4>
+                        <p class="text-sm text-gray-600">Glutensiz gıdaya erişim, SGK ödemeleri ve okul/kantin hakları için mücadele etmek.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- YEREL REHBER -->
+        <section id="guide" class="page-section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Yerel Rehber</h2>
+                <p class="text-gray-600">Kırıkkale'de glutensiz ürün bulabileceğiniz güvenilir adresler.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+                <div id="map" class="w-full h-[500px] bg-gray-100 relative z-0">
+                    <div class="absolute inset-0 flex items-center justify-center bg-gray-100 z-[-1]">
+                        <div class="text-center">
+                            <i class="fas fa-map-marked-alt text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">Harita Yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Location Cards -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-gray-800">Elit Ekmek</h3>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Fırın</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3"><i class="fas fa-map-marker-alt text-emerald-500 mr-2"></i> Yahşihan Mahallesi, Ankara Cd.</p>
+                    <p class="text-sm text-gray-500 mb-4">Özel glutensiz ekmek ve unlu mamuller üretimi yapan yerel fırın.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Glutensiz Ekmek</span>
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Kurabiye</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-gray-800">File Market</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Market</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3"><i class="fas fa-map-marker-alt text-emerald-500 mr-2"></i> Cumhuriyet Mah. İnönü Cad.</p>
+                    <p class="text-sm text-gray-500 mb-4">Geniş içecek reyonu ve temel gıda ürünleri bulunan yerel zincir market.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Makarna</span>
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Un</span>
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Atıştırmalık</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-gray-800">Migros</h3>
+                        <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Süpermarket</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3"><i class="fas fa-map-marker-alt text-emerald-500 mr-2"></i> Kırıkkale Merkez AVM</p>
+                    <p class="text-sm text-gray-500 mb-4">Büyük mağaza zinciri. Geniş ürün yelpazesi ve özel diyet reyonu mevcuttur.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Dondurulmuş Gıda</span>
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Süt Ürünleri</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-gray-800">Helal Market</h3>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">Şarküteri</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3"><i class="fas fa-map-marker-alt text-emerald-500 mr-2"></i> Bahçelievler Mah.</p>
+                    <p class="text-sm text-gray-500 mb-4">Yerel ürünler ve ithal glutensiz ürünlerin bulunduğu market.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Baharat</span>
+                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Bakliyat</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GLUTENSİZ YAŞAM -->
+        <!-- GLUTENSİZ YAŞAM (Ana Siteye Entegre Edilmiş Versiyon) -->
+<section id="life" class="page-section">
+    <!-- Hero Banner -->
+    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl shadow-xl overflow-hidden mb-10 text-white relative">
+        <div class="relative p-8 md:p-12">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-2/3 mb-6 md:mb-0">
+                    <div class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        <i class="fas fa-book-open mr-2"></i> Kapsamlı Rehber
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Çölyak Hastalığı ve Glutensiz Yaşam</h2>
+                    <p class="text-emerald-50 text-lg mb-6">Sağlıklı, bilinçli ve özgür bir yaşam için kapsamlı rehberiniz. Teşhisten günlük yaşam pratiklerine, her şey burada.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="document.getElementById('life-nedir').scrollIntoView({behavior: 'smooth'})" class="bg-white text-emerald-600 px-6 py-2 rounded-full font-semibold hover:bg-emerald-50 transition shadow-lg text-sm">
+                            <i class="fas fa-question-circle mr-2"></i> Çölyak Nedir?
+                        </button>
+                        <button onclick="document.getElementById('life-diyet').scrollIntoView({behavior: 'smooth'})" class="bg-emerald-700 text-white border border-emerald-500 px-6 py-2 rounded-full font-semibold hover:bg-emerald-600 transition text-sm">
+                            <i class="fas fa-utensils mr-2"></i> Beslenme
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/3 flex justify-center">
+                    <div class="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/30">
+                        <i class="fas fa-wheat-awn-circle-exclamation text-6xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid md:grid-cols-4 gap-4 mb-10">
+        <div class="bg-emerald-50 p-6 rounded-xl text-center border border-emerald-100">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">%1</div>
+            <div class="text-sm text-gray-600">Dünya Nüfusunu Etkiler</div>
+        </div>
+        <div class="bg-emerald-50 p-6 rounded-xl text-center border border-emerald-100">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">%80</div>
+            <div class="text-sm text-gray-600">Tanı Almayan Hasta</div>
+        </div>
+        <div class="bg-emerald-50 p-6 rounded-xl text-center border border-emerald-100">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">0</div>
+            <div class="text-sm text-gray-600">Gluten (Tedavi İçin)</div>
+        </div>
+        <div class="bg-emerald-50 p-6 rounded-xl text-center border border-emerald-100">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">%100</div>
+            <div class="text-sm text-gray-600">Sağlıklı Yaşam Mümkün</div>
+        </div>
+    </div>
+
+    <!-- Çölyak Nedir Section -->
+    <div id="life-nedir" class="mb-12">
+        <div class="text-center mb-8">
+            <span class="inline-block bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-sm font-semibold mb-3">Temel Bilgiler</span>
+            <h3 class="text-2xl font-bold text-gray-800">Çölyak Hastalığı Nedir?</h3>
+            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Glutenin tetiklediği, genetik temelli otoimmün bir sindirim sistemi hastalığıdır.</p>
+        </div>
+
+        <!-- Uyarı Kutusu -->
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-8">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <strong class="text-amber-800 block mb-1">Önemli Hatırlatma</strong>
+                    <p class="text-amber-700 text-sm">Çölyak bir gıda alerjisi veya intoleransı değil, otoimmün bir hastalıktır. Tedavi edilebilir ancak şu an için kalıcı bir tedavisi yoktur.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-dna"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Genetik Temelli</h4>
+                <p class="text-gray-600 text-sm">HLA-DQ2 ve HLA-DQ8 genleri taşıyan kişilerde görülür. Aile öyküsü olanlarda risk 10 kat artar.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-shield-virus"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Otoimmün Mekanizma</h4>
+                <p class="text-gray-600 text-sm">Gluten tüketildiğinde bağışıklık sistemi ince bağırsağın villuslarına saldırır, besin emilimini bozar.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-wheat-awn"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Tetikleyici: Gluten</h4>
+                <p class="text-gray-600 text-sm">Buğday, arpa ve çavdarda bulunan proteindir. En küçük miktar bile bağışıklık tepkisini tetikler.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teşhis Süreci -->
+    <div class="bg-gray-50 rounded-2xl p-8 mb-12">
+        <div class="text-center mb-8">
+            <span class="inline-block bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-sm font-semibold mb-3">Teşhis Süreci</span>
+            <h3 class="text-2xl font-bold text-gray-800">Teşhis Nasıl Konulur?</h3>
+            <p class="text-gray-600 mt-2">Doğru tanı için izlenmesi gereken adımlar ve testler</p>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Adım 1 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/3">
+                    <div class="bg-blue-50 rounded-lg p-4 text-center">
+                        <i class="fas fa-vial text-4xl text-blue-500 mb-2"></i>
+                        <div class="text-sm font-semibold text-blue-700">1. Adım: Kan Testleri</div>
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <h4 class="font-bold text-lg mb-2">Serolojik Testler</h4>
+                    <p class="text-gray-600 text-sm mb-3">İlk başvuru noktasıdır. IgA anti-transglutaminaz (tTG-IgA) en yaygın ve duyarlı testtir.</p>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> <strong>tTG-IgA:</strong> En yaygın tarama testi</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> <strong>EMA:</strong> Yüksek özellikli doğrulama testi</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> <strong>Total IgA:</strong> IgA eksikliği taraması</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Adım 2 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/3">
+                    <div class="bg-purple-50 rounded-lg p-4 text-center">
+                        <i class="fas fa-microscope text-4xl text-purple-500 mb-2"></i>
+                        <div class="text-sm font-semibold text-purple-700">2. Adım: Biyopsi</div>
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <h4 class="font-bold text-lg mb-2">Endoskopi (Altın Standart)</h4>
+                    <p class="text-gray-600 text-sm mb-3">İnce bağırsaktan doku örneği alınır. Villus atrofisi, kript hiperplazisi ve lenfositozis değerlendirilir.</p>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> Marsh sınıflandırması (1-3c)</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> Villus yapısı analizi</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> İnflamasyon düzeyi</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Adım 3 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/3">
+                    <div class="bg-emerald-50 rounded-lg p-4 text-center">
+                        <i class="fas fa-dna text-4xl text-emerald-500 mb-2"></i>
+                        <div class="text-sm font-semibold text-emerald-700">3. Adım: Genetik Testler</div>
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <h4 class="font-bold text-lg mb-2">HLA Testi</h4>
+                    <p class="text-gray-600 text-sm mb-3">HLA-DQ2 ve HLA-DQ8 genetik markerları hastalığın %99'unda bulunur. Negatif sonuç çölyak olasılığını neredeyse dışlar.</p>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> HLA-DQ2 pozitiflik: %90</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> HLA-DQ8 pozitiflik: %5-10</li>
+                        <li><i class="fas fa-check text-emerald-500 mr-2"></i> Negatif sonuç = Çölyak dışlanır</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kritik Uyarı -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-6">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-circle text-red-500 text-xl mt-1 mr-3"></i>
+                <div>
+                    <strong class="text-red-800 block mb-1">Kritik Uyarı</strong>
+                    <p class="text-red-700 text-sm">Teşhis süreci başlamadan önce kesinlikle glutensiz diyete başlanmamalıdır! Testlerin güvenilirliği için gluten tüketimi şarttır.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glutensiz Diyet Section -->
+    <div id="life-diyet" class="mb-12">
+        <div class="text-center mb-8">
+            <span class="inline-block bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-sm font-semibold mb-3">Beslenme</span>
+            <h3 class="text-2xl font-bold text-gray-800">Glutensiz Diyet</h3>
+            <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Yaşam boyu süren tek tedavi: %100 glutensiz beslenme</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <!-- Yasaklı Gıdalar -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-red-500 overflow-hidden">
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-4 text-red-700">Kesinlikle Yasak</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> Buğday (durum, kamut, spelt)</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> Arpa ve malt ürünleri</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> Çavdar ve triticale</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> Soya sosu (çoğu marka)</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> İşlenmiş et ürünleri</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-500 mr-2"></i> Bira ve malt içecekler</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Güvenli Gıdalar -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-emerald-500 overflow-hidden">
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-4 text-emerald-700">Güvenli Gıdalar</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Pirinç (tüm çeşitler)</li>
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Mısır ve mısır unu</li>
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Kinoa ve amarant</li>
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Karabuğday (greçka)</li>
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Glutensiz yulaf</li>
+                        <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-2"></i> Patates ve tapyoka</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Çapraz Kontaminasyon -->
+            <div class="bg-white rounded-xl shadow-sm border-t-4 border-amber-500 overflow-hidden">
+                <div class="p-6">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-4 text-amber-700">Çapraz Kontaminasyon</h4>
+                    <p class="text-sm text-gray-600 mb-3">Riskli Durumlar:</p>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center"><i class="fas fa-times text-amber-500 mr-2"></i> Ortak ekmek kızartma makinesi</li>
+                        <li class="flex items-center"><i class="fas fa-times text-amber-500 mr-2"></i> Aynı yağda kızartma</li>
+                        <li class="flex items-center"><i class="fas fa-times text-amber-500 mr-2"></i> Un serpilmiş tezgahlar</li>
+                        <li class="flex items-center"><i class="fas fa-times text-amber-500 mr-2"></i> Ortak kesme tahtaları</li>
+                        <li class="flex items-center"><i class="fas fa-times text-amber-500 mr-2"></i> Tozlu un ortamları</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Etiket Okuma Rehberi -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h4 class="font-bold text-xl mb-6 text-center">Etiket Okuma Rehberi</h4>
+            
+            <div class="space-y-4">
+                <details class="group bg-gray-50 rounded-lg overflow-hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition list-none">
+                        <span class="font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-magnifying-glass text-emerald-600 mr-3"></i> Türkiye'de Etiketleme Kuralları
+                        </span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 pt-0 text-gray-600 text-sm leading-relaxed">
+                        Türkiye'de gıdaların etiketinde "gluten" ibaresi zorunludur. Alerjen uyarısı olarak içindekiler listesinin altında veya içindekiler bölümünde belirtilir. "Glutensiz" logosu (TSE veya uluslararası sertifikalar) güvenli ürünlerdir.
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-lg overflow-hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition list-none">
+                        <span class="font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-xmark text-red-500 mr-3"></i> Kaçınılması Gereken İfadeler
+                        </span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 pt-0">
+                        <ul class="space-y-1 text-sm text-gray-600">
+                            <li>❌ Buğday, Arpa, Çavdar</li>
+                            <li>❌ Malt (şurup, özü, tozu)</li>
+                            <li>❌ Kamut, Spelt, Farro</li>
+                            <li>❌ "May contain wheat" (Buğday içerebilir)</li>
+                            <li>❌ "Processed in facility with wheat"</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-lg overflow-hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition list-none">
+                        <span class="font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-check text-emerald-500 mr-3"></i> Güvenli İfadeler
+                        </span>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 pt-0">
+                        <ul class="space-y-1 text-sm text-gray-600">
+                            <li>✅ "Glutensiz" logosu (TSE/AOECS)</li>
+                            <li>✅ "Gluten-free" (GF) etiketi</li>
+                            <li>✅ "Doğal olarak glutensiz"</li>
+                            <li>✅ Crossed Grain simgesi</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Günlük Yaşam Rehberi -->
+    <div class="bg-emerald-50 rounded-2xl p-8 mb-12">
+        <div class="text-center mb-8">
+            <span class="inline-block bg-white text-emerald-700 px-4 py-1 rounded-full text-sm font-semibold mb-3 shadow-sm">Pratik Bilgiler</span>
+            <h3 class="text-2xl font-bold text-gray-800">Günlük Yaşam Rehberi</h3>
+            <p class="text-gray-600 mt-2">Okul, iş, sosyal yaşam ve restoranlarda glutensiz yaşam pratikleri</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-3">Dışarıda Yemek</h4>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Menüyü önceden inceleyin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> "Alerji değil, otoimmün hastalık" deyin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Yoğun saatler dışında gidin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Ayrı tencere/tava kullanımını sorun</li>
+                </ul>
+                <p class="mt-3 text-sm text-emerald-700 font-medium">Güvenli Mutfaklar: Japon, Meksikan, Hint (pide hariç)</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-3">Okulda Glutensiz Yaşam</h4>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Öğretmen ve yönetimi bilgilendirin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Doktor raporu ve acil planı sunun</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Beslenme çantası hazırlayın</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Doğum günleri için önceden plan yapın</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Sanat malzemelerine dikkat (play-dough)</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-3">Sosyal Yaşam</h4>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Ev sahiplerini önceden bilgilendirin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Yanınızda güvenli yemek getirin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Partnerinizi eğitin (öpüşme öncesi diş fırçalama)</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> İş yemeklerinde strateji geliştirin</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Destek gruplarına katılın</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4 text-xl">
+                    <i class="fas fa-kitchen-set"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-3">Evde Hazırlık</h4>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Ayrı kesme tahtası ve ekipman</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Renk kodlama sistemi (yeşil = güvenli)</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Ayrı ekmek kızartma makinesi</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Önce glutensiz yemekleri hazırlayın</li>
+                    <li class="flex items-start"><i class="fas fa-check text-emerald-500 mt-1 mr-2"></i> Mutfak yüzeylerini düzenli temizleyin</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SSS Section -->
+    <div class="mb-12">
+        <div class="text-center mb-8">
+            <h3 class="text-2xl font-bold text-gray-800">Sıkça Sorulan Sorular</h3>
+        </div>
+
+        <div class="space-y-4 max-w-3xl mx-auto">
+            <details class="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <summary class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition list-none">
+                    <span class="font-semibold text-gray-800">Yulaf glutensiz midir? Yiyebilir miyim?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-5 pt-0 text-gray-600 text-sm leading-relaxed">
+                    Yulaf doğal olarak glutensizdir ama üretim ve paketleme aşamalarında buğday, arpa gibi tahıllarla temas ederek kontamine olma riski çok yüksektir. Dolayısıyla sadece üzerinde "Glutensiz" ibaresi bulunan, sertifikalı glutensiz yulafları tüketmelisiniz.
+                </div>
+            </details>
+
+            <details class="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <summary class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition list-none">
+                    <span class="font-semibold text-gray-800">"Glutensiz" etiketli her ürün sağlıklı mıdır?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-5 pt-0 text-gray-600 text-sm leading-relaxed">
+                    Hayır. Pek çok paketli glutensiz ürün (kurabiye, kraker vb.) normal ürünlerden daha fazla şeker, yağ ve tuz içerebilir. "Glutensiz" etiketi bir ürünün "sağlıklı" olduğu anlamına gelmez. Tercihinizi her zaman doğal ve işlenmemiş gıdalardan yana kullanın.
+                </div>
+            </details>
+
+            <details class="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <summary class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition list-none">
+                    <span class="font-semibold text-gray-800">Alkol tüketebilir miyim? Hangi içecekler güvenli?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-5 pt-0 text-gray-600 text-sm leading-relaxed">
+                    Bira, malt içeren içkiler ve bazı viskiler arpa içerdiği için yasaktır. Şarap, şampanya, rom, tekila ve patatesten yapılan votkalar genellikle güvenlidir. Fakat emin olmak için her zaman markayı araştırmakta fayda var.
+                </div>
+            </details>
+
+            <details class="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <summary class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition list-none">
+                    <span class="font-semibold text-gray-800">Glutensiz diyete başlayınca hemen iyileşecek miyim?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-5 pt-0 text-gray-600 text-sm leading-relaxed">
+                    İyileşme süreci kişiden kişiye değişir. Sindirim sistemi belirtileri genellikle birkaç hafta içinde hafiflemeye başlar. Ama bağırsak villuslarının tamamen onarılması ve enerjinizin tam olarak yerine gelmesi 6 aydan 2 yıla kadar sürebilir. Sabırlı olmak çok büyük öneme sahiptir.
+                </div>
+            </details>
+
+            <details class="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <summary class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition list-none">
+                    <span class="font-semibold text-gray-800">Karabuğday (Greçka) gerçekten güvenli mi?</span>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-5 pt-0 text-gray-600 text-sm leading-relaxed">
+                    Evet, kesinlikle güvenlidir. İsmindeki "buğday" kelimesi yanıltıcıdır. Karabuğday, buğdaygillerden değildir ve doğal olarak gluten içermeyen, son derece besleyici bir tohumdur.
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8 text-center text-white shadow-lg">
+        <h3 class="text-2xl font-bold mb-3">Yeni Tanı Aldınız?</h3>
+        <p class="text-emerald-50 mb-6 max-w-2xl mx-auto">İlk 30 gün yol haritanız: Bilgi toplama, mutfak düzeni ve beslenme uzmanı görüşmesi ile başlayın. Bu süreçte yalnız değilsiniz!</p>
+        <button onclick="showPage('contact')" class="bg-white text-emerald-600 px-8 py-3 rounded-full font-semibold hover:bg-emerald-50 transition shadow-lg">
+            <i class="fas fa-phone mr-2"></i> Bize Ulaşın
+        </button>
+    </div>
+</section>
+
+
+            <!-- Info Cards Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                    <div class="text-emerald-600 text-3xl mb-4"><i class="fas fa-question-circle"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Çölyak Nedir?</h3>
+                    <p class="text-gray-600 text-sm">Glutenin bağışıklık sistemince yanlış tanınması sonucu ince bağırsakta oluşan kronik bir hastalıktır. Tedavisi ömür boyu glutensiz diyettir.</p>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                    <div class="text-blue-600 text-3xl mb-4"><i class="fas fa-ban"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Yasaklı Gıdalar</h3>
+                    <p class="text-gray-600 text-sm">Buğday, arpa, çavdar ve yulaf (kontamine). Ekmek, pasta, bisküvi, bulgur, kuskus, malt ve malt içeren ürünler.</p>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+                    <div class="text-green-600 text-3xl mb-4"><i class="fas fa-check-circle"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Serbest Gıdalar</h3>
+                    <p class="text-gray-600 text-sm">Et, balık, tavuk, yumurta, süt, pirinç, mısır, patates, baklagiller, sebzeler ve meyveler doğal olarak glutensizdir.</p>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500">
+                    <div class="text-yellow-600 text-3xl mb-4"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Çapraz Kontaminasyon</h3>
+                    <p class="text-gray-600 text-sm">Glutensiz ürünlerin glutenli ürünlerle teması sonucu oluşan kirlilik. Ayrı ekmek kızartma makinesi ve toaster kullanımı önemlidir.</p>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500">
+                    <div class="text-purple-600 text-3xl mb-4"><i class="fas fa-tags"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Etiket Okuma</h3>
+                    <p class="text-gray-600 text-sm">Ambalajlarda "Gluten Free", "Glutensiz" ibaresi veya "Çölyaklar için uygundur" ifadesi aranmalıdır. İçindekiler listesi mutlaka okunmalıdır.</p>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                    <div class="text-red-600 text-3xl mb-4"><i class="fas fa-hospital"></i></div>
+                    <h3 class="font-bold text-xl mb-2">Tanı ve Takip</h3>
+                    <p class="text-gray-600 text-sm">Doktor ve diyetisyen kontrolünde olmak esastır. Yılda bir defa kan tahlili ve biyopsi takibi önerilir.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Sıkça Sorulan Sorular</h3>
+                <div class="space-y-4">
+                    <details class="group bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <summary class="font-semibold text-gray-800 flex justify-between items-center list-none">
+                            <span>Çölyak bulaşıcı mıdır?</span>
+                            <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                        </summary>
+                        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Hayır, çölyak bulaşıcı değildir. Genetik ve çevresel faktörlerin etkileşimiyle ortaya çıkan otoimmün bir hastalıktır.</p>
+                    </details>
+                    <details class="group bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <summary class="font-semibold text-gray-800 flex justify-between items-center list-none">
+                            <span>Bir dilim ekmek yesem ne olur?</span>
+                            <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                        </summary>
+                        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Bağırsaklarda yangı oluşur, villuslar zarar görür. Bu durum besin emilimini engeller ve ishal, karın ağrısı, halsizlik gibi şikayetlere yol açar.</p>
+                    </details>
+                    <details class="group bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <summary class="font-semibold text-gray-800 flex justify-between items-center list-none">
+                            <span>Çölyak ilacı var mıdır?</span>
+                            <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                        </summary>
+                        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Şu an için kesin tedavisi yoktur. Tek tedavi ömür boyu sıkı bir glutensiz diyettir. Ancak üzerinde çalışılan aşı ve enzim tedavileri bulunmaktadır.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- BAĞIŞ YAP -->
+        <section id="donate" class="page-section">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden shadow-md bg-emerald-100 flex items-center justify-center">
+                        <img src="logo.png" alt="Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-3xl text-emerald-600\'></i>';">
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Bağış Yap</h2>
+                    <p class="text-gray-600">Sizin desteğinizle daha fazla farkındalık yaratabiliriz.</p>
+                </div>
+
+                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-6 mb-8">
+                    <h3 class="font-bold text-emerald-800 mb-4 flex items-center"><i class="fas fa-hand-holding-heart mr-2"></i> Bağışlarınız Nereye Gidiyor?</h3>
+                    <ul class="space-y-3 text-emerald-900">
+                        <li class="flex items-start"><i class="fas fa-check mt-1 mr-2 text-emerald-600"></i> <span>Yeni tanı alan üyelerimize glutensiz başlangıç paketleri</span></li>
+                        <li class="flex items-start"><i class="fas fa-check mt-1 mr-2 text-emerald-600"></i> <span>Okullarda ve kamu kurumlarında farkındalık seminerleri</span></li>
+                        <li class="flex items-start"><i class="fas fa-check mt-1 mr-2 text-emerald-600"></i> <span>Ücretsiz diyetisyen danışmanlık hizmetleri</span></li>
+                        <li class="flex items-start"><i class="fas fa-check mt-1 mr-2 text-emerald-600"></i> <span>Dernek merkezimizin işletme giderleri</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="p-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Banka Hesap Bilgilerimiz</h3>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="block text-gray-500 mb-1">Hesap Adı</span>
+                                    <span class="font-semibold text-gray-800">Kırıkkale Çölyak Derneği</span>
+                                </div>
+                                <div>
+                                    <span class="block text-gray-500 mb-1">Banka</span>
+                                    <span class="font-semibold text-gray-800">Türkiye İş Bankası</span>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <span class="block text-gray-500 mb-1">IBAN (TL)</span>
+                                    <div class="flex items-center justify-between bg-white p-3 rounded border border-gray-200">
+                                        <span class="font-mono font-bold text-gray-800 text-sm md:text-base" id="iban-text">TR00 1234 5678 9012 3456 7890 12</span>
+                                        <button onclick="copyIBAN()" class="text-emerald-600 hover:text-emerald-800 font-medium text-xs ml-2 px-3 py-1 bg-emerald-50 rounded hover:bg-emerald-100 transition">
+                                            <i class="fas fa-copy mr-1"></i> Kopyala
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500 mb-4">Bağış yapmadan önce lütfen dekont bilgisini whatsapp hattımıza bildiriniz.</p>
+                            <a href="https://wa.me/905551234567" target="_blank" class="inline-flex items-center justify-center bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition shadow-md">
+                                <i class="fab fa-whatsapp mr-2 text-xl"></i> WhatsApp'tan Bildirim Gönder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- İLETİŞİM -->
+        <section id="contact" class="page-section">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <div class="flex items-center mb-6">
+                        <div class="w-16 h-16 rounded-full overflow-hidden shadow-md mr-4 bg-emerald-100 flex items-center justify-center">
+                            <img src="logo.png" alt="Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-2xl text-emerald-600\'></i>';">
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">İletişim</h2>
+                    </div>
+                    <p class="text-gray-600 mb-8">Sorularınız için bize ulaşabilirsiniz. En kısa sürede dönüş yapacağız.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                <i class="fas fa-map-marker-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Adres</h4>
+                                <p class="text-gray-600">Yahşihan Mahallesi, Ankara Caddesi, No:123<br>Merkez/Kırıkkale</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                <i class="fas fa-phone-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Telefon</h4>
+                                <p class="text-gray-600">+90 (318) 123 45 67</p>
+                                <p class="text-gray-500 text-sm">Hafta içi: 09:00 - 17:00</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                <i class="fas fa-envelope text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">E-posta</h4>
+                                <p class="text-gray-600">info@kirikkalecolyak.org</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <h4 class="font-bold text-gray-800 mb-4">Sosyal Medya & Topluluk</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="w-10 h-10 bg-pink-600 text-white rounded-full flex items-center justify-center hover:bg-pink-700 transition"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition"><i class="fab fa-youtube"></i></a>
+                            <a href="https://chat.whatsapp.com/example" target="_blank" class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition" title="WhatsApp Grubumuza Katılın">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                        <a href="https://chat.whatsapp.com/example" target="_blank" class="inline-block mt-4 text-emerald-600 hover:underline text-sm font-medium">
+                            <i class="fab fa-whatsapp mr-1"></i> WhatsApp Topluluk Grubumuza Katılın
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <form onsubmit="event.preventDefault(); alert('Mesajınız gönderildi!'); this.reset();" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Adınız Soyadınız</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">E-posta Adresiniz</label>
+                            <input type="email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Konu</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+                                <option>Genel Bilgi</option>
+                                <option>Üyelik</option>
+                                <option>Bağış</option>
+                                <option>Şikayet/Öneri</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mesajınız</label>
+                            <textarea rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition shadow-md">
+                            <i class="fas fa-paper-plane mr-2"></i> Gönder
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-8 mt-12">
+        <div class="max-w-[1100px] mx-auto px-4 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                <img src="logo.png" alt="Logo" class="w-full h-full object-cover opacity-80" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-2xl text-gray-400\'></i>';">
+            </div>
+            <p class="mb-2">&copy; 2026 Kırıkkale Çölyak Derneği. Tüm Hakları Saklıdır.</p>
+            <p class="text-sm text-gray-500">Bu web sitesi bilgilendirme amaçlıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // RSS XML Data
+        const rssXML = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Kırıkkale Çölyak Derneği Haberleri</title>
+    <link>https://www.kirikkalecolyak.org</link>
+    <description>Kırıkkale Çölyak Derneği güncel haberleri ve duyuruları</description>
+    <language>tr</language>
+    <lastBuildDate>Mon, 17 Feb 2026 12:00:00 +0300</lastBuildDate>
+    
+    <item>
+      <title>Türkoğlu: "Çölyak hastaları için yapılan ödeme yetersiz kalıyor!"</title>
+      <link>https://www.yenigungazetesi.com.tr/saglik/turkoglu-colyak-hastalari-icin-yapilan-odeme-yetersiz-kaliyor-174057h</link>
+      <guid>https://www.yenigungazetesi.com.tr/saglik/turkoglu-colyak-hastalari-icin-yapilan-odeme-yetersiz-kaliyor-174057h</guid>
+      <description>Kırıkkale Çölyak Derneği Yönetim Kurulu Başkanı Fahri Türkoğlu, "Çölyak hastalığı, ömür boyu sıkı bir glutensiz diyetle yaşanabilen ciddi ve kronik bir hastalıktır" dedi.</description>
+      <pubDate>17.01.2026 15:03</pubDate>
+      <enclosure url="https://www.yenigungazetesi.com.tr/d/news_ts/37101.jpg" length="12345" type="image/jpeg" />
+    </item>
+    
+    <item>
+      <title>Glutensiz Yaşam Semineri Düzenlendi</title>
+      <link>https://www.kirikkalecolyak.org/haberler/glutensiz-yasam-semineri</link>
+      <guid>https://www.kirikkalecolyak.org/haberler/glutensiz-yasam-semineri</guid>
+      <description>Derneğimiz tarafından düzenlenen "Glutensiz Yaşam" semineri büyük ilgi gördü. Uzman diyetisyenler ve gastroenteroloji uzmanları katılımcılara önemli bilgiler verdi.</description>
+      <pubDate>15.02.2026 10:00:00 +0300</pubDate>
+      <enclosure url="https://via.placeholder.com/600x400/059669/ffffff?text=Seminer" length="12345" type="image/jpeg" />
+    </item>
+   
+    <item>
+      <title>Yeni İş Birlikleri ile Ürün Yelpazesi Genişliyor</title>
+      <link>https://www.kirikkalecolyak.org/haberler/yeni-is-birlikleri</link>
+      <guid>https://www.kirikkalecolyak.org/haberler/yeni-is-birlikleri</guid>
+      <description>Yerel marketler ve fırınlarla yapılan yeni anlaşmalar sayesinde üyelerimize özel indirimler ve daha geniş ürün seçenekleri sunulmaya başlandı.</description>
+      <pubDate>10.02.2026 14:30:00 +0300</pubDate>
+      <enclosure url="https://via.placeholder.com/600x400/10b981/ffffff?text=Is+Birligi" length="12345" type="image/jpeg" />
+    </item>
+
+    <item>
+      <title>Okul Kantinlerinde Glutensiz Seçenekler Artıyor</title>
+      <link>https://www.kirikkalecolyak.org/haberler/okul-kantinleri</link>
+      <guid>https://www.kirikkalecolyak.org/haberler/okul-kantinleri</guid>
+      <description>İl Milli Eğitim Müdürlüğü ile yapılan görüşmeler sonucu, okul kantinlerinde glutensiz ürünlerin bulundurulması zorunluluğu getirildi.</description>
+      <pubDate>05.02.2026 09:15:00 +0300</pubDate>
+      <enclosure url="https://via.placeholder.com/600x400/34d399/ffffff?text=Okul" length="12345" type="image/jpeg" />
+    </item>
+
+    <item>
+      <title>Üye Buluşması ve Kahvaltı Etkinliği</title>
+      <link>https://www.kirikkalecolyak.org/haberler/uye-bulusmasi</link>
+      <guid>https://www.kirikkalecolyak.org/haberler/uye-bulusmasi</guid>
+      <description>Aylık üye buluşmamızda bu ay glutensiz kahvaltı etkinliği düzenlendi. Aileler bir araya gelerek deneyimlerini paylaştı.</description>
+      <pubDate>01.02.2026 11:00:00 +0300</pubDate>
+      <enclosure url="https://via.placeholder.com/600x400/6ee7b7/ffffff?text=Kahvalti" length="12345" type="image/jpeg" />
+    </item>
+  </channel>
+</rss>`;
+
+        // Navigation Logic
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                }
+            });
+
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            if(pageId === 'guide' && !window.mapInitialized) {
+                initMap();
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Map Initialization
+        function initMap() {
+            window.mapInitialized = true;
+            const kirikkaleCenter = [39.8468, 33.5153];
+            
+            const map = L.map('map').setView(kirikkaleCenter, 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const icon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            const locations = [
+                { name: "Elit Ekmek", coords: [39.8500, 33.5200], desc: "Glutensiz fırın ürünleri" },
+                { name: "File Market", coords: [39.8450, 33.5100], desc: "Market zinciri" },
+                { name: "Migros", coords: [39.8400, 33.5050], desc: "Süpermarket" },
+                { name: "Helal Market", coords: [39.8550, 33.5250], desc: "Yerel market" }
+            ];
+
+            locations.forEach(loc => {
+                L.marker(loc.coords, {icon: icon}).addTo(map)
+                    .bindPopup(`<b>${loc.name}</b><br>${loc.desc}`);
+            });
+        }
+
+        // RSS News Functions
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        const slider = document.getElementById('newsScrollContainer');
+
+        if(slider) {
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('cursor-grabbing');
+                slider.classList.remove('cursor-grab');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+            });
+
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('cursor-grabbing');
+                slider.classList.add('cursor-grab');
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+        function parseRSS(xmlString) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+            
+            const channel = xmlDoc.querySelector('channel');
+            const items = xmlDoc.querySelectorAll('item');
+            
+            const channelInfo = {
+                title: channel?.querySelector('title')?.textContent || 'Bilinmeyen Kaynak',
+                link: channel?.querySelector('link')?.textContent || '#',
+                description: channel?.querySelector('description')?.textContent || '',
+                lastBuildDate: channel?.querySelector('lastBuildDate')?.textContent || new Date().toString()
+            };
+            
+            const newsItems = Array.from(items).map((item, index) => {
+                const title = item.querySelector('title')?.textContent || 'Başlıksız';
+                const link = item.querySelector('link')?.textContent || '#';
+                const description = item.querySelector('description')?.textContent || '';
+                const pubDate = item.querySelector('pubDate')?.textContent || '';
+                const guid = item.querySelector('guid')?.textContent || '';
+                const enclosure = item.querySelector('enclosure');
+                const imageUrl = enclosure ? enclosure.getAttribute('url') : null;
+                
+                return {
+                    id: index,
+                    title,
+                    link,
+                    description,
+                    pubDate,
+                    guid,
+                    imageUrl,
+                    source: 'Kırıkkale Çölyak Derneği'
+                };
+            });
+            
+            return { channelInfo, newsItems };
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    const parts = dateString.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
+                    if (parts) {
+                        return `${parts[1]}.${parts[2]}.${parts[3]}`;
+                    }
+                    return dateString;
+                }
+                return date.toLocaleDateString('tr-TR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function getRelativeTime(dateString) {
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diff = now - date;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                
+                if (days === 0) return 'Bugün';
+                if (days === 1) return 'Dün';
+                if (days < 7) return `${days} gün önce`;
+                if (days < 30) return `${Math.floor(days / 7)} hafta önce`;
+                return `${Math.floor(days / 30)} ay önce`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function scrollContainer(direction) {
+            const container = document.getElementById('newsScrollContainer');
+            const scrollAmount = 400;
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        function renderNews() {
+            const container = document.getElementById('newsScrollContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!container) return;
+            
+            const { channelInfo, newsItems } = parseRSS(rssXML);
+            
+            if (newsItems.length === 0) {
+                container.innerHTML = '';
+                if(emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            if(emptyState) emptyState.classList.add('hidden');
+            
+            const uniqueItems = newsItems.filter((item, index, self) => 
+                index === self.findIndex((t) => t.title === item.title)
+            );
+            
+            container.innerHTML = uniqueItems.map((item, index) => {
+                const imageHtml = item.imageUrl ? 
+                    `<div class="relative h-48 overflow-hidden">
+                        <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onerror="this.src='https://via.placeholder.com/600x400/059669/ffffff?text=Haber'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 bg-emerald-600 text-white text-xs font-semibold rounded-full shadow-lg">
+                                ${item.source}
+                            </span>
+                        </div>
+                    </div>` : 
+                    `<div class="relative h-48 bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-newspaper text-6xl text-white/20"></i>
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full border border-white/30">
+                                ${item.source}
+                            </span>
+                        </div>
+                    </div>`;
+                
+                return `
+                    <article class="news-card group flex-shrink-0 w-80 sm:w-96 bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-emerald-200 snap-center flex flex-col h-[420px] shadow-sm hover:shadow-xl">
+                        ${imageHtml}
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center text-xs text-gray-500 mb-3 space-x-2">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>${formatDate(item.pubDate)}</span>
+                                <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span class="text-emerald-600 font-medium">${getRelativeTime(item.pubDate)}</span>
+                            </div>
+                            
+                            <h2 class="text-lg font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-emerald-600 transition-colors headline leading-tight">
+                                ${item.title}
+                            </h2>
+                            
+                            <p class="text-gray-600 text-sm line-clamp-3 mb-4 flex-1 leading-relaxed">
+                                ${item.description}
+                            </p>
+                            
+                            <a href="${item.link}" target="_blank" class="inline-flex items-center justify-center w-full px-4 py-2.5 bg-gray-50 hover:bg-emerald-600 text-gray-700 hover:text-white rounded-xl transition-all duration-300 group/link border border-gray-200 hover:border-emerald-600 font-medium text-sm">
+                                <span>Haberi Oku</span>
+                                <i class="fas fa-arrow-right ml-2 transform group-hover/link:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function refreshNews() {
+            const container = document.getElementById('newsScrollContainer');
+            if(!container) return;
+            
+            container.innerHTML = `
+                <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[420px] snap-center"></div>
+                <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[420px] snap-center"></div>
+                <div class="flex-shrink-0 w-80 sm:w-96 skeleton rounded-2xl h-[420px] snap-center"></div>
+            `;
+            
+            setTimeout(() => {
+                renderNews();
+            }, 800);
+        }
+
+        // Copy IBAN Function
+        function copyIBAN() {
+            const iban = document.getElementById('iban-text').innerText.replace(/\s/g, '');
+            navigator.clipboard.writeText(iban).then(() => {
+                const btn = document.querySelector('button[onclick="copyIBAN()"]');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Kopyalandı';
+                btn.classList.add('bg-green-100', 'text-green-700');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-green-100', 'text-green-700');
+                }, 2000);
+            }).catch(err => {
+                alert("IBAN: " + iban);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(renderNews, 500);
+        });
+    </script>
+</body>
+</html>
