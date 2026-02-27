@@ -1,0 +1,56 @@
+[
+    {
+        "name": "Elit Ekmek",
+        "type": "Fırın",
+        "typeColor": "green",
+        "address": "İsmet İnönü Cad., No:22",
+        "description": "Perşembe günleri glutensiz ekmek ve sipariş üzerine özel ürünler.",
+        "tags": ["Glutensiz Ekmek", "Un"],
+        "coords": [39.840398, 33.510618]
+    },
+    {
+        "name": "File Market",
+        "type": "Market",
+        "typeColor": "blue",
+        "address": "Cumhuriyet Mah. İnönü Cad.",
+        "description": "Yerel zincir market, temel glutensiz ürünler.",
+        "tags": ["Makarna", "Un"],
+        "coords": [39.846882, 33.482444]
+    },
+    {
+        "name": "Migros MM (Podium)",
+        "type": "Süpermarket",
+        "typeColor": "orange",
+        "address": "Podium AVM",
+        "description": "Geniş glutensiz reyonu ve özel diyet ürünleri.",
+        "tags": ["Dondurulmuş", "Atıştırmalık"],
+        "coords": [39.851026, 33.482788]
+    },
+    {
+        "name": "Migros M (Yahşihan)",
+        "type": "Süpermarket",
+        "typeColor": "orange",
+        "address": "Yahşihan",
+        "description": "Standart Migros ürün yelpazesi.",
+        "tags": ["Temel Gıda"],
+        "coords": [39.855399, 33.482809]
+    },
+    {
+        "name": "Migros Jet",
+        "type": "Market",
+        "typeColor": "orange",
+        "address": "Merkez",
+        "description": "Hızlı alışveriş için temel ürünler.",
+        "tags": ["Temel Gıda"],
+        "coords": [39.850367, 33.509599]
+    },
+    {
+        "name": "Helal Market",
+        "type": "Şarküteri",
+        "typeColor": "purple",
+        "address": "Bahçelievler Mah.",
+        "description": "Yerel ürünler ve ithal glutensiz ürünler.",
+        "tags": ["Baharat", "Bakliyat"],
+        "coords": [39.842772, 33.509116]
+    }
+]
