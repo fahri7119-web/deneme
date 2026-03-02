@@ -1,0 +1,174 @@
+{
+  "mapConfig": {
+    "center": [39.85, 33.49],
+    "zoom": 13,
+    "city": "Kırıkkale"
+  },
+  "baseLayers": [
+    {
+      "name": "OpenStreetMap",
+      "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "attribution": "© OpenStreetMap contributors"
+    }
+  ],
+  "overlayLayers": [
+    {
+      "layerName": "Elit Ekmek",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "green",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "Elit Ekmek",
+          "type": "Şarküteri",
+          "iconColor": "green",
+          "address": "İsmet İnönü Cad., No:22",
+          "description": "Perşembe günleri glutensiz ekmek günü, sipariş üzerine özel ürünler.",
+          "tags": ["Glutensiz Ekmek", "Un"],
+          "coords": [39.840398, 33.510618]
+        }
+      ]
+    },
+    {
+      "layerName": "File Market",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "blue",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "File Market",
+          "type": "Market",
+          "iconColor": "blue",
+          "address": "File Market, Seyrantepe, Oktay Kırlangıç Sk No:11, Yahşihan/Kırıkkale.",
+          "description": "Yerel zincir market, temel glutensiz ürünler.siyah etiketli ürünler glutensiz.",
+          "tags": ["Makarna", "Un"],
+          "coords": [39.848628, 33.482668]
+        }
+      ]
+    },
+
+
+
+
+{
+      "layerName": "Kırıkkale Belediyesi Marketi",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "blue",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "Kırıkkale Belediyesi Marketi",
+          "type": "Market",
+          "iconColor": "blue",
+          "address": "Atatürk Bulvarı.",
+          "description": "Yerel market, Ankara Belediyesine ait ekmek ve sipariş üzerine glutensiz ürünler.",
+          "tags": ["Ekmek", "Un"],
+          "coords": [39.840663, 33.500921]
+        }
+      ]
+    },
+
+
+{
+      "layerName": "Çerez Tabağı",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "blue",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "Çerez Tabağı",
+          "type": "Kuruyemiş",
+          "iconColor": "blue",
+          "address": "Alparslan Pehlivanlı Blv.",
+          "description": "Yerel zincir market, glutensiz kuruyemiş ürünleri.",
+          "tags": ["kuruyemiş"],
+          "coords": [39.848999, 33.509945]
+        }
+      ]
+    },
+
+{
+      "layerName": "CarrefourSa",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "blue",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "CarrefourSa",
+          "type": "Market",
+          "iconColor": "blue",
+          "address": " İnönü Cad.",
+          "description": "Genel zincir market, glutensiz ürünler.",
+          "tags": ["glutensiz reyon"],
+          "coords": [39.840508, 33.510786]
+        }
+      ]
+    },
+
+{
+      "layerName": "Çarşı Gross Market",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "blue",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "Çarşı Gross Market",
+          "type": "Market",
+          "iconColor": "blue",
+          "address": "Kayseri Yolu Üzeri",
+          "description": "Yerel zincir market, temel glutensiz ürünler reyonu.",
+          "tags": ["Makarna", "Un"],
+          "coords": [39.849605, 33.482838]
+        }
+      ]
+    },
+
+
+
+    {
+      "layerName": "Helal Market",
+      "layerType": "group",
+      "visible": true,
+      "icon": {
+        "color": "darkgreen",
+        "symbol": "D",
+        "className": "custom-marker-other"
+      },
+      "stores": [
+        {
+          "name": "Helal Market",
+          "type": "Şarküteri",
+          "iconColor": "darkgreen",
+          "address": "Hüseyin Kahya Mah.",
+          "description": "Afiş markalı glutensiz pasta malzemeleri ve diğer ürünler.",
+          "tags": ["pasta malz.", "cips..."],
+          "coords": [39.843291, 33.507596]
+        }
+      ]
+    }
+  ]
+}
