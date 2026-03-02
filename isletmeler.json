@@ -126,7 +126,7 @@
     },
 
 {
-      "layerName": "Çarşı Gross Market",
+      "layerName": "Gülenler Market",
       "layerType": "group",
       "visible": true,
       "icon": {
@@ -136,7 +136,7 @@
       },
       "stores": [
         {
-          "name": "Çarşı Gross Market",
+          "name": "Gülenler Market",
           "type": "Market",
           "iconColor": "blue",
           "address": "Kayseri Yolu Üzeri",
