@@ -1,0 +1,2735 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kırıkkale Çölyak Derneği - Takip Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+            padding-left: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .top-bar {
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-bar h2 {
+            font-size: 24px;
+            color: #1f2937;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            min-width: 0;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .card.gradient-green {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+            border-color: #86efac;
+        }
+
+        .card.gradient-blue {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: #60a5fa;
+        }
+
+        .card.gradient-amber {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-color: #fcd34d;
+        }
+
+        .card.gradient-emerald {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #86efac;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 12px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #047857;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #059669;
+        }
+
+        .btn-primary:hover {
+            background-color: #047857;
+        }
+
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-amber {
+            background-color: #d97706;
+        }
+
+        .btn-amber:hover {
+            background-color: #b45309;
+        }
+
+        .btn-green {
+            background-color: #10b981;
+        }
+
+        .btn-green:hover {
+            background-color: #059669;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .btn-edit {
+            background-color: #3b82f6;
+        }
+
+        .btn-edit:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-delete {
+            background-color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+
+        /* Forms */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: minmax(400px, 1fr) minmax(600px, 2fr);
+            gap: 24px;
+            min-width: 0;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            background: linear-gradient(90deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 16px 20px;
+        }
+
+        .form-header h3 {
+            font-size: 18px;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #047857;
+        }
+
+        /* Lists */
+        .list-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            min-width: 0;
+        }
+
+        .list-header {
+            background: linear-gradient(90deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-header h3 {
+            font-size: 18px;
+        }
+
+        .list-body {
+            padding: 20px;
+            width: 100%;
+            overflow-x: visible;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead tr {
+            background-color: #f3f4f6;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Üye tablosu sütun genişlikleri */
+        #members table th:nth-child(1) { width: 15%; }
+        #members table th:nth-child(2) { width: 10%; }
+        #members table th:nth-child(3) { width: 10%; }
+        #members table th:nth-child(4) { width: 15%; }
+        #members table th:nth-child(5) { width: 15%; }
+        #members table th:nth-child(6) { width: 15%; }
+
+        /* Stok tablosu sütun genişlikleri */
+        #stock table th:nth-child(1) { width: 20%; }
+        #stock table th:nth-child(2) { width: 15%; }
+        #stock table th:nth-child(3) { width: 10%; }
+        #stock table th:nth-child(4) { width: 10%; }
+        #stock table th:nth-child(5) { width: 10%; }
+        #stock table th:nth-child(6) { width: 15%; }
+
+        /* Dağıtım tablosu sütun genişlikleri */
+        #distribution table th:nth-child(1) { width: 15%; }
+        #distribution table th:nth-child(2) { width: 15%; }
+        #distribution table th:nth-child(3) { width: 15%; }
+        #distribution table th:nth-child(4) { width: 35%; }
+        #distribution table th:nth-child(5) { width: 15%; }
+
+        /* Finansal tablosu sütun genişlikleri */
+        #financial table th:nth-child(1) { width: 10%; }
+        #financial table th:nth-child(2) { width: 8%; }
+        #financial table th:nth-child(3) { width: 15%; }
+        #financial table th:nth-child(4) { width: 25%; }
+        #financial table th:nth-child(5) { width: 12%; }
+        #financial table th:nth-child(6) { width: 15%; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background-color: #059669;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #047857;
+        }
+
+        .btn-cancel {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Settings */
+        .settings-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .settings-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .info-box {
+            background-color: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #065f46;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Statistics */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .product-chart {
+            margin-top: 16px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .chart-label {
+            width: 150px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .chart-progress {
+            flex: 1;
+            height: 24px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 12px;
+        }
+
+        .chart-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #059669 0%, #10b981 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .chart-value {
+            width: 60px;
+            text-align: right;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-green {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-yellow {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Finansal özet kutuları */
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-box.income {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #86efac;
+        }
+
+        .summary-box.expense {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 1px solid #fca5a5;
+        }
+
+        .summary-box.balance {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #93c5fd;
+        }
+
+        .summary-box-label {
+            font-size: 12px;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+
+        .summary-box-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .income { color: #059669; }
+        .expense { color: #dc2626; }
+
+        /* Ürün dağıtım öğeleri için düzenleme */
+        .distribution-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            flex-wrap: wrap;
+        }
+
+        .distribution-item select,
+        .distribution-item input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-remove {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-remove:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-add {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .btn-add:hover {
+            background-color: #2563eb;
+        }
+
+        /* ===== GİRİŞ EKRANI ===== */
+        #loginScreen {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 100%);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loginScreen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 56px;
+            margin-bottom: 8px;
+        }
+
+        .login-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        .login-form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .login-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .login-input:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+        }
+
+        .login-error {
+            background-color: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Görüntüleme modu banner */
+        #viewModeBanner {
+            display: none;
+            background: linear-gradient(90deg, #d97706, #b45309);
+            color: white;
+            padding: 8px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #viewModeBanner.show {
+            display: flex;
+        }
+
+        /* Görüntüleme modunda gizlenecek elementler */
+        body.view-mode .admin-only {
+            display: none !important;
+        }
+
+        body.view-mode .form-card {
+            display: none !important;
+        }
+
+        body.view-mode .form-container {
+            grid-template-columns: 1fr;
+        }
+
+        body.view-mode .quick-actions {
+            display: none !important;
+        }
+
+        body.view-mode #settingsAdminSection {
+            display: none !important;
+        }
+
+        /* Şifre değiştirme modalı */
+        #passwordModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #passwordModal.active {
+            display: flex;
+        }
+
+        .password-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .password-modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .password-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .password-tab {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .password-tab.active {
+            background: white;
+            color: #059669;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .password-tab-content {
+            display: none;
+        }
+
+        .password-tab-content.active {
+            display: block;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-badge.admin {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #86efac;
+        }
+
+        .user-badge.viewer {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 1200px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                table-layout: auto;
+            }
+            
+            th, td {
+                white-space: normal;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 60px;
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .sidebar-header {
+                margin-bottom: 0;
+            }
+
+            .sidebar-header h1 {
+                font-size: 16px;
+            }
+
+            .nav-items {
+                display: none;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-label {
+                width: 100px;
+            }
+
+            /* Mobilde tabloları blok olarak göster */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead {
+                display: none;
+            }
+            
+            tr {
+                margin-bottom: 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 12px;
+            }
+            
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid #e5e7eb;
+                text-align: right;
+            }
+            
+            td:last-child {
+                border-bottom: none;
+            }
+            
+            td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                margin-right: 12px;
+                text-align: left;
+            }
+            
+            .action-buttons {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .distribution-item {
+                flex-direction: column;
+            }
+            
+            .distribution-item select,
+            .distribution-item input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== GİRİŞ EKRANI ===== -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🌿</div>
+            <div class="login-title">Kırıkkale Çölyak Derneği</div>
+            <div class="login-subtitle">Takip Sistemine Giriş</div>
+
+            <div class="login-error" id="loginError">Hatalı şifre! Lütfen tekrar deneyiniz.</div>
+
+            <div class="login-form-group">
+                <label for="loginPassword">🔒 Giriş Şifresi</label>
+                <input type="password" id="loginPassword" class="login-input" placeholder="Şifrenizi giriniz..." onkeydown="if(event.key==='Enter') doLogin()" autofocus>
+            </div>
+
+            <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+
+            <div class="login-footer">
+                Admin Şifresi: admin123 &nbsp;|&nbsp; Görüntüleme Şifresi: goruntule123
+            </div>
+        </div>
+    </div>
+
+    <!-- Görüntüleme Modu Bilgi Bantı -->
+    <div id="viewModeBanner">
+        <span>👁️ GÖRÜNTÜLEME MODU — Sadece okuma yetkisi ile giriş yapıldı. Düzenleme ve ekleme işlemleri devre dışı.</span>
+    </div>
+
+    <!-- Şifre Yönetimi Modalı -->
+    <div id="passwordModal">
+        <div class="password-modal-content">
+            <div class="password-modal-title">🔐 Şifre Yönetimi</div>
+
+            <div class="password-tabs">
+                <button class="password-tab active" onclick="switchPasswordTab('admin')">Admin Şifresi</button>
+                <button class="password-tab" onclick="switchPasswordTab('viewer')">Görüntüleme Şifresi</button>
+            </div>
+
+            <div id="tabAdmin" class="password-tab-content active">
+                <div class="form-group">
+                    <label>Mevcut Admin Şifresi</label>
+                    <input type="password" id="currentAdminPw" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Mevcut şifre">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Admin Şifresi</label>
+                    <input type="password" id="newAdminPw" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Yeni şifre (min. 4 karakter)">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Şifre (Tekrar)</label>
+                    <input type="password" id="newAdminPw2" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Yeni Şifreyi tekrar giriniz">
+                </div>
+                <div id="adminPwError" style="color:#dc2626; font-size:13px; margin-bottom:8px; display:none;"></div>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button class="btn btn-primary" onclick="changeAdminPassword()" style="flex:1;">Kaydet</button>
+                    <button class="btn" style="background:#e5e7eb; color:#374151; flex:1;" onclick="closePasswordModal()">Vazgeç</button>
+                </div>
+            </div>
+
+            <div id="tabViewer" class="password-tab-content">
+                <div class="form-group">
+                    <label>Mevcut Admin Şifresi (Doğrulama)</label>
+                    <input type="password" id="confirmAdminForViewer" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Admin Şifresini giriniz">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Görüntüleme Şifresi</label>
+                    <input type="password" id="newViewerPw" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Yeni şifre (min. 4 karakter)">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Şifre (Tekrar)</label>
+                    <input type="password" id="newViewerPw2" class="login-input" style="border:1px solid #d1d5db; border-radius:6px; padding:10px 12px; font-size:14px;" placeholder="Yeni Şifreyi tekrar giriniz">
+                </div>
+                <div id="viewerPwError" style="color:#dc2626; font-size:13px; margin-bottom:8px; display:none;"></div>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button class="btn btn-primary" onclick="changeViewerPassword()" style="flex:1;">Kaydet</button>
+                    <button class="btn" style="background:#e5e7eb; color:#374151; flex:1;" onclick="closePasswordModal()">Vazgeç</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🌿 Çölyak</h1>
+                <p>Kırıkkale Derneği</p>
+            </div>
+            <div class="nav-items">
+                <button class="nav-item active" onclick="showPage('dashboard')">📊 Anasayfa</button>
+                <button class="nav-item" onclick="showPage('members')">👥 Üyeler</button>
+                <button class="nav-item" onclick="showPage('stock')">📦 Stok Yönetimi</button>
+                <button class="nav-item" onclick="showPage('distribution')">🚚 Ürün Dağıtım</button>
+                <button class="nav-item" onclick="showPage('financial')">💰 Gelir-Gider</button>
+                <button class="nav-item" onclick="showPage('reports')">📈 İstatistikler</button>
+                <button class="nav-item" onclick="showPage('settings')">⚙️ Ayarlar</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h2 id="pageTitle">Anasayfa</h2>
+                <div class="top-bar-right">
+                    <span id="userBadge" class="user-badge admin">👤 Admin</span>
+                    <button class="logout-btn" onclick="doLogout()">🔓 Çıkış</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard -->
+                <div id="dashboard" class="dashboard active">
+                    <div class="summary-cards">
+                        <div class="card gradient-green">
+                            <div class="card-header">👥 Toplam Üye</div>
+                            <div class="card-value" id="totalMembers">0</div>
+                        </div>
+                        <div class="card gradient-blue">
+                            <div class="card-header">📦 Aktif Ürünler</div>
+                            <div class="card-value" id="activeProducts">0</div>
+                        </div>
+                        <div class="card gradient-amber">
+                            <div class="card-header">🚚 Dağıtımlar</div>
+                            <div class="card-value" id="totalDistributions">0</div>
+                        </div>
+                        <div class="card gradient-emerald">
+                            <div class="card-header">💵 Kasa Bakiyesi</div>
+                            <div class="card-value" id="totalBalance">0 ₺</div>
+                        </div>
+                    </div>
+
+                    <div class="card admin-only">
+                        <h3 style="margin-bottom: 16px;">Hızlı İşlemler</h3>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" onclick="showPage('members')">+ Üye Kayıt</button>
+                            <button class="btn btn-blue" onclick="showPage('stock')">+ Stok Giriş</button>
+                            <button class="btn btn-amber" onclick="showPage('distribution')">+ Ürün Dağıt</button>
+                            <button class="btn btn-green" onclick="showPage('financial')">+ Finansal Kayıt</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Page -->
+                <div id="members" class="form-section">
+                    <div class="form-container">
+                        <!-- Form -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>Yeni Üye Kayıt</h3>
+                            </div>
+                            <div class="form-body">
+                                <form id="memberForm" onsubmit="addMember(event)">
+                                    <div class="form-group">
+                                        <label>Adı *</label>
+                                        <input type="text" id="memberFirstName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Soyadı *</label>
+                                        <input type="text" id="memberLastName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Doğum Tarihi</label>
+                                        <input type="date" id="memberBirthDate">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mesleği</label>
+                                        <input type="text" id="memberProfession">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>TC Kimlik No *</label>
+                                        <input type="text" id="memberTcId" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Telefon</label>
+                                        <input type="tel" id="memberPhone">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">Üyeyi Kaydet</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- List -->
+                        <div class="list-container">
+                            <div class="list-header">
+                                <h3>👥 Kayıtlı Üyeler</h3>
+                            </div>
+                            <div class="list-body">
+                                <div id="membersList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Page -->
+                <div id="stock" class="form-section">
+                    <div class="form-container">
+                        <!-- Form -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>Stok Giriş</h3>
+                            </div>
+                            <div class="form-body">
+                                <form id="stockForm" onsubmit="addStock(event)">
+                                    <div class="form-group">
+                                        <label>Ürün Adı *</label>
+                                        <input type="text" id="stockProductName" placeholder="Glutensiz Un, Makarna vb." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Giriş Tarihi *</label>
+                                        <input type="date" id="stockEntryDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Miktar *</label>
+                                        <input type="number" id="stockQuantity" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Birim</label>
+                                        <select id="stockUnit">
+                                            <option>Adet</option>
+                                            <option>Kg</option>
+                                            <option>Litre</option>
+                                            <option>Paket</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">Stok Ekle</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- List -->
+                        <div class="list-container">
+                            <div class="list-header">
+                                <h3>📦 Stok Durumu</h3>
+                            </div>
+                            <div class="list-body">
+                                <div id="stockList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribution Page -->
+                <div id="distribution" class="form-section">
+                    <div class="form-container">
+                        <!-- Form -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>Ürün Dağıtım (FIFO)</h3>
+                            </div>
+                            <div class="form-body">
+                                <form id="distributionForm" onsubmit="addDistribution(event)">
+                                    <div class="form-group">
+                                        <label>Makbuz No *</label>
+                                        <input type="text" id="receiptNumber" placeholder="Örn: MK-2026-001" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Üye Seçimi *</label>
+                                        <select id="distributionMember" required>
+                                            <option value="">Seçiniz...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dağıtım Tarihi</label>
+                                        <input type="date" id="distributionDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="margin-bottom: 12px;">Ürünler (Max 4)</label>
+                                        <div id="distributionItems"></div>
+                                        <button type="button" class="btn-add" onclick="addDistributionItem()">+ Ürün Ekle</button>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">Dağıtımı Kaydet</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- List -->
+                        <div class="list-container">
+                            <div class="list-header">
+                                <h3>🚚 Dağıtım Kayıtları</h3>
+                            </div>
+                            <div class="list-body">
+                                <div id="distributionList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Page -->
+                <div id="financial" class="form-section">
+                    <div class="form-container">
+                        <!-- Form -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>Gelir-Gider Kaydı</h3>
+                            </div>
+                            <div class="form-body">
+                                <form id="financialForm" onsubmit="addFinancial(event)">
+                                    <div class="form-group">
+                                        <label>Tarih</label>
+                                        <input type="date" id="financialDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tür *</label>
+                                        <select id="financialType" required>
+                                            <option value="Gelir">Gelir</option>
+                                            <option value="Gider">Gider</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ödeme Yöntemi *</label>
+                                        <select id="paymentMethod" required onchange="updatePaymentFields()">
+                                            <option value="">Seçiniz...</option>
+                                            <option value="Nakit">Nakit</option>
+                                            <option value="Banka">Banka Transferi</option>
+                                            <option value="Makbuz">Makbuz</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" id="dekontField" style="display:none;">
+                                        <label>Dekont No</label>
+                                        <input type="text" id="dekontNumber" placeholder="Örn: DEKONT-2026-001">
+                                    </div>
+                                    <div class="form-group" id="makbuzField" style="display:none;">
+                                        <label>Makbuz No</label>
+                                        <input type="text" id="makbuzNumber" placeholder="Örn: MK-2026-001">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Açıklama *</label>
+                                        <textarea id="financialDescription" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tutar (₺) *</label>
+                                        <input type="number" id="financialAmount" step="0.01" required>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">Kayıt Ekle</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- List -->
+                        <div class="list-container">
+                            <div class="list-header">
+                                <h3>💰 Finansal Kayıtlar</h3>
+                            </div>
+                            <div class="list-body">
+                                <div id="financialSummary"></div>
+                                <div id="financialList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports" class="form-section">
+                    <div id="reportsContent"></div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings" class="form-section">
+                    <div class="settings-container">
+                        <h2 style="margin-bottom: 24px;">Ayarlar ve Veri Yönetimi</h2>
+
+                        <div class="settings-section">
+                            <h3>💾 Veri Depolama</h3>
+                            <div class="info-box">
+                                <strong>Veriler Nerede Saklanıyor?</strong>
+                                Tüm verileriniz tarayıcınızın <strong>LocalStorage</strong> özelliğinde saklanmaktadır. Bu, verilerin sadece sizin bilgisayarınızda güvenli bir şekilde tutulduğu anlamına gelir. İnternet bağlantısı gerekmez.
+                            </div>
+                            <div class="info-box">
+                                <strong>⚠️ Önemli:</strong>
+                                Tarayıcı verileri temizlerseniz (cache temizleme), tüm veriler silinir. Lütfen düzenli olarak yedek alınız.
+                            </div>
+                        </div>
+
+                        <div class="settings-section admin-only">
+                            <h3>📥 Verileri İçe Aktar</h3>
+                            <p style="margin-bottom: 12px; font-size: 14px; color: #6b7280;">Daha önce dışa aktardığınız JSON dosyasını yükleyin.</p>
+                            <div class="settings-buttons">
+                                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">📂 Dosya Seç</button>
+                                <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>📤 Verileri Dışa Aktar</h3>
+                            <p style="margin-bottom: 12px; font-size: 14px; color: #6b7280;">Tüm verilerinizi JSON formatında indirin (yedek için).</p>
+                            <div class="settings-buttons">
+                                <button class="btn btn-blue" onclick="exportDataJSON()">📥 JSON Olarak İndir</button>
+                                <button class="btn btn-green" onclick="exportDataCSV()">📊 CSV Olarak İndir</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-section admin-only" id="settingsAdminSection">
+                            <h3>🔐 Şifre Yönetimi</h3>
+                            <p style="margin-bottom: 12px; font-size: 14px; color: #6b7280;">Admin ve görüntüleme şifrelerini buradan değiştirebilirsiniz.</p>
+                            <div class="settings-buttons">
+                                <button class="btn btn-primary" onclick="openPasswordModal('admin')">Admin Şifresini Değiştir</button>
+                                <button class="btn btn-blue" onclick="openPasswordModal('viewer')">Görüntüleme Şifresini Değiştir</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-section admin-only">
+                            <h3>🗑️ Verileri Sil</h3>
+                            <p style="margin-bottom: 12px; font-size: 14px; color: #6b7280;">Tüm verileri kalıcı olarak silin. Bu işlem geri alınamaz!</p>
+                            <div class="settings-buttons">
+                                <button class="btn btn-delete" onclick="clearAllData()">Tüm Verileri Sil</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+            <div class="modal-header" id="editModalTitle"></div>
+            <div id="editModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveEdit()">Kaydet</button>
+                <button class="btn-cancel" onclick="closeEditModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let data = {
+            members: [],
+            stock: [],
+            distributions: [],
+            financial: []
+        };
+
+        let editingData = null;
+
+        const API_URL = 'http://localhost:5000/api';
+
+        // Load data from API
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_URL}/data`);
+                if (response.ok) {
+                    data = await response.json();
+                }
+                
+                // Load passwords
+                const settingsResponse = await fetch(`${API_URL}/settings`);
+                if (settingsResponse.ok) {
+                    const settings = await settingsResponse.json();
+                    DEFAULT_ADMIN_PW = settings.admin_pw || 'admin123';
+                    DEFAULT_VIEWER_PW = settings.viewer_pw || 'goruntule123';
+                }
+            } catch (error) {
+                console.error('Veri yükleme hatası:', error);
+            }
+            
+            // Set today's date as default
+            document.getElementById('stockEntryDate').valueAsDate = new Date();
+            document.getElementById('distributionDate').valueAsDate = new Date();
+            document.getElementById('financialDate').valueAsDate = new Date();
+            
+            updateDashboard();
+            renderMembers();
+            renderStock();
+            renderDistributions();
+            renderFinancial();
+        }
+
+        // Save data to API
+        async function saveData() {
+            try {
+                const response = await fetch(`${API_URL}/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Kaydetme hatası');
+                }
+                
+                updateDashboard();
+            } catch (error) {
+                console.error('Veri kaydetme hatası:', error);
+                alert('Veriler sunucuya kaydedilemedi!');
+            }
+        }
+
+        // Export Data as JSON
+        function exportDataJSON() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `colyak-veriler-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            alert('Veriler JSON formatında indirildi!');
+        }
+
+        // Export Data as CSV
+        function exportDataCSV() {
+            let csv = 'ÜYELER\n';
+            csv += 'Ad,Soyad,Doğum Tarihi,Meslek,TC No,Telefon\n';
+            data.members.forEach(m => {
+                csv += `"${m.firstName}","${m.lastName}","${m.birthDate}","${m.profession}","${m.tcId}","${m.phone}"\n`;
+            });
+
+            csv += '\nSTOK\n';
+            csv += 'Ürün Adı,Giriş Tarihi,Alınan Miktar,Kalan Miktar,Birim\n';
+            data.stock.forEach(s => {
+                csv += `"${s.productName}","${s.entryDate}","${s.receivedQuantity}","${s.remainingQuantity}","${s.unit}"\n`;
+            });
+
+            csv += '\nDAĞITIM\n';
+            csv += 'Makbuz No,Üye,Tarih,Ürün,Miktar,Birim\n';
+            data.distributions.forEach(d => {
+                const member = data.members.find(m => m.id === d.memberId);
+                const memberName = member ? `${member.firstName} ${member.lastName}` : 'Bilinmeyen';
+                d.items.forEach(item => {
+                    csv += `"${d.receiptNumber}","${memberName}","${d.distributionDate}","${item.productName}","${item.quantity}","${item.unit}"\n`;
+                });
+            });
+
+            csv += '\nFİNANSAL\n';
+            csv += 'Tarih,Tür,Ödeme Yöntemi,Dekont/Makbuz No,Açıklama,Tutar\n';
+            data.financial.forEach(f => {
+                const refNumber = f.dekontNumber || f.makbuzNumber || '-';
+                csv += `"${f.date}","${f.type}","${f.paymentMethod || '-'}","${refNumber}","${f.description}","${f.amount}"\n`;
+            });
+
+            const csvBlob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(csvBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `colyak-veriler-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            alert('Veriler CSV formatında indirildi!');
+        }
+
+        // Import Data
+        function importData(event) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (confirm('Mevcut verilerin üzerine yazılacak. Devam etmek istiyor musunuz?')) {
+                        data = imported;
+                        saveData();
+                        alert('Veriler başarıyla içe aktarıldı!');
+                        location.reload();
+                    }
+                } catch (error) {
+                    alert('Dosya okunamadı. Lütfen geçerli bir JSON dosyası seçiniz.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            if (confirm('Tüm verileri silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+                if (confirm('Son kez onaylayın: Tüm veriler silinecek!')) {
+                    data = { members: [], stock: [], distributions: [], financial: [] };
+                    saveData();
+                    alert('Tüm veriler silindi!');
+                    location.reload();
+                }
+            }
+        }
+
+        // Show page
+        function showPage(page) {
+            // Hide all sections
+            document.querySelectorAll('.form-section, .dashboard').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Remove active from nav items
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(page).classList.add('active');
+            event.target.classList.add('active');
+
+            // Update title
+            const titles = {
+                dashboard: 'Anasayfa',
+                members: 'Üyeler',
+                stock: 'Stok Yönetimi',
+                distribution: 'Ürün Dağıtım',
+                financial: 'Gelir-Gider',
+                reports: 'İstatistikler ve Raporlar',
+                settings: 'Ayarlar'
+            };
+            document.getElementById('pageTitle').textContent = titles[page];
+
+            // Refresh lists
+            if (page === 'members') {
+                renderMembers();
+            } else if (page === 'stock') {
+                renderStock();
+            } else if (page === 'distribution') {
+                renderDistributions();
+                updateMemberSelect();
+                renderDistributionItems();
+            } else if (page === 'financial') {
+                renderFinancial();
+            } else if (page === 'reports') {
+                renderReports();
+            }
+        }
+
+        // Add Member
+        function addMember(e) {
+            e.preventDefault();
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const member = {
+                id: Date.now(),
+                firstName: document.getElementById('memberFirstName').value,
+                lastName: document.getElementById('memberLastName').value,
+                birthDate: document.getElementById('memberBirthDate').value,
+                profession: document.getElementById('memberProfession').value,
+                tcId: document.getElementById('memberTcId').value,
+                phone: document.getElementById('memberPhone').value,
+                registrationDate: new Date().toISOString().split('T')[0]
+            };
+
+            data.members.push(member);
+            saveData();
+            document.getElementById('memberForm').reset();
+            alert('Üye başarıyla kaydedildi!');
+            renderMembers();
+        }
+
+        // Edit Member
+        function editMember(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const member = data.members.find(m => m.id === id);
+            if (!member) return;
+
+            editingData = { type: 'member', id, data: member };
+            document.getElementById('editModalTitle').textContent = 'Üye Bilgilerini Düzenle';
+            
+            const html = `
+                <div class="form-group">
+                    <label>Adı</label>
+                    <input type="text" id="editFirstName" value="${member.firstName}">
+                </div>
+                <div class="form-group">
+                    <label>Soyadı</label>
+                    <input type="text" id="editLastName" value="${member.lastName}">
+                </div>
+                <div class="form-group">
+                    <label>Doğum Tarihi</label>
+                    <input type="date" id="editBirthDate" value="${member.birthDate || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Mesleği</label>
+                    <input type="text" id="editProfession" value="${member.profession || ''}">
+                </div>
+                <div class="form-group">
+                    <label>TC Kimlik No</label>
+                    <input type="text" id="editTcId" value="${member.tcId}">
+                </div>
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="tel" id="editPhone" value="${member.phone || ''}">
+                </div>
+            `;
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Delete Member
+        function deleteMember(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            if (confirm('Bu üyeyi silmek istediğinize emin misiniz?')) {
+                data.members = data.members.filter(m => m.id !== id);
+                saveData();
+                renderMembers();
+                alert('Üye başarıyla silindi!');
+            }
+        }
+
+        // Render Members
+        function renderMembers() {
+            const container = document.getElementById('membersList');
+            if (data.members.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz üye kaydı yapılmamıştır</p></div>';
+                return;
+            }
+
+            const isAdmin = currentUserMode === 'admin';
+            let html = '<table><thead><tr><th>Ad Soyad</th><th>Doğum Tarihi</th><th>Meslek</th><th>TC No</th><th>Telefon</th>' + (isAdmin ? '<th>İşlemler</th>' : '') + '</tr></thead><tbody>';
+            data.members.forEach(member => {
+                html += `<tr>
+                    <td data-label="Ad Soyad">${member.firstName} ${member.lastName}</td>
+                    <td data-label="Doğum Tarihi">${member.birthDate ? new Date(member.birthDate).toLocaleDateString('tr-TR') : '-'}</td>
+                    <td data-label="Meslek">${member.profession || '-'}</td>
+                    <td data-label="TC No">${member.tcId}</td>
+                    <td data-label="Telefon">${member.phone || '-'}</td>
+                    ${isAdmin ? `<td data-label="İşlemler"><div class="action-buttons"><button class="btn btn-edit btn-small" onclick="editMember(${member.id})">Düzenle</button><button class="btn btn-delete btn-small" onclick="deleteMember(${member.id})">Sil</button></div></td>` : ''}
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Add Stock
+        function addStock(e) {
+            e.preventDefault();
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const stock = {
+                id: Date.now(),
+                productName: document.getElementById('stockProductName').value,
+                entryDate: document.getElementById('stockEntryDate').value,
+                receivedQuantity: parseFloat(document.getElementById('stockQuantity').value),
+                remainingQuantity: parseFloat(document.getElementById('stockQuantity').value),
+                unit: document.getElementById('stockUnit').value
+            };
+
+            data.stock.push(stock);
+            saveData();
+            document.getElementById('stockForm').reset();
+            alert('Stok başarıyla eklendi!');
+            renderStock();
+        }
+
+        // Edit Stock
+        function editStock(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const stock = data.stock.find(s => s.id === id);
+            if (!stock) return;
+
+            editingData = { type: 'stock', id, data: stock };
+            document.getElementById('editModalTitle').textContent = 'Stok Bilgilerini Düzenle';
+            
+            const html = `
+                <div class="form-group">
+                    <label>Ürün Adı</label>
+                    <input type="text" id="editProductName" value="${stock.productName}">
+                </div>
+                <div class="form-group">
+                    <label>Giriş Tarihi</label>
+                    <input type="date" id="editEntryDate" value="${stock.entryDate}">
+                </div>
+                <div class="form-group">
+                    <label>Alınan Miktar</label>
+                    <input type="number" id="editReceivedQuantity" step="0.01" value="${stock.receivedQuantity}">
+                </div>
+                <div class="form-group">
+                    <label>Kalan Miktar</label>
+                    <input type="number" id="editRemainingQuantity" step="0.01" value="${stock.remainingQuantity}">
+                </div>
+                <div class="form-group">
+                    <label>Birim</label>
+                    <select id="editUnit">
+                        <option ${stock.unit === 'Adet' ? 'selected' : ''}>Adet</option>
+                        <option ${stock.unit === 'Kg' ? 'selected' : ''}>Kg</option>
+                        <option ${stock.unit === 'Litre' ? 'selected' : ''}>Litre</option>
+                        <option ${stock.unit === 'Paket' ? 'selected' : ''}>Paket</option>
+                    </select>
+                </div>
+            `;
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Delete Stock
+        function deleteStock(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            if (confirm('Bu stok kaydını silmek istediğinize emin misiniz?')) {
+                data.stock = data.stock.filter(s => s.id !== id);
+                saveData();
+                renderStock();
+                alert('Stok kaydı başarıyla silindi!');
+            }
+        }
+
+        // Render Stock
+        function renderStock() {
+            const container = document.getElementById('stockList');
+            if (data.stock.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz stok kaydı yapılmamıştır</p></div>';
+                return;
+            }
+
+            const isAdmin = currentUserMode === 'admin';
+            let html = '<table><thead><tr><th>Ürün Adı</th><th>Giriş Tarihi</th><th>Alınan</th><th>Kalan</th><th>Birim</th>' + (isAdmin ? '<th>İşlemler</th>' : '') + '</tr></thead><tbody>';
+            data.stock.forEach(stock => {
+                const statusClass = stock.remainingQuantity > 20 ? 'badge-green' : stock.remainingQuantity > 10 ? 'badge-yellow' : 'badge-red';
+                html += `<tr>
+                    <td data-label="Ürün Adı">${stock.productName}</td>
+                    <td data-label="Giriş Tarihi">${new Date(stock.entryDate).toLocaleDateString('tr-TR')}</td>
+                    <td data-label="Alınan">${stock.receivedQuantity}</td>
+                    <td data-label="Kalan"><span class="badge ${statusClass}">${stock.remainingQuantity}</span></td>
+                    <td data-label="Birim">${stock.unit}</td>
+                    ${isAdmin ? `<td data-label="İşlemler"><div class="action-buttons"><button class="btn btn-edit btn-small" onclick="editStock(${stock.id})">Düzenle</button><button class="btn btn-delete btn-small" onclick="deleteStock(${stock.id})">Sil</button></div></td>` : ''}
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Update Member Select
+        function updateMemberSelect() {
+            const select = document.getElementById('distributionMember');
+            select.innerHTML = '<option value="">Seçiniz...</option>';
+            data.members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = `${member.firstName} ${member.lastName}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Add Distribution Item
+        function addDistributionItem() {
+            const container = document.getElementById('distributionItems');
+            const count = container.children.length;
+            if (count >= 4) {
+                alert('Maksimum 4 ürün ekleyebilirsiniz');
+                return;
+            }
+
+            const products = [...new Set(data.stock.map(s => s.productName))];
+            const html = `<div class="distribution-item" id="item-${count}">
+                <select class="product-select" onchange="updateStockInfo(${count})">
+                    <option value="">Ürün Seçiniz</option>
+                    ${products.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+                <input type="number" class="quantity-input" step="0.01" placeholder="Miktar">
+                <select class="unit-select">
+                    <option>Adet</option>
+                    <option>Kg</option>
+                    <option>Litre</option>
+                    <option>Paket</option>
+                </select>
+                <button type="button" class="btn-remove" onclick="removeDistributionItem(${count})">Sil</button>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Remove Distribution Item
+        function removeDistributionItem(index) {
+            document.getElementById(`item-${index}`).remove();
+        }
+
+        // Render Distribution Items
+        function renderDistributionItems() {
+            const container = document.getElementById('distributionItems');
+            container.innerHTML = '';
+            addDistributionItem();
+        }
+
+        // Add Distribution
+        function addDistribution(e) {
+            e.preventDefault();
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const memberId = document.getElementById('distributionMember').value;
+            const items = [];
+
+            document.querySelectorAll('.distribution-item').forEach(item => {
+                const productName = item.querySelector('.product-select').value;
+                const quantity = parseFloat(item.querySelector('.quantity-input').value);
+                const unit = item.querySelector('.unit-select').value;
+
+                if (productName && quantity > 0) {
+                    items.push({ productName, quantity, unit });
+                }
+            });
+
+            if (items.length === 0) {
+                alert('Lütfen en az bir ürün seçiniz');
+                return;
+            }
+
+            // FIFO: Deduct from stock
+            items.forEach(item => {
+                let remaining = item.quantity;
+                const stockItems = data.stock
+                    .filter(s => s.productName === item.productName && s.remainingQuantity > 0)
+                    .sort((a, b) => new Date(a.entryDate) - new Date(b.entryDate));
+
+                stockItems.forEach(stock => {
+                    if (remaining <= 0) return;
+                    const deduct = Math.min(remaining, stock.remainingQuantity);
+                    stock.remainingQuantity -= deduct;
+                    remaining -= deduct;
+                });
+            });
+
+            const distribution = {
+                id: Date.now(),
+                receiptNumber: document.getElementById('receiptNumber').value,
+                memberId: parseInt(memberId),
+                distributionDate: document.getElementById('distributionDate').value,
+                items: items
+            };
+
+            data.distributions.push(distribution);
+            saveData();
+            document.getElementById('distributionForm').reset();
+            renderDistributionItems();
+            alert('Dağıtım kaydedildi ve stoktan FIFO usulü düşüldü!');
+            renderDistributions();
+            renderStock();
+        }
+
+        // Edit Distribution Modal
+        function editDistributionModal(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const dist = data.distributions.find(d => d.id === id);
+            if (!dist) return;
+
+            editingData = { type: 'distribution', id, data: dist };
+            document.getElementById('editModalTitle').textContent = 'Dağıtımı Düzenle';
+            
+            const products = [...new Set(data.stock.map(s => s.productName))];
+
+            let html = `
+                <div class="form-group">
+                    <label>Makbuz No</label>
+                    <input type="text" id="editReceiptNumber" value="${dist.receiptNumber}">
+                </div>
+                <div class="form-group">
+                    <label>Üye</label>
+                    <select id="editDistMember">
+                        ${data.members.map(m => `<option value="${m.id}" ${m.id === dist.memberId ? 'selected' : ''}>${m.firstName} ${m.lastName}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dağıtım Tarihi</label>
+                    <input type="date" id="editDistDate" value="${dist.distributionDate}">
+                </div>
+                <div class="form-group">
+                    <label>Ürünler</label>
+                    <div id="editDistributionItems">`;
+            
+            dist.items.forEach((item, idx) => {
+                html += `<div class="edit-dist-item" style="margin-bottom: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                    <select class="edit-product-select" style="width: 100%; margin-bottom: 8px; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+                        ${products.map(p => `<option value="${p}" ${p === item.productName ? 'selected' : ''}>${p}</option>`).join('')}
+                    </select>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" class="edit-quantity-input" step="0.01" value="${item.quantity}" style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <select class="edit-unit-select" style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+                            <option ${item.unit === 'Adet' ? 'selected' : ''}>Adet</option>
+                            <option ${item.unit === 'Kg' ? 'selected' : ''}>Kg</option>
+                            <option ${item.unit === 'Litre' ? 'selected' : ''}>Litre</option>
+                            <option ${item.unit === 'Paket' ? 'selected' : ''}>Paket</option>
+                        </select>
+                    </div>
+                </div>`;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Delete Distribution
+        function deleteDistribution(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            if (confirm('Bu dağıtım kaydını silmek istediğinize emin misiniz?')) {
+                const dist = data.distributions.find(d => d.id === id);
+                if (dist) {
+                    // Restore stock
+                    dist.items.forEach(item => {
+                        const stockItems = data.stock
+                            .filter(s => s.productName === item.productName)
+                            .sort((a, b) => new Date(a.entryDate) - new Date(b.entryDate));
+                        
+                        let remaining = item.quantity;
+                        for (let stock of stockItems) {
+                            if (remaining <= 0) break;
+                            const restore = Math.min(remaining, stock.receivedQuantity - stock.remainingQuantity);
+                            stock.remainingQuantity += restore;
+                            remaining -= restore;
+                        }
+                    });
+                }
+                data.distributions = data.distributions.filter(d => d.id !== id);
+                saveData();
+                renderDistributions();
+                renderStock();
+                alert('Dağıtım kaydı silindi ve stok geri yüklendi!');
+            }
+        }
+
+        // Render Distributions
+        function renderDistributions() {
+            const container = document.getElementById('distributionList');
+            if (data.distributions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz ürün dağıtımı yapılmamıştır</p></div>';
+                return;
+            }
+
+            const isAdmin = currentUserMode === 'admin';
+            let html = '<table><thead><tr><th>Makbuz No</th><th>Üye Adı</th><th>Tarih</th><th>Ürünler</th>' + (isAdmin ? '<th>İşlemler</th>' : '') + '</tr></thead><tbody>';
+            data.distributions.forEach(dist => {
+                const member = data.members.find(m => m.id === dist.memberId);
+                const memberName = member ? `${member.firstName} ${member.lastName}` : 'Bilinmeyen';
+                const items = dist.items.map(i => `${i.productName} (${i.quantity} ${i.unit})`).join(', ');
+                
+                html += `<tr>
+                    <td data-label="Makbuz No"><strong>${dist.receiptNumber}</strong></td>
+                    <td data-label="Üye Adı">${memberName}</td>
+                    <td data-label="Tarih">${new Date(dist.distributionDate).toLocaleDateString('tr-TR')}</td>
+                    <td data-label="Ürünler">${items}</td>
+                    ${isAdmin ? `<td data-label="İşlemler"><div class="action-buttons"><button class="btn btn-edit btn-small" onclick="editDistributionModal(${dist.id})">Düzenle</button><button class="btn btn-delete btn-small" onclick="deleteDistribution(${dist.id})">Sil</button></div></td>` : ''}
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Update Payment Fields
+        function updatePaymentFields() {
+            const method = document.getElementById('paymentMethod').value;
+            document.getElementById('dekontField').style.display = method === 'Banka' ? 'block' : 'none';
+            document.getElementById('makbuzField').style.display = method === 'Makbuz' ? 'block' : 'none';
+        }
+
+        // Add Financial
+        function addFinancial(e) {
+            e.preventDefault();
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const record = {
+                id: Date.now(),
+                date: document.getElementById('financialDate').value,
+                description: document.getElementById('financialDescription').value,
+                type: document.getElementById('financialType').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                dekontNumber: document.getElementById('dekontNumber').value || null,
+                makbuzNumber: document.getElementById('makbuzNumber').value || null,
+                amount: parseFloat(document.getElementById('financialAmount').value)
+            };
+
+            data.financial.push(record);
+            saveData();
+            document.getElementById('financialForm').reset();
+            updatePaymentFields();
+            alert('Finansal kayıt başarıyla eklendi!');
+            renderFinancial();
+        }
+
+        // Edit Financial
+        function editFinancial(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            const record = data.financial.find(r => r.id === id);
+            if (!record) return;
+
+            editingData = { type: 'financial', id, data: record };
+            document.getElementById('editModalTitle').textContent = 'Finansal Kaydı Düzenle';
+            
+            const html = `
+                <div class="form-group">
+                    <label>Tarih</label>
+                    <input type="date" id="editFinDate" value="${record.date}">
+                </div>
+                <div class="form-group">
+                    <label>Tür</label>
+                    <select id="editFinType">
+                        <option ${record.type === 'Gelir' ? 'selected' : ''}>Gelir</option>
+                        <option ${record.type === 'Gider' ? 'selected' : ''}>Gider</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ödeme Yöntemi</label>
+                    <select id="editPaymentMethod" onchange="updateEditPaymentFields()">
+                        <option value="">Seçiniz...</option>
+                        <option ${record.paymentMethod === 'Nakit' ? 'selected' : ''}>Nakit</option>
+                        <option ${record.paymentMethod === 'Banka' ? 'selected' : ''}>Banka Transferi</option>
+                        <option ${record.paymentMethod === 'Makbuz' ? 'selected' : ''}>Makbuz</option>
+                    </select>
+                </div>
+                <div class="form-group" id="editDekontField" style="display:${record.paymentMethod === 'Banka' ? 'block' : 'none'};">
+                    <label>Dekont No</label>
+                    <input type="text" id="editDekontNumber" value="${record.dekontNumber || ''}">
+                </div>
+                <div class="form-group" id="editMakbuzField" style="display:${record.paymentMethod === 'Makbuz' ? 'block' : 'none'};">
+                    <label>Makbuz No</label>
+                    <input type="text" id="editMakbuzNumber" value="${record.makbuzNumber || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea id="editFinDesc">${record.description}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tutar (₺)</label>
+                    <input type="number" id="editFinAmount" step="0.01" value="${record.amount}">
+                </div>
+            `;
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Update Edit Payment Fields
+        function updateEditPaymentFields() {
+            const method = document.getElementById('editPaymentMethod').value;
+            document.getElementById('editDekontField').style.display = method === 'Banka' ? 'block' : 'none';
+            document.getElementById('editMakbuzField').style.display = method === 'Makbuz' ? 'block' : 'none';
+        }
+
+        // Delete Financial
+        function deleteFinancial(id) {
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); return; }
+            if (confirm('Bu finansal kaydını silmek istediğinize emin misiniz?')) {
+                data.financial = data.financial.filter(r => r.id !== id);
+                saveData();
+                renderFinancial();
+                alert('Finansal kayıt başarıyla silindi!');
+            }
+        }
+
+        // Render Financial
+        function renderFinancial() {
+            const container = document.getElementById('financialList');
+            const summaryContainer = document.getElementById('financialSummary');
+
+            const income = data.financial.filter(r => r.type === 'Gelir').reduce((sum, r) => sum + r.amount, 0);
+            const expense = data.financial.filter(r => r.type === 'Gider').reduce((sum, r) => sum + r.amount, 0);
+            const balance = income - expense;
+
+            summaryContainer.innerHTML = `<div class="financial-summary">
+                <div class="summary-box income">
+                    <div class="summary-box-label">Toplam Gelir</div>
+                    <div class="summary-box-value">${income.toLocaleString('tr-TR')} ₺</div>
+                </div>
+                <div class="summary-box expense">
+                    <div class="summary-box-label">Toplam Gider</div>
+                    <div class="summary-box-value">${expense.toLocaleString('tr-TR')} ₺</div>
+                </div>
+                <div class="summary-box balance">
+                    <div class="summary-box-label">Net Bakiye</div>
+                    <div class="summary-box-value">${balance.toLocaleString('tr-TR')} ₺</div>
+                </div>
+            </div>`;
+
+            if (data.financial.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz finansal kayıt yapılmamıştır</p></div>';
+                return;
+            }
+
+            const isAdmin = currentUserMode === 'admin';
+            let html = '<table><thead><tr><th>Tarih</th><th>Tür</th><th>Ödeme Yöntemi</th><th>Açıklama</th><th>Tutar</th>' + (isAdmin ? '<th>İşlemler</th>' : '') + '</tr></thead><tbody>';
+            data.financial
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .forEach(record => {
+                    const amountClass = record.type === 'Gelir' ? 'income' : 'expense';
+                    const sign = record.type === 'Gelir' ? '+' : '-';
+                    let paymentInfo = record.paymentMethod || 'Tanımsız';
+                    if (record.paymentMethod === 'Banka' && record.dekontNumber) {
+                        paymentInfo += ` (${record.dekontNumber})`;
+                    } else if (record.paymentMethod === 'Makbuz' && record.makbuzNumber) {
+                        paymentInfo += ` (${record.makbuzNumber})`;
+                    }
+                    html += `<tr>
+                        <td data-label="Tarih">${new Date(record.date).toLocaleDateString('tr-TR')}</td>
+                        <td data-label="Tür"><span class="badge ${record.type === 'Gelir' ? 'badge-green' : 'badge-red'}">${record.type}</span></td>
+                        <td data-label="Ödeme Yöntemi">${paymentInfo}</td>
+                        <td data-label="Açıklama">${record.description}</td>
+                        <td data-label="Tutar" class="${amountClass}">${sign}${record.amount.toLocaleString('tr-TR')} ₺</td>
+                        ${isAdmin ? `<td data-label="İşlemler"><div class="action-buttons"><button class="btn btn-edit btn-small" onclick="editFinancial(${record.id})">Düzenle</button><button class="btn btn-delete btn-small" onclick="deleteFinancial(${record.id})">Sil</button></div></td>` : ''}
+                    </tr>`;
+                });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Render Reports
+        function renderReports() {
+            const container = document.getElementById('reportsContent');
+            
+            // Calculate statistics
+            const memberDistributions = {};
+            data.members.forEach(member => {
+                memberDistributions[member.id] = {
+                    name: `${member.firstName} ${member.lastName}`,
+                    products: {}
+                };
+            });
+
+            data.distributions.forEach(dist => {
+                if (memberDistributions[dist.memberId]) {
+                    dist.items.forEach(item => {
+                        if (!memberDistributions[dist.memberId].products[item.productName]) {
+                            memberDistributions[dist.memberId].products[item.productName] = 0;
+                        }
+                        memberDistributions[dist.memberId].products[item.productName] += item.quantity;
+                    });
+                }
+            });
+
+            // Product statistics
+            const productStats = {};
+            data.distributions.forEach(dist => {
+                dist.items.forEach(item => {
+                    if (!productStats[item.productName]) {
+                        productStats[item.productName] = { total: 0, count: 0 };
+                    }
+                    productStats[item.productName].total += item.quantity;
+                    productStats[item.productName].count += 1;
+                });
+            });
+
+            const maxQuantity = Math.max(...Object.values(productStats).map(p => p.total), 1);
+
+            let html = '<div class="stats-container">';
+
+            // Member Statistics
+            html += '<div class="stat-card"><h3>👥 Üyelere Verilen Ürünler</h3>';
+            Object.entries(memberDistributions).forEach(([memberId, memberData]) => {
+                if (Object.keys(memberData.products).length > 0) {
+                    html += `<div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
+                        <strong style="color: #059669;">${memberData.name}</strong>
+                        <div class="product-chart">`;
+                    Object.entries(memberData.products).forEach(([product, quantity]) => {
+                        html += `<div class="chart-bar">
+                            <div class="chart-label">${product}</div>
+                            <div class="chart-progress">
+                                <div class="chart-fill" style="width: ${(quantity / maxQuantity) * 100}%">${quantity}</div>
+                            </div>
+                            <div class="chart-value">${quantity}</div>
+                        </div>`;
+                    });
+                    html += `</div></div>`;
+                }
+            });
+            html += '</div>';
+
+            // Product Distribution Statistics
+            html += '<div class="stat-card"><h3>📦 Ürün Dağıtım İstatistikleri</h3>';
+            Object.entries(productStats)
+                .sort((a, b) => b[1].total - a[1].total)
+                .forEach(([product, stats]) => {
+                    html += `<div class="stat-item">
+                        <span>${product}</span>
+                        <span class="stat-value">${stats.total} (${stats.count} dağıtım)</span>
+                    </div>`;
+                });
+            html += '</div>';
+
+            // Summary Statistics
+            const totalDistributions = data.distributions.length;
+            const totalMembers = data.members.length;
+            const uniqueProducts = new Set(data.distributions.flatMap(d => d.items.map(i => i.productName))).size;
+
+            html += `<div class="stat-card">
+                <h3>📊 Genel İstatistikler</h3>
+                <div class="stat-item">
+                    <span>Toplam Dağıtım Sayısı</span>
+                    <span class="stat-value">${totalDistributions}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Aktif Üye Sayısı</span>
+                    <span class="stat-value">${totalMembers}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Dağıtılan Ürün Çeşidi</span>
+                    <span class="stat-value">${uniqueProducts}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Ortalama Üye Başı Dağıtım</span>
+                    <span class="stat-value">${(totalDistributions / totalMembers || 0).toFixed(1)}</span>
+                </div>
+            </div>`;
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Modal Functions
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingData = null;
+        }
+
+        function saveEdit() {
+            if (!editingData) return;
+            if (currentUserMode !== 'admin') { alert('Bu işlem için admin yetkisi gereklidir!'); closeEditModal(); return; }
+
+            if (editingData.type === 'member') {
+                const member = data.members.find(m => m.id === editingData.id);
+                if (member) {
+                    member.firstName = document.getElementById('editFirstName').value;
+                    member.lastName = document.getElementById('editLastName').value;
+                    member.birthDate = document.getElementById('editBirthDate').value;
+                    member.profession = document.getElementById('editProfession').value;
+                    member.tcId = document.getElementById('editTcId').value;
+                    member.phone = document.getElementById('editPhone').value;
+                }
+                renderMembers();
+            } else if (editingData.type === 'stock') {
+                const stock = data.stock.find(s => s.id === editingData.id);
+                if (stock) {
+                    stock.productName = document.getElementById('editProductName').value;
+                    stock.entryDate = document.getElementById('editEntryDate').value;
+                    stock.receivedQuantity = parseFloat(document.getElementById('editReceivedQuantity').value);
+                    stock.remainingQuantity = parseFloat(document.getElementById('editRemainingQuantity').value);
+                    stock.unit = document.getElementById('editUnit').value;
+                }
+                renderStock();
+            } else if (editingData.type === 'financial') {
+                const record = data.financial.find(r => r.id === editingData.id);
+                if (record) {
+                    record.date = document.getElementById('editFinDate').value;
+                    record.type = document.getElementById('editFinType').value;
+                    record.paymentMethod = document.getElementById('editPaymentMethod').value;
+                    record.dekontNumber = document.getElementById('editDekontNumber').value || null;
+                    record.makbuzNumber = document.getElementById('editMakbuzNumber').value || null;
+                    record.description = document.getElementById('editFinDesc').value;
+                    record.amount = parseFloat(document.getElementById('editFinAmount').value);
+                }
+                renderFinancial();
+            } else if (editingData.type === 'distribution') {
+                const dist = data.distributions.find(d => d.id === editingData.id);
+                if (dist) {
+                    dist.receiptNumber = document.getElementById('editReceiptNumber').value;
+                    dist.memberId = parseInt(document.getElementById('editDistMember').value);
+                    dist.distributionDate = document.getElementById('editDistDate').value;
+                    dist.items = [];
+                    document.querySelectorAll('.edit-dist-item').forEach(item => {
+                        const productName = item.querySelector('.edit-product-select').value;
+                        const quantity = parseFloat(item.querySelector('.edit-quantity-input').value);
+                        const unit = item.querySelector('.edit-unit-select').value;
+                        if (productName && quantity > 0) {
+                            dist.items.push({ productName, quantity, unit });
+                        }
+                    });
+                }
+                renderDistributions();
+                renderStock();
+            }
+
+            saveData();
+            closeEditModal();
+            alert('Değişiklikler başarıyla kaydedildi!');
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            document.getElementById('totalMembers').textContent = data.members.length;
+            
+            const uniqueProducts = new Set(data.stock.map(s => s.productName)).size;
+            document.getElementById('activeProducts').textContent = uniqueProducts;
+            
+            document.getElementById('totalDistributions').textContent = data.distributions.length;
+            
+            const income = data.financial.filter(r => r.type === 'Gelir').reduce((sum, r) => sum + r.amount, 0);
+            const expense = data.financial.filter(r => r.type === 'Gider').reduce((sum, r) => sum + r.amount, 0);
+            const balance = income - expense;
+            document.getElementById('totalBalance').textContent = balance.toLocaleString('tr-TR') + ' ₺';
+        }
+
+        // ===== ŞİFRE SİSTEMİ =====
+
+        // Varsayılan şifreler (ilk kullanımda)
+        const DEFAULT_ADMIN_PW = 'admin123';
+        const DEFAULT_VIEWER_PW = 'goruntule123';
+
+        let currentUserMode = null; // 'admin' veya 'viewer'
+
+        function getAdminPassword() {
+            return DEFAULT_ADMIN_PW;
+        }
+
+        function getViewerPassword() {
+            return DEFAULT_VIEWER_PW;
+        }
+
+        function doLogin() {
+            const pw = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (pw === getAdminPassword()) {
+                currentUserMode = 'admin';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('viewModeBanner').classList.remove('show');
+                document.body.classList.remove('view-mode');
+                document.getElementById('userBadge').textContent = '👤 Admin';
+                document.getElementById('userBadge').className = 'user-badge admin';
+                errorEl.classList.remove('show');
+                sessionStorage.setItem('colyak_session', 'admin');
+            } else if (pw === getViewerPassword()) {
+                currentUserMode = 'viewer';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('viewModeBanner').classList.add('show');
+                document.body.classList.add('view-mode');
+                document.getElementById('userBadge').textContent = '👁️ Görüntüleme';
+                document.getElementById('userBadge').className = 'user-badge viewer';
+                errorEl.classList.remove('show');
+                sessionStorage.setItem('colyak_session', 'viewer');
+            } else {
+                errorEl.classList.add('show');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginPassword').focus();
+            }
+        }
+
+        function doLogout() {
+            if (confirm('Oturumu kapatmak istediğinize emin misiniz?')) {
+                currentUserMode = null;
+                sessionStorage.removeItem('colyak_session');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginError').classList.remove('show');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('loginPassword').focus();
+            }
+        }
+
+        function checkSession() {
+            const session = sessionStorage.getItem('colyak_session');
+            if (session === 'admin') {
+                currentUserMode = 'admin';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('userBadge').textContent = '👤 Admin';
+                document.getElementById('userBadge').className = 'user-badge admin';
+            } else if (session === 'viewer') {
+                currentUserMode = 'viewer';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('viewModeBanner').classList.add('show');
+                document.body.classList.add('view-mode');
+                document.getElementById('userBadge').textContent = '👁️ Görüntüleme';
+                document.getElementById('userBadge').className = 'user-badge viewer';
+            }
+            // Oturum yoksa giriş ekranı görünür kalır
+        }
+
+        // Şifre değiştirme modalı
+        function openPasswordModal(tab) {
+            document.getElementById('passwordModal').classList.add('active');
+            switchPasswordTab(tab || 'admin');
+            // Alanları temizle
+            ['currentAdminPw','newAdminPw','newAdminPw2','confirmAdminForViewer','newViewerPw','newViewerPw2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('adminPwError').style.display = 'none';
+            document.getElementById('viewerPwError').style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        function switchPasswordTab(tab) {
+            document.querySelectorAll('.password-tab').forEach((btn, i) => {
+                btn.classList.toggle('active', (i === 0 && tab === 'admin') || (i === 1 && tab === 'viewer'));
+            });
+            document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+            document.getElementById('tabViewer').classList.toggle('active', tab === 'viewer');
+        }
+
+        function changeAdminPassword() {
+            const current = document.getElementById('currentAdminPw').value;
+            const newPw = document.getElementById('newAdminPw').value;
+            const newPw2 = document.getElementById('newAdminPw2').value;
+            const errEl = document.getElementById('adminPwError');
+
+            if (current !== getAdminPassword()) {
+                errEl.textContent = 'Mevcut admin şifresi hatalı!';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (newPw.length < 4) {
+                errEl.textContent = 'Yeni şifre en az 4 karakter olmalıdır!';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (newPw !== newPw2) {
+                errEl.textContent = 'Şifreler eşleşmiyor!';
+                errEl.style.display = 'block';
+                return;
+            }
+            fetch(`${API_URL}/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ admin_pw: newPw })
+            }).then(() => {
+                DEFAULT_ADMIN_PW = newPw;
+                errEl.style.display = 'none';
+                closePasswordModal();
+                alert('✅ Admin şifresi başarıyla güncellendi!');
+            });
+        }
+
+        function changeViewerPassword() {
+            const adminConfirm = document.getElementById('confirmAdminForViewer').value;
+            const newPw = document.getElementById('newViewerPw').value;
+            const newPw2 = document.getElementById('newViewerPw2').value;
+            const errEl = document.getElementById('viewerPwError');
+
+            if (adminConfirm !== getAdminPassword()) {
+                errEl.textContent = 'Admin şifresi hatalı!';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (newPw.length < 4) {
+                errEl.textContent = 'Yeni şifre en az 4 karakter olmalıdır!';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (newPw !== newPw2) {
+                errEl.textContent = 'Şifreler eşleşmiyor!';
+                errEl.style.display = 'block';
+                return;
+            }
+            fetch(`${API_URL}/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ viewer_pw: newPw })
+            }).then(() => {
+                DEFAULT_VIEWER_PW = newPw;
+                errEl.style.display = 'none';
+                closePasswordModal();
+                alert('✅ Görüntüleme şifresi başarıyla güncellendi!');
+            });
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            checkSession();
+            loadData();
+            updateDashboard();
+            renderMembers();
+            renderStock();
+            renderDistributions();
+            renderFinancial();
+        });
+
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            const editModal = document.getElementById('editModal');
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+            const pwModal = document.getElementById('passwordModal');
+            if (e.target === pwModal) {
+                closePasswordModal();
+            }
+        });
+    </script>
+</body>
+</html>
