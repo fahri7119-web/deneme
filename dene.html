@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kırıkkale Çölyak Derneği - Firebase Takip Sistemi</title>
+    <style>
+        /* Önceki stiller aynen korunacak - yer tasarrufu için kısaltıldı */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; }
+        .container { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: linear-gradient(180deg, #059669 0%, #047857 100%); color: white; padding: 24px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: transparent; border: none; color: white; width: 100%; text-align: left; }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .nav-item.active { background-color: rgba(255, 255, 255, 0.2); border-left: 4px solid white; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-bar { background-color: white; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .content-area { flex: 1; overflow-y: auto; padding: 24px; }
+        .btn { padding: 12px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; color: white; }
+        .btn-primary { background-color: #059669; }
+        .btn-primary:hover { background-color: #047857; }
+        .btn-blue { background-color: #3b82f6; }
+        .btn-success { background-color: #10b981; }
+        
+        /* Giriş ekranı stilleri */
+        #loginScreen {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 100%);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        #loginScreen.hidden { display: none; }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        .login-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .login-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #6b7280;
+        }
+        .login-tab.active {
+            background: white;
+            color: #059669;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .login-tab-content { display: none; }
+        .login-tab-content.active { display: block; }
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+        .login-input:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+            outline: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .login-error {
+            background-color: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-error.show { display: block; }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .divider::before { margin-right: 10px; }
+        .divider::after { margin-left: 10px; }
+        .btn-outline {
+            background: white;
+            border: 2px solid #059669;
+            color: #059669;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-outline:hover {
+            background: #f0fdf4;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <!-- ===== GİRİŞ EKRANI ===== -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo" style="font-size: 56px; text-align: center; margin-bottom: 8px;">🌿</div>
+            <div class="login-title" style="font-size: 22px; font-weight: 700; color: #065f46; text-align: center;">Kırıkkale Çölyak Derneği</div>
+            <div class="login-subtitle" style="text-align: center; color: #6b7280; margin-bottom: 24px;">Firebase Takip Sistemi</div>
+
+            <!-- Giriş/Kayıt Tabs -->
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('login')">Giriş Yap</button>
+                <button class="login-tab" onclick="switchLoginTab('register')">Kayıt Ol</button>
+            </div>
+
+            <!-- Giriş Formu -->
+            <div id="loginTab" class="login-tab-content active">
+                <div class="login-error" id="loginError"></div>
+                
+                <input type="email" id="loginEmail" class="login-input" placeholder="E-posta adresiniz" value="admin@dernek.com">
+                <input type="password" id="loginPassword" class="login-input" placeholder="Şifreniz" value="123456" onkeydown="if(event.key==='Enter') doLogin()">
+                
+                <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+                
+                <div class="divider">veya</div>
+                
+                <button class="btn-outline" onclick="createTestAccount()">⚡ Test Hesabı Oluştur</button>
+                
+                <div style="margin-top: 20px; font-size: 12px; color: #9ca3af; text-align: center;">
+                    Test hesabı oluşturmak için yukarıdaki butonu kullanın
+                </div>
+            </div>
+
+            <!-- Kayıt Formu -->
+            <div id="registerTab" class="login-tab-content">
+                <div class="login-error" id="registerError"></div>
+                
+                <input type="email" id="registerEmail" class="login-input" placeholder="E-posta adresiniz">
+                <input type="password" id="registerPassword" class="login-input" placeholder="Şifreniz (en az 6 karakter)">
+                <input type="password" id="registerPasswordConfirm" class="login-input" placeholder="Şifre tekrar">
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="registerAsAdmin" checked>
+                        <span style="font-size: 14px;">Admin yetkileriyle kaydol (tam erişim)</span>
+                    </label>
+                </div>
+                
+                <button class="login-btn" onclick="doRegister()">Kayıt Ol</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Görüntüleme Modu Bilgi Bantı -->
+    <div id="viewModeBanner" style="display: none; background: linear-gradient(90deg, #d97706, #b45309); color: white; padding: 8px 24px; font-size: 13px; text-align: center;">
+        <span>👁️ GÖRÜNTÜLEME MODU — Sadece okuma yetkisi ile giriş yapıldı.</span>
+    </div>
+
+    <!-- Ana Uygulama (diğer stiller ve içerik aynen devam edecek) -->
+    <div class="container" style="display: none;" id="mainApp">
+        <!-- Sidebar ve içerik aynen kalacak - kısaltıldı -->
+        <div class="sidebar">...</div>
+        <div class="main-content">...</div>
+    </div>
+
+    <script>
+        // ===== FIREBASE YAPILANDIRMASI =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJZyj9pO0VACjdIRUDKC-mrvFA1Y30ITs",
+            authDomain: "dernek-takip-4fbce.firebaseapp.com",
+            databaseURL: "https://dernek-takip-4fbce-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "dernek-takip-4fbce",
+            storageBucket: "dernek-takip-4fbce.firebasestorage.app",
+            messagingSenderId: "835728513617",
+            appId: "1:835728513617:web:f243b5bd0c8651510bf670"
+        };
+
+        // Firebase'i başlat
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // ===== GİRİŞ EKRANI TAB =====
+        function switchLoginTab(tab) {
+            document.querySelectorAll('.login-tab').forEach((btn, i) => {
+                btn.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+            });
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+            
+            // Hata mesajlarını temizle
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+        }
+
+        // ===== KAYIT OL =====
+        function doRegister() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const isAdmin = document.getElementById('registerAsAdmin').checked;
+            const errorEl = document.getElementById('registerError');
+
+            if (!email || !password) {
+                errorEl.textContent = 'E-posta ve şifre gerekli!';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Şifre en az 6 karakter olmalı!';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'Şifreler eşleşmiyor!';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Kullanıcı oluşturuldu
+                    const user = userCredential.user;
+                    
+                    // Admin mi viewer mı belirlemek için custom claim veya veritabanına kayıt
+                    // Basitçe email ile kontrol yapacağız veya veritabanına rol kaydedeceğiz
+                    return database.ref('userRoles/' + user.uid).set({
+                        email: email,
+                        role: isAdmin ? 'admin' : 'viewer',
+                        createdAt: new Date().toISOString()
+                    });
+                })
+                .then(() => {
+                    alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+                    switchLoginTab('login');
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPassword').value = '';
+                    document.getElementById('registerPasswordConfirm').value = '';
+                })
+                .catch((error) => {
+                    errorEl.textContent = 'Kayıt hatası: ' + error.message;
+                    errorEl.style.display = 'block';
+                });
+        }
+
+        // ===== TEST HESABI OLUŞTUR =====
+        function createTestAccount() {
+            const errorEl = document.getElementById('loginError');
+            const testEmail = 'test' + Math.floor(Math.random() * 10000) + '@dernek.com';
+            const testPassword = '123456';
+
+            auth.createUserWithEmailAndPassword(testEmail, testPassword)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Test hesabını admin yapalım
+                    return database.ref('userRoles/' + user.uid).set({
+                        email: testEmail,
+                        role: 'admin', // Test hesabı admin olsun
+                        createdAt: new Date().toISOString(),
+                        isTestAccount: true
+                    });
+                })
+                .then(() => {
+                    alert(`✅ Test hesabı oluşturuldu!\n\nE-posta: ${testEmail}\nŞifre: ${testPassword}\n\nBu bilgilerle giriş yapabilirsiniz.`);
+                    
+                    // Giriş alanlarını doldur
+                    document.getElementById('loginEmail').value = testEmail;
+                    document.getElementById('loginPassword').value = testPassword;
+                    
+                    // Otomatik giriş yap
+                    return doLogin();
+                })
+                .catch((error) => {
+                    errorEl.textContent = 'Test hesabı oluşturulamadı: ' + error.message;
+                    errorEl.style.display = 'block';
+                });
+        }
+
+        // ===== GİRİŞ YAP =====
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!email || !password) {
+                errorEl.textContent = 'E-posta ve şifre gerekli!';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    errorEl.style.display = 'none';
+                })
+                .catch((error) => {
+                    errorEl.textContent = 'Giriş başarısız: ' + error.message;
+                    errorEl.style.display = 'block';
+                });
+        }
+
+        // ===== ÇIKIŞ YAP =====
+        function doLogout() {
+            if (confirm('Oturumu kapatmak istediğinize emin misiniz?')) {
+                auth.signOut();
+            }
+        }
+
+        // ===== KULLANICI ROLÜNÜ AL =====
+        async function getUserRole(uid) {
+            try {
+                const snapshot = await database.ref('userRoles/' + uid).once('value');
+                const roleData = snapshot.val();
+                return roleData ? roleData.role : 'viewer'; // Varsayılan viewer
+            } catch (error) {
+                console.error('Rol alınamadı:', error);
+                return 'viewer';
+            }
+        }
+
+        // ===== AUTH DURUM DİNLEYİCİSİ =====
+        auth.onAuthStateChanged(async (user) => {
+            const loginScreen = document.getElementById('loginScreen');
+            const mainApp = document.getElementById('mainApp');
+            const viewModeBanner = document.getElementById('viewModeBanner');
+            const userBadge = document.getElementById('userBadge');
+
+            if (user) {
+                // Kullanıcı rolünü al
+                const role = await getUserRole(user.uid);
+                const isAdmin = role === 'admin';
+
+                // Admin değilse görüntüleme modu
+                if (isAdmin) {
+                    viewModeBanner.style.display = 'none';
+                    document.body.classList.remove('view-mode');
+                    if (userBadge) {
+                        userBadge.textContent = '👤 Admin - ' + user.email;
+                        userBadge.className = 'user-badge admin';
+                    }
+                } else {
+                    viewModeBanner.style.display = 'flex';
+                    document.body.classList.add('view-mode');
+                    if (userBadge) {
+                        userBadge.textContent = '👁️ Görüntüleme - ' + user.email;
+                        userBadge.className = 'user-badge viewer';
+                    }
+                }
+
+                // Ana uygulamayı göster
+                loginScreen.classList.add('hidden');
+                mainApp.style.display = 'flex';
+                
+                // Veri dinleyicilerini başlat
+                setupDataListeners();
+            } else {
+                // Giriş ekranını göster
+                loginScreen.classList.remove('hidden');
+                mainApp.style.display = 'none';
+            }
+        });
+
+        // ===== VERİ DİNLEYİCİLERİ =====
+        function setupDataListeners() {
+            // Önceki dinleyicileri kaldır (varsa)
+            firebase.database().ref().off();
+            
+            // Üyeler
+            database.ref('members').on('value', (snapshot) => {
+                window.data = window.data || {};
+                window.data.members = [];
+                snapshot.forEach((child) => {
+                    window.data.members.push({ id: child.key, ...child.val() });
+                });
+                updateDashboard();
+                if (document.getElementById('members')?.classList.contains('active')) {
+                    renderMembers();
+                }
+            });
+
+            // Stok
+            database.ref('stock').on('value', (snapshot) => {
+                window.data = window.data || {};
+                window.data.stock = [];
+                snapshot.forEach((child) => {
+                    window.data.stock.push({ id: child.key, ...child.val() });
+                });
+                updateDashboard();
+                if (document.getElementById('stock')?.classList.contains('active')) {
+                    renderStock();
+                }
+            });
+
+            // Diğer dinleyiciler...
+            database.ref('distributions').on('value', (snapshot) => {
+                window.data = window.data || {};
+                window.data.distributions = [];
+                snapshot.forEach((child) => {
+                    window.data.distributions.push({ id: child.key, ...child.val() });
+                });
+                updateDashboard();
+            });
+
+            database.ref('financial').on('value', (snapshot) => {
+                window.data = window.data || {};
+                window.data.financial = [];
+                snapshot.forEach((child) => {
+                    window.data.financial.push({ id: child.key, ...child.val() });
+                });
+                updateDashboard();
+            });
+        }
+
+        // ===== DASHBOARD GÜNCELLEME =====
+        function updateDashboard() {
+            const data = window.data || { members: [], stock: [], distributions: [], financial: [] };
+            
+            const totalMembers = document.getElementById('totalMembers');
+            const activeProducts = document.getElementById('activeProducts');
+            const totalDistributions = document.getElementById('totalDistributions');
+            const totalBalance = document.getElementById('totalBalance');
+
+            if (totalMembers) totalMembers.textContent = data.members.length;
+            if (activeProducts) {
+                const uniqueProducts = new Set(data.stock.map(s => s.productName)).size;
+                activeProducts.textContent = uniqueProducts;
+            }
+            if (totalDistributions) totalDistributions.textContent = data.distributions.length;
+            if (totalBalance) {
+                const income = data.financial.filter(r => r.type === 'Gelir').reduce((sum, r) => sum + (r.amount || 0), 0);
+                const expense = data.financial.filter(r => r.type === 'Gider').reduce((sum, r) => sum + (r.amount || 0), 0);
+                totalBalance.textContent = (income - expense).toLocaleString('tr-TR') + ' ₺';
+            }
+        }
+
+        // ===== BASİT RENDER FONKSİYONLARI =====
+        function renderMembers() {
+            const container = document.getElementById('membersList');
+            if (!container) return;
+            
+            const data = window.data || { members: [] };
+            if (data.members.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz üye kaydı yapılmamıştır</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Ad Soyad</th><th>Doğum Tarihi</th><th>Meslek</th><th>TC No</th><th>Telefon</th></tr></thead><tbody>';
+            data.members.forEach(member => {
+                html += `<tr>
+                    <td>${member.firstName || ''} ${member.lastName || ''}</td>
+                    <td>${member.birthDate ? new Date(member.birthDate).toLocaleDateString('tr-TR') : '-'}</td>
+                    <td>${member.profession || '-'}</td>
+                    <td>${member.tcId || ''}</td>
+                    <td>${member.phone || '-'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderStock() {
+            const container = document.getElementById('stockList');
+            if (!container) return;
+            
+            const data = window.data || { stock: [] };
+            if (data.stock.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Henüz stok kaydı yapılmamıştır</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Ürün Adı</th><th>Giriş Tarihi</th><th>Alınan</th><th>Kalan</th><th>Birim</th></tr></thead><tbody>';
+            data.stock.forEach(stock => {
+                html += `<tr>
+                    <td>${stock.productName || ''}</td>
+                    <td>${stock.entryDate ? new Date(stock.entryDate).toLocaleDateString('tr-TR') : '-'}</td>
+                    <td>${stock.receivedQuantity || 0}</td>
+                    <td>${stock.remainingQuantity || 0}</td>
+                    <td>${stock.unit || 'Adet'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Sayfa değiştirme fonksiyonu
+        function showPage(page) {
+            document.querySelectorAll('.form-section, .dashboard').forEach(el => {
+                if (el) el.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if (el) el.classList.remove('active');
+            });
+
+            const pageEl = document.getElementById(page);
+            if (pageEl) pageEl.classList.add('active');
+            
+            if (event && event.target) event.target.classList.add('active');
+
+            const titles = {
+                dashboard: 'Anasayfa',
+                members: 'Üyeler',
+                stock: 'Stok Yönetimi',
+                distribution: 'Ürün Dağıtım',
+                financial: 'Gelir-Gider',
+                reports: 'İstatistikler',
+                settings: 'Ayarlar'
+            };
+            
+            const titleEl = document.getElementById('pageTitle');
+            if (titleEl) titleEl.textContent = titles[page] || page;
+
+            if (page === 'members') renderMembers();
+            else if (page === 'stock') renderStock();
+        }
+
+        // Bağlantı durumu
+        database.ref('.info/connected').on('value', (snap) => {
+            const statusEl = document.getElementById('connectionStatus');
+            if (statusEl) {
+                if (snap.val()) {
+                    statusEl.innerHTML = '✅ Bağlı';
+                    statusEl.className = 'connection-status online';
+                } else {
+                    statusEl.innerHTML = '⚠️ Bağlantı Yok';
+                    statusEl.className = 'connection-status offline';
+                }
+            }
+        });
+
+        // Tarih alanlarını doldur
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            ['stockEntryDate', 'distributionDate', 'financialDate'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = today;
+            });
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', () => {
+            setDefaultDates();
+            
+            // Modal dışına tıklama
+            window.addEventListener('click', (e) => {
+                const editModal = document.getElementById('editModal');
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+        });
+
+        // Modal fonksiyonları
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            if (modal) modal.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
