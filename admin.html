@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Kırıkkale Çölyak Derneği - Takip Sistemi</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #10b981; --primary-dark: #059669; --primary-light: #d1fae5; --primary-bg: #ecfdf5;
+            --secondary: #3b82f6; --secondary-dark: #2563eb; --danger: #ef4444; --danger-dark: #dc2626;
+            --warning: #f59e0b; --info: #06b6d4; --gray-50: #f9fafb; --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.1); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1); --radius-sm: 0.5rem; --radius-md: 0.75rem;
+            --radius-lg: 1rem; --radius-xl: 1.5rem;
+        }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%); color: var(--gray-800); line-height: 1.5; min-height: 100vh; }
+        
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #065f46 0%, #047857 50%, #10b981 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+        #loginScreen.hidden { display: none; }
+        .login-card { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-radius: var(--radius-xl); padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: center; }
+        .login-logo { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.5rem; color: white; }
+        .login-title { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 0.5rem; }
+        .login-subtitle { color: var(--gray-500); margin-bottom: 1.5rem; font-size: 0.875rem; }
+        .login-input { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--gray-200); border-radius: var(--radius-md); font-size: 1rem; margin-bottom: 1rem; transition: all 0.2s; }
+        .login-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .login-btn { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s; }
+        .login-btn:hover { transform: translateY(-1px); }
+        .login-error { background: #fee2e2; color: var(--danger-dark); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; display: none; font-size: 0.875rem; }
+        .login-error.show { display: block; }
+        .login-hint { margin-top: 1.5rem; padding: 1rem; background: var(--gray-100); border-radius: var(--radius-sm); font-size: 0.75rem; color: var(--gray-600); }
+        .login-hint code { background: white; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 600; }
+        
+        .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+        .top-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; }
+        .logo-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
+        .logo-text h2 { font-size: 1rem; font-weight: 700; color: white; }
+        .logo-text p { font-size: 0.65rem; color: rgba(255,255,255,0.8); }
+        .nav-menu { display: flex; gap: 0.25rem; padding: 0.5rem 0; flex-wrap: wrap; }
+        .nav-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--radius-md); cursor: pointer; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+        .nav-item.active { background: white; color: var(--primary-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .user-section { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; }
+        .user-badge { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.875rem; color: white; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 0.5rem 1rem; border-radius: var(--radius-sm); color: white; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s; }
+        .logout-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        .main-content { flex: 1; max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; width: 100%; }
+        .view-banner { background: linear-gradient(90deg, var(--warning), #ea580c); color: white; padding: 0.75rem; text-align: center; border-radius: var(--radius-lg); margin-bottom: 1.5rem; display: none; align-items: center; justify-content: center; gap: 0.5rem; }
+        .view-banner.show { display: flex; }
+        
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: white; border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .card-header { font-size: 0.875rem; font-weight: 600; color: var(--gray-500); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .card-value { font-size: 1.8rem; font-weight: 700; color: var(--gray-900); }
+        .small-stats { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem; border-top: 1px solid var(--gray-100); padding-top: 0.5rem; }
+        .product-list { font-size: 0.8rem; margin-top: 0.5rem; max-height: 120px; overflow-y: auto; }
+        
+        .form-card { background: white; border-radius: var(--radius-lg); margin-bottom: 2rem; border: 1px solid var(--gray-200); overflow: hidden; }
+        .form-header { padding: 1.25rem 1.5rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .form-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; font-family: inherit; transition: border 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(16,185,129,0.1); }
+        
+        .table-container { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow-x: auto; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: var(--gray-50); padding: 1rem 1rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); text-align: left; }
+        td { padding: 1rem 1rem; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; vertical-align: top; }
+        tr:hover td { background: var(--gray-50); }
+        .filter-select { width: 200px; margin-bottom: 1rem; padding: 0.5rem; font-size: 0.875rem; border-radius: var(--radius-md); border: 1px solid var(--gray-300); }
+        
+        .btn { padding: 0.625rem 1.25rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; border: none; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), var(--danger-dark)); color: white; }
+        .btn-info { background: linear-gradient(135deg, var(--info), #0891b2); color: white; }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #ea580c); color: white; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-block { width: 100%; }
+        .btn-small { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+        
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 0.5rem; }
+        .badge { display: inline-flex; padding: 0.25rem 0.625rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-purple { background: #e9d5ff; color: #6b21a5; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .celiac-tag { background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; margin: 0.1rem; }
+        
+        .celiac-card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 0.75rem; position: relative; }
+        .remove-celiac { position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 0.8rem; }
+        .financial-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .summary-box { background: white; border-radius: var(--radius-lg); padding: 1rem; text-align: center; border: 1px solid var(--gray-200); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: var(--radius-lg); width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 1.25rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .modal-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--gray-200); display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 3000; display: flex; flex-direction: column; gap: 0.5rem; }
+        .toast { background: white; padding: 0.875rem 1.25rem; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.75rem; border-left: 4px solid var(--primary); animation: slideIn 0.2s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .empty-state { text-align: center; padding: 3rem; color: var(--gray-500); }
+        .member-detail-card { background: var(--primary-bg); border: 1px solid var(--primary-light); border-radius: var(--radius-md); padding: 1rem; }
+        .distribution-item { background: var(--gray-50); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 0.75rem; border: 1px solid var(--gray-200); display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+        .distribution-item .form-row { flex: 1; margin: 0; }
+        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        .stat-card { background: white; border-radius: var(--radius-lg); padding: 1.25rem; border: 1px solid var(--gray-200); overflow-x: auto; }
+        .distribution-detail-item { background: var(--gray-50); padding: 0.75rem; margin-bottom: 0.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--primary); }
+        #chart { margin-top: 1rem; }
+        
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .quick-actions { grid-template-columns: 1fr; } .nav-menu { overflow-x: auto; flex-wrap: nowrap; } .summary-cards { grid-template-columns: 1fr; } }
+        body.view-mode .admin-only { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🌾</div>
+            <div class="login-title">Kırıkkale Çölyak Derneği</div>
+            <div class="login-subtitle">Takip Sistemine Hoş Geldiniz</div>
+            <div class="login-error" id="loginError">Hatalı şifre! Lütfen tekrar deneyiniz.</div>
+            <input type="password" id="loginPassword" class="login-input" placeholder="Şifrenizi giriniz..." onkeydown="if(event.key==='Enter') doLogin()">
+            <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+            <div class="login-hint">
+                <strong>Demo Şifreler:</strong><br>
+                Admin: <code>admin123</code> | Görüntüleme: <code>goruntule123</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANA UYGULAMA -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <div class="top-nav">
+            <div class="nav-container">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-seedling"></i></div>
+                    <div class="logo-text">
+                        <h2>Kırıkkale Çölyak Derneği</h2>
+                        <p>Takip ve Yönetim Sistemi</p>
+                    </div>
+                </div>
+                <div class="nav-menu">
+                    <button class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-chart-line"></i><span>Anasayfa</span></button>
+                    <button class="nav-item" onclick="showPage('members')"><i class="fas fa-users"></i><span>Üyeler</span></button>
+                    <button class="nav-item" onclick="showPage('stock')"><i class="fas fa-boxes"></i><span>Stok</span></button>
+                    <button class="nav-item" onclick="showPage('distribution')"><i class="fas fa-truck"></i><span>Dağıtım</span></button>
+                    <button class="nav-item" onclick="showPage('financial')"><i class="fas fa-coins"></i><span>Gelir-Gider</span></button>
+                    <button class="nav-item" onclick="showPage('reports')"><i class="fas fa-chart-bar"></i><span>İstatistikler</span></button>
+                    <button class="nav-item" onclick="showPage('settings')"><i class="fas fa-cog"></i><span>Ayarlar</span></button>
+                </div>
+                <div class="user-section">
+                    <span id="desktopUserBadge" class="user-badge"><i class="fas fa-user-shield"></i> Admin</span>
+                    <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="view-banner" id="viewModeBanner"><i class="fas fa-eye"></i> GÖRÜNTÜLEME MODU - Sadece okuma yetkisi</div>
+
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="form-section active">
+                <div class="summary-cards">
+                    <div class="card"><div class="card-header"><i class="fas fa-database"></i> Toplam Kayıt Sayısı</div><div class="card-value" id="totalMembers">0</div><div class="small-stats" id="memberTypeStats"></div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-heartbeat"></i> Çölyaklı Sayısı</div><div class="card-value" id="totalCeliacs">0</div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-boxes"></i> Aktif Ürünler</div><div id="activeProductsDetail" class="product-list">-</div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-truck"></i> Dağıtılan Ürünler</div><div id="distributedProductsDetail" class="product-list">-</div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-chart-line"></i> Toplam Gelir</div><div class="card-value" id="totalIncomeCard">0 ₺</div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-chart-line"></i> Toplam Gider</div><div class="card-value" id="totalExpenseCard">0 ₺</div></div>
+                    <div class="card"><div class="card-header"><i class="fas fa-wallet"></i> Kasa Bakiyesi</div><div class="card-value" id="totalBalance">0 ₺</div></div>
+                </div>
+                <div class="card admin-only">
+                    <div class="card-header"><i class="fas fa-bolt"></i> Hızlı İşlemler</div>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" onclick="showPage('members')"><i class="fas fa-user-plus"></i> Üye Ekle</button>
+                        <button class="btn btn-info" onclick="showPage('stock')"><i class="fas fa-plus-circle"></i> Stok Giriş</button>
+                        <button class="btn btn-warning" onclick="showPage('distribution')"><i class="fas fa-hand-holding-heart"></i> Dağıtım</button>
+                        <button class="btn btn-primary" onclick="showPage('financial')"><i class="fas fa-money-bill-wave"></i> Finansal</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÜYELER -->
+            <div id="members" class="form-section" style="display:none;">
+                <div class="form-card admin-only">
+                    <div class="form-header"><i class="fas fa-user-plus"></i> Yeni Üye Kaydı</div>
+                    <div class="form-body">
+                        <form id="memberForm" onsubmit="addMember(event)">
+                            <div class="form-row"><div class="form-group"><label>Adı *</label><input type="text" id="first_name" required></div><div class="form-group"><label>Soyadı *</label><input type="text" id="last_name" required></div></div>
+                            <div class="form-row"><div class="form-group"><label>TC Kimlik No *</label><input type="text" id="tc_id" required maxlength="11" pattern="\d{11}"></div><div class="form-group"><label>Telefon</label><input type="tel" id="phone"></div></div>
+                            <div class="form-row"><div class="form-group"><label>Üyelik Türü *</label><select id="member_type" required><option value="">Seçiniz...</option><option value="kurucu">🏆 Kurucu Üye</option><option value="asil">⭐ Asıl Üye</option><option value="onursal">🌟 Onursal Üye</option><option value="degil">📝 Üye Değil</option></select></div><div class="form-group"><label>Doğum Tarihi</label><input type="date" id="birth_date"></div></div>
+                            <div class="form-group"><label>Mesleği</label><input type="text" id="profession"></div>
+                            <div class="form-group"><label><i class="fas fa-heartbeat"></i> Çölyaklı Bilgileri (Sınırsız)</label></div>
+                            <div id="celiacListContainer"></div>
+                            <button type="button" class="btn btn-secondary btn-small" onclick="addCeliacField()"><i class="fas fa-plus"></i> Çölyaklı Ekle</button>
+                            <div class="form-group" style="margin-top:1rem;"><label>Açıklama / Notlar</label><textarea id="member_description" rows="3"></textarea></div>
+                            <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-user-check"></i> Üyeyi Kaydet</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>#</th><th>Ad Soyad / TC</th><th>Üyelik Türü</th><th>Telefon</th><th>Doğum Tarihi</th><th>Meslek</th><th>Çölyaklılar</th><th>Açıklama</th><th class="admin-only">İşlemler</th></tr></thead>
+                        <tbody id="membersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STOK -->
+            <div id="stock" class="form-section" style="display:none;">
+                <div class="form-card admin-only"><div class="form-header"><i class="fas fa-plus-circle"></i> Stok Girişi</div><div class="form-body"><form id="stockForm" onsubmit="addStock(event)"><div class="form-group"><label>Ürün Adı *</label><input type="text" id="product_name" required></div><div class="form-row"><div class="form-group"><label>Giriş Tarihi *</label><input type="date" id="entry_date" required></div><div class="form-group"><label>Birim</label><select id="unit"><option>Adet</option><option>Kg</option><option>Litre</option><option>Paket</option></select></div></div><div class="form-group"><label>Miktar *</label><input type="number" id="received_quantity" step="0.01" required></div><button type="submit" class="btn btn-primary btn-block"><i class="fas fa-arrow-down"></i> Stok Ekle</button></form></div></div>
+                <div class="table-container"><table><thead><tr><th>#</th><th>Ürün</th><th>Giriş Tarihi</th><th>Alınan</th><th>Kalan</th><th>Durum</th><th class="admin-only">İşlemler</th></tr></thead><tbody id="stockTableBody"></tbody></table></div>
+            </div>
+
+            <!-- DAĞITIM -->
+            <div id="distribution" class="form-section" style="display:none;">
+                <div class="form-card admin-only"><div class="form-header"><i class="fas fa-hand-holding-heart"></i> Yeni Dağıtım (FIFO)</div><div class="form-body"><form id="distributionForm" onsubmit="addDistribution(event)"><div class="form-row"><div class="form-group"><label>Makbuz No *</label><input type="text" id="receipt_number" required></div><div class="form-group"><label>Dağıtım Tarihi *</label><input type="date" id="distribution_date" required></div></div><div class="form-group"><label>Üye Seçimi *</label><select id="member_id" required><option value="">Üye seçiniz...</option></select></div><div class="form-group"><label>Çölyaklı Seçimi (Opsiyonel)</label><select id="celiac_index"><option value="">Seçilmedi</option></select></div><div class="form-group"><label>Ürünler</label><div id="distributionItems"></div><button type="button" class="btn btn-secondary btn-small" onclick="addDistributionItem()"><i class="fas fa-plus"></i> Ürün Ekle</button></div><button type="submit" class="btn btn-primary btn-block"><i class="fas fa-check-circle"></i> Dağıtımı Kaydet</button></form></div></div>
+                <div class="table-container"><table><thead><tr><th>Makbuz No</th><th>Üye / Çölyaklı</th><th>Tarih</th><th>Ürünler</th><th class="admin-only">İşlemler</th></tr></thead><tbody id="distributionTableBody"></tbody></table></div>
+            </div>
+
+            <!-- GELİR GİDER -->
+            <div id="financial" class="form-section" style="display:none;">
+                <div class="form-card admin-only"><div class="form-header"><i class="fas fa-plus-circle"></i> Yeni Kayıt</div><div class="form-body"><form id="financialForm" onsubmit="addFinancial(event)"><div class="form-row"><div class="form-group"><label>Tarih *</label><input type="date" id="date" required></div><div class="form-group"><label>Tür *</label><select id="type" required><option value="Gelir">📈 Gelir</option><option value="Gider">📉 Gider</option></select></div></div><div class="form-group"><label>Ödeme Yöntemi *</label><select id="payment_method" required><option value="">Seçiniz...</option><option value="Banka">🏦 Banka</option><option value="Makbuz">🧾 Makbuz</option></select></div><div class="form-group"><label>Açıklama *</label><textarea id="financial_description" required></textarea></div><div class="form-group"><label>Tutar (₺) *</label><input type="number" id="amount" step="0.01" required></div><button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Kayıt Ekle</button></form></div></div>
+                <div><div class="financial-summary"><div class="summary-box"><div class="summary-label">Toplam Gelir</div><div class="summary-value" id="totalIncome">0 ₺</div></div><div class="summary-box"><div class="summary-label">Toplam Gider</div><div class="summary-value" id="totalExpense">0 ₺</div></div><div class="summary-box"><div class="summary-label">Net Bakiye</div><div class="summary-value" id="netBalance">0 ₺</div></div></div>
+                <div class="table-container"><table><thead><tr><th>#</th><th>Tarih</th><th>Tür</th><th>Ödeme Yöntemi</th><th>Açıklama</th><th>Tutar</th><th class="admin-only">İşlemler</th></tr></thead><tbody id="financialTableBody"></tbody></table></div></div>
+            </div>
+
+            <!-- İSTATİSTİKLER -->
+            <div id="reports" class="form-section" style="display:none;">
+                <div class="stats-grid"><div class="stat-card"><h3><i class="fas fa-chart-bar"></i> Dağıtılan Ürünler (Toplam Ürün Bazlı)</h3><div id="chart"></div></div></div>
+            </div>
+
+            <!-- AYARLAR -->
+            <div id="settings" class="form-section" style="display:none;">
+                <div class="card"><h3><i class="fas fa-cloud"></i> Bulut Depolama</h3><p>Tüm verileriniz Supabase'de güvenle saklanmaktadır.</p></div>
+                <div class="card admin-only"><h3><i class="fas fa-key"></i> Şifre Yönetimi</h3><div class="form-group"><label>Admin Şifresi</label><input type="password" id="newAdminPassword" placeholder="Yeni admin şifresi"><button class="btn btn-primary btn-small" style="margin-top:0.5rem;" onclick="changePassword('admin')">Admin Şifresini Değiştir</button></div><div class="form-group"><label>Görüntüleme Şifresi</label><input type="password" id="newViewerPassword" placeholder="Yeni görüntüleme şifresi"><button class="btn btn-secondary btn-small" style="margin-top:0.5rem;" onclick="changePassword('viewer')">Görüntüleme Şifresini Değiştir</button></div></div>
+                <div class="card"><h3><i class="fas fa-file-excel"></i> Veri Dışa Aktar (Excel)</h3><button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-download"></i> Tüm Verileri Excel Olarak İndir</button></div>
+                <div class="card"><h3><i class="fas fa-download"></i> JSON / CSV Yedek</h3><div style="display:flex;gap:0.75rem;"><button class="btn btn-primary" onclick="exportData('json')"><i class="fas fa-file-code"></i> JSON İndir</button><button class="btn btn-info" onclick="exportData('csv')"><i class="fas fa-file-csv"></i> CSV İndir</button></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="editModalTitle">Düzenle</div><button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="editModalBody"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeEditModal()">İptal</button><button class="btn btn-primary" onclick="saveEdit()">Kaydet</button></div></div></div>
+
+    <script>
+        const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let data = { members: [], stock: [], distributions: [], financial: [], passwords: { admin: 'admin123', viewer: 'goruntule123' } };
+        let currentUserMode = null;
+        let editingData = null;
+        let stockChart = null;
+        let memberFilter = 'all';
+
+        function showToast(msg, type) { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span><span>${msg}</span>`; c.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        function checkAdmin() { if (currentUserMode !== 'admin') { showToast('Admin yetkisi gerekli!', 'error'); return false; } return true; }
+        async function loadPasswordsFromSupabase() { try { const { data: pwd } = await supabaseClient.from('settings').select('value').eq('key', 'passwords').single(); if (pwd?.value) data.passwords = pwd.value; } catch(e) {} }
+        async function savePasswordsToSupabase() { if (!checkAdmin()) return false; await supabaseClient.from('settings').upsert({ key: 'passwords', value: data.passwords, updated_at: new Date().toISOString() }, { onConflict: 'key' }); return true; }
+        async function changePassword(type) { if (!checkAdmin()) return; const inputId = type === 'admin' ? 'newAdminPassword' : 'newViewerPassword'; const newPw = document.getElementById(inputId).value; if (!newPw || newPw.length < 4) { showToast('Şifre en az 4 karakter', 'warning'); return; } data.passwords[type] = newPw; document.getElementById(inputId).value = ''; if (await savePasswordsToSupabase()) showToast('Şifre değiştirildi', 'success'); }
+        async function doLogin() { const pw = document.getElementById('loginPassword').value; await loadPasswordsFromSupabase(); if (pw === data.passwords.admin) { currentUserMode = 'admin'; sessionStorage.setItem('colyak_session', 'admin'); showApp(); } else if (pw === data.passwords.viewer) { currentUserMode = 'viewer'; sessionStorage.setItem('colyak_session', 'viewer'); showApp(); } else { document.getElementById('loginError').classList.add('show'); setTimeout(() => document.getElementById('loginError').classList.remove('show'), 3000); } }
+        function showApp() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContainer').style.display = 'flex'; const isAdmin = currentUserMode === 'admin'; document.getElementById('desktopUserBadge').innerHTML = isAdmin ? '<i class="fas fa-user-shield"></i> Admin' : '<i class="fas fa-eye"></i> Görüntüleme'; document.getElementById('viewModeBanner').classList.toggle('show', !isAdmin); document.body.classList.toggle('view-mode', !isAdmin); loadData(); }
+        function doLogout() { if (confirm('Çıkış yap?')) { currentUserMode = null; sessionStorage.removeItem('colyak_session'); document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appContainer').style.display = 'none'; } }
+        
+        function addCeliacField() { const container = document.getElementById('celiacListContainer'); const div = document.createElement('div'); div.className = 'celiac-card'; div.innerHTML = `<button type="button" class="remove-celiac" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button><div class="form-row"><div class="form-group"><label>Çölyaklı Adı</label><input type="text" name="celiac_name" required placeholder="Ad"></div><div class="form-group"><label>Çölyaklı Soyadı</label><input type="text" name="celiac_surname" required placeholder="Soyad"></div></div><div class="form-row"><div class="form-group"><label>Yakınlık</label><select name="celiac_relation"><option value="Kendisi">Kendisi</option><option value="Eşi">Eşi</option><option value="Çocuğu">Çocuğu</option><option value="Diğer">Diğer</option></select></div><div class="form-group"><label>Notlar</label><textarea name="celiac_desc" rows="1" placeholder="Ek bilgiler..."></textarea></div></div>`; container.appendChild(div); }
+        
+        async function addMember(e) { e.preventDefault(); if (!checkAdmin()) return; const celiacs = []; document.querySelectorAll('#celiacListContainer .celiac-card').forEach(card => { const name = card.querySelector('input[name="celiac_name"]')?.value.trim(); const surname = card.querySelector('input[name="celiac_surname"]')?.value.trim(); if (name && surname) celiacs.push({ name, surname, relation: card.querySelector('select[name="celiac_relation"]')?.value || 'Diğer', description: card.querySelector('textarea[name="celiac_desc"]')?.value || '' }); }); const member = { id: crypto.randomUUID(), first_name: document.getElementById('first_name').value.trim(), last_name: document.getElementById('last_name').value.trim(), tc_id: document.getElementById('tc_id').value.trim(), phone: document.getElementById('phone').value.trim() || null, member_type: document.getElementById('member_type').value, birth_date: document.getElementById('birth_date').value || null, profession: document.getElementById('profession').value.trim() || null, celiacs, description: document.getElementById('member_description').value.trim() || null, created_at: new Date().toISOString() }; const { error } = await supabaseClient.from('members').insert(member); if (!error) { data.members.unshift(member); document.getElementById('memberForm').reset(); document.getElementById('celiacListContainer').innerHTML = ''; renderMembers(); updateDashboard(); showToast('Üye kaydedildi', 'success'); } else showToast('Hata: ' + error.message, 'error'); }
+        
+        function renderMembers() { let filtered = [...data.members]; if (memberFilter !== 'all') filtered = filtered.filter(m => m.member_type === memberFilter); const tbody = document.getElementById('membersTableBody'); if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Henüz üye yok</td></tr>'; return; } const typeMap = { kurucu: '🏆 Kurucu', asil: '⭐ Asıl', onursal: '🌟 Onursal', degil: '📝 Üye Değil' }; tbody.innerHTML = filtered.map((m, idx) => `<tr><td>${idx+1}</td><td><strong>${escapeHtml(m.first_name)} ${escapeHtml(m.last_name)}</strong><br><small>${m.tc_id}</small></td><td><span class="badge badge-purple">${typeMap[m.member_type]}</span></td><td>${m.phone || '-'}</td><td>${m.birth_date ? new Date(m.birth_date).toLocaleDateString('tr-TR') : '-'}</td><td>${escapeHtml(m.profession) || '-'}</td><td>${(m.celiacs || []).map(c => `<span class="celiac-tag">${c.name} ${c.surname}</span>`).join(' ') || '-'}</td><td>${escapeHtml(m.description) || '-'}</td><td class="admin-only"><button class="btn btn-info btn-small" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-secondary btn-small" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }
+        
+        async function deleteMember(id) { if (!checkAdmin() || !confirm('Sil?')) return; const { error } = await supabaseClient.from('members').delete().eq('id', id); if (!error) { data.members = data.members.filter(m => m.id !== id); renderMembers(); updateDashboard(); showToast('Üye silindi', 'success'); } }
+        
+        async function addStock(e) { e.preventDefault(); if (!checkAdmin()) return; const stock = { id: crypto.randomUUID(), product_name: document.getElementById('product_name').value.trim(), entry_date: document.getElementById('entry_date').value, received_quantity: parseFloat(document.getElementById('received_quantity').value), remaining_quantity: parseFloat(document.getElementById('received_quantity').value), unit: document.getElementById('unit').value, created_at: new Date().toISOString() }; const { error } = await supabaseClient.from('stock').insert(stock); if (!error) { data.stock.unshift(stock); document.getElementById('stockForm').reset(); renderStock(); updateDashboard(); showToast('Stok eklendi', 'success'); } else showToast('Hata: ' + error.message, 'error'); }
+        
+        function renderStock() { const tbody = document.getElementById('stockTableBody'); if (!data.stock.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Stok yok</td></tr>'; return; } tbody.innerHTML = data.stock.map((s, idx) => `<tr><td>${idx+1}</td><td><strong>${escapeHtml(s.product_name)}</strong></td><td>${new Date(s.entry_date).toLocaleDateString('tr-TR')}</td><td>${s.received_quantity} ${s.unit}</td><td><strong>${s.remaining_quantity} ${s.unit}</strong></td><td><span class="badge ${s.remaining_quantity/s.received_quantity > 0.5 ? 'badge-green' : 'badge-yellow'}">${s.remaining_quantity/s.received_quantity > 0.5 ? 'Yeterli' : 'Azalıyor'}</span></td><td class="admin-only"><button class="btn btn-info btn-small" onclick="editStockItem('${s.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="deleteStock('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }
+        
+        async function editStockItem(id) { if (!checkAdmin()) return; const item = data.stock.find(s => s.id === id); if(!item) return; editingData = { type: 'stock', id }; const content = `<div class="form-group"><label>Ürün Adı</label><input id="edit_product_name" value="${escapeHtml(item.product_name)}"></div><div class="form-group"><label>Giriş Tarihi</label><input type="date" id="edit_entry_date" value="${item.entry_date}"></div><div class="form-group"><label>Alınan Miktar</label><input type="number" id="edit_received_qty" step="0.01" value="${item.received_quantity}"></div><div class="form-group"><label>Kalan Miktar</label><input type="number" id="edit_remaining_qty" step="0.01" value="${item.remaining_quantity}"></div><div class="form-group"><label>Birim</label><select id="edit_unit"><option ${item.unit==='Adet'?'selected':''}>Adet</option><option ${item.unit==='Kg'?'selected':''}>Kg</option><option ${item.unit==='Litre'?'selected':''}>Litre</option><option ${item.unit==='Paket'?'selected':''}>Paket</option></select></div>`; document.getElementById('editModalTitle').innerHTML = 'Stok Düzenle'; document.getElementById('editModalBody').innerHTML = content; document.getElementById('editModal').classList.add('active'); }
+        
+        async function deleteStock(id) { if (!checkAdmin() || !confirm('Sil?')) return; await supabaseClient.from('stock').delete().eq('id', id); data.stock = data.stock.filter(s => s.id !== id); renderStock(); updateDashboard(); showToast('Stok silindi', 'success'); }
+        
+        function updateMemberSelect() { const select = document.getElementById('member_id'); select.innerHTML = '<option value="">Üye seçiniz...</option>' + data.members.map(m => `<option value="${m.id}">${escapeHtml(m.first_name)} ${escapeHtml(m.last_name)}</option>`).join(''); select.onchange = function() { const member = data.members.find(m => m.id === this.value); const celiacSelect = document.getElementById('celiac_index'); celiacSelect.innerHTML = '<option value="">Seçilmedi</option>'; if (member?.celiacs?.length) member.celiacs.forEach((c, idx) => celiacSelect.innerHTML += `<option value="${idx}">${escapeHtml(c.name)} ${escapeHtml(c.surname)} (${c.relation})</option>`); }; }
+        
+        function addDistributionItem() { const container = document.getElementById('distributionItems'); const products = [...new Set(data.stock.map(s => s.product_name))]; const div = document.createElement('div'); div.className = 'distribution-item'; div.innerHTML = `<div class="form-row" style="flex:1"><select class="dist-product" required><option value="">Ürün seçiniz...</option>${products.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('')}</select><input type="number" class="dist-qty" step="0.01" placeholder="Miktar" required></div><button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>`; container.appendChild(div); }
+        
+        async function addDistribution(e) { e.preventDefault(); if (!checkAdmin()) return; const memberId = document.getElementById('member_id').value; if (!memberId) { showToast('Üye seçin', 'warning'); return; } const celiacIdx = document.getElementById('celiac_index').value; const member = data.members.find(m => m.id === memberId); let celiacName = 'Belirtilmemiş'; if (member && celiacIdx !== "" && member.celiacs && member.celiacs[celiacIdx]) celiacName = `${member.celiacs[celiacIdx].name} ${member.celiacs[celiacIdx].surname}`; const items = []; document.querySelectorAll('.distribution-item').forEach(it => { const p = it.querySelector('.dist-product')?.value; const q = parseFloat(it.querySelector('.dist-qty')?.value); if (p && q > 0) items.push({ productName: p, quantity: q, unit: 'Adet' }); }); if (items.length === 0) { showToast('Ürün ekleyin', 'warning'); return; } for (const item of items) { let rem = item.quantity; const stockItems = data.stock.filter(s => s.product_name === item.productName && s.remaining_quantity > 0).sort((a,b) => new Date(a.entry_date) - new Date(b.entry_date)); const totalAvail = stockItems.reduce((s,st) => s + st.remaining_quantity, 0); if (totalAvail < rem) { showToast(`${item.productName} stok yetersiz!`, 'error'); return; } for (const st of stockItems) { if (rem <= 0) break; const d = Math.min(rem, st.remaining_quantity); st.remaining_quantity = parseFloat((st.remaining_quantity - d).toFixed(2)); rem = parseFloat((rem - d).toFixed(2)); await supabaseClient.from('stock').update({ remaining_quantity: st.remaining_quantity }).eq('id', st.id); } } const dist = { id: crypto.randomUUID(), receipt_number: document.getElementById('receipt_number').value.trim(), member_id: memberId, celiac_name: celiacName, celiac_relation: '', distribution_date: document.getElementById('distribution_date').value, items, created_at: new Date().toISOString() }; const { error } = await supabaseClient.from('distributions').insert(dist); if (!error) { data.distributions.unshift(dist); renderDistributions(); renderStock(); updateDashboard(); document.getElementById('distributionForm').reset(); document.getElementById('distributionItems').innerHTML = ''; addDistributionItem(); document.getElementById('distribution_date').valueAsDate = new Date(); showToast('Dağıtım kaydedildi', 'success'); } else showToast('Hata: ' + error.message, 'error'); }
+        
+        function renderDistributions() { const tbody = document.getElementById('distributionTableBody'); if (!data.distributions.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Dağıtım yok</td></tr>'; return; } tbody.innerHTML = data.distributions.map(d => { const member = data.members.find(m => m.id === d.member_id); const items = d.items.map(i => `${i.productName}(${i.quantity})`).join(', '); return `<tr><td><span class="badge badge-green">${escapeHtml(d.receipt_number)}</span></td><td><strong>${member ? escapeHtml(member.first_name+' '+member.last_name) : '?'}</strong><br><small>${escapeHtml(d.celiac_name)}</small></td><td>${new Date(d.distribution_date).toLocaleDateString('tr-TR')}</td><td><small>${escapeHtml(items)}</small></td><td class="admin-only"><button class="btn btn-danger btn-small" onclick="deleteDistribution('${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }).join(''); }
+        
+        async function deleteDistribution(id) { if (!checkAdmin() || !confirm('Sil?')) return; await supabaseClient.from('distributions').delete().eq('id', id); data.distributions = data.distributions.filter(d => d.id !== id); renderDistributions(); await loadData(); showToast('Dağıtım silindi', 'success'); }
+        
+        async function addFinancial(e) { e.preventDefault(); if (!checkAdmin()) return; const rec = { id: crypto.randomUUID(), date: document.getElementById('date').value, type: document.getElementById('type').value, payment_method: document.getElementById('payment_method').value, description: document.getElementById('financial_description').value.trim(), amount: parseFloat(document.getElementById('amount').value), created_at: new Date().toISOString() }; const { error } = await supabaseClient.from('financial').insert(rec); if (!error) { data.financial.unshift(rec); renderFinancial(); updateDashboard(); document.getElementById('financialForm').reset(); document.getElementById('date').valueAsDate = new Date(); showToast('Kayıt eklendi', 'success'); } else showToast('Hata: ' + error.message, 'error'); }
+        
+        function renderFinancial() { const tbody = document.getElementById('financialTableBody'); if (!data.financial.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Kayıt yok</td></tr>'; } else { tbody.innerHTML = data.financial.map((r, idx) => `<tr><td>${idx+1}</td><td>${new Date(r.date).toLocaleDateString('tr-TR')}</td><td><span class="badge ${r.type === 'Gelir' ? 'badge-green' : 'badge-red'}">${r.type}</span></td><td>${r.payment_method}</td><td>${escapeHtml(r.description)}</td><td><strong>${r.amount.toLocaleString('tr-TR')} ₺</strong></td><td class="admin-only"><button class="btn btn-info btn-small" onclick="editFinancialRecord('${r.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="deleteFinancial('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); } const inc = data.financial.filter(r => r.type === 'Gelir').reduce((s, r) => s + r.amount, 0); const exp = data.financial.filter(r => r.type === 'Gider').reduce((s, r) => s + r.amount, 0); document.getElementById('totalIncome').innerHTML = inc.toLocaleString('tr-TR') + ' ₺'; document.getElementById('totalExpense').innerHTML = exp.toLocaleString('tr-TR') + ' ₺'; document.getElementById('netBalance').innerHTML = (inc - exp).toLocaleString('tr-TR') + ' ₺'; }
+        
+        async function deleteFinancial(id) { if (!checkAdmin() || !confirm('Sil?')) return; await supabaseClient.from('financial').delete().eq('id', id); data.financial = data.financial.filter(f => f.id !== id); renderFinancial(); updateDashboard(); showToast('Kayıt silindi', 'success'); }
+        
+        function updateDashboard() { const totalMembers = data.members.length; const kurucu = data.members.filter(m => m.member_type === 'kurucu').length; const asil = data.members.filter(m => m.member_type === 'asil').length; const onursal = data.members.filter(m => m.member_type === 'onursal').length; const uyeDegil = data.members.filter(m => m.member_type === 'degil').length; document.getElementById('totalMembers').innerHTML = totalMembers; document.getElementById('memberTypeStats').innerHTML = `🏆 Kurucu: ${kurucu} | ⭐ Asıl: ${asil} | 🌟 Onursal: ${onursal} | 📝 Üye Olmayan: ${uyeDegil}`; const totalCeliacs = data.members.reduce((sum, m) => sum + (m.celiacs?.length || 0), 0); document.getElementById('totalCeliacs').innerHTML = totalCeliacs; const activeMap = new Map(); data.stock.forEach(s => { if(s.remaining_quantity > 0) activeMap.set(s.product_name, (activeMap.get(s.product_name) || 0) + s.remaining_quantity); }); const totalActiveQty = Array.from(activeMap.values()).reduce((a,b)=>a+b,0); const distMap = new Map(); data.distributions.forEach(d => d.items.forEach(i => { distMap.set(i.productName, (distMap.get(i.productName) || 0) + i.quantity); })); const totalDistQty = Array.from(distMap.values()).reduce((a,b)=>a+b,0); document.getElementById('activeProductsDetail').innerHTML = `<strong>Stok Toplamı: ${totalActiveQty} adet</strong><br/>` + (activeMap.size ? Array.from(activeMap.entries()).map(([n,q]) => `<div>${n}: ${q} adet</div>`).join('') : 'Stokta ürün yok'); document.getElementById('distributedProductsDetail').innerHTML = `<strong>Dağıtım Toplamı: ${totalDistQty} adet</strong><br/>` + (distMap.size ? Array.from(distMap.entries()).map(([n,q]) => `<div>${n}: ${q} adet</div>`).join('') : 'Henüz dağıtım yok'); const inc = data.financial.filter(r => r.type === 'Gelir').reduce((s, r) => s + r.amount, 0); const exp = data.financial.filter(r => r.type === 'Gider').reduce((s, r) => s + r.amount, 0); document.getElementById('totalIncomeCard').innerHTML = inc.toLocaleString('tr-TR') + ' ₺'; document.getElementById('totalExpenseCard').innerHTML = exp.toLocaleString('tr-TR') + ' ₺'; document.getElementById('totalBalance').innerHTML = (inc - exp).toLocaleString('tr-TR') + ' ₺'; }
+        
+        function renderStatsChart() { const productTotals = new Map(); data.distributions.forEach(d => { d.items.forEach(item => { productTotals.set(item.productName, (productTotals.get(item.productName) || 0) + item.quantity); }); }); const categories = Array.from(productTotals.keys()); const seriesData = categories.map(c => productTotals.get(c)); if (stockChart) stockChart.destroy(); const options = { chart: { type: 'bar', height: 350 }, series: [{ name: 'Dağıtım Miktarı (adet)', data: seriesData }], xaxis: { categories: categories, title: { text: 'Ürünler' } }, yaxis: { title: { text: 'Miktar' } }, title: { text: 'Dağıtılan Ürünler (Toplam)', align: 'center' }, colors: ['#10b981'] }; stockChart = new ApexCharts(document.querySelector("#chart"), options); stockChart.render(); }
+        
+        async function loadData() { showToast('Veriler yükleniyor...', 'info'); try { const [mr, sr, dr, fr] = await Promise.all([supabaseClient.from('members').select('*').order('created_at', { ascending: false }), supabaseClient.from('stock').select('*').order('entry_date', { ascending: false }), supabaseClient.from('distributions').select('*').order('distribution_date', { ascending: false }), supabaseClient.from('financial').select('*').order('date', { ascending: false })]); if (mr.data) data.members = mr.data; if (sr.data) data.stock = sr.data; if (dr.data) data.distributions = dr.data; if (fr.data) data.financial = fr.data; updateDashboard(); renderMembers(); renderStock(); renderDistributions(); renderFinancial(); if(document.getElementById('reports').style.display !== 'none') renderStatsChart(); showToast('Veriler yüklendi!', 'success'); } catch(e) { showToast('Yükleme hatası', 'error'); } }
+        
+        function showPage(p) { document.querySelectorAll('.form-section').forEach(el => el.style.display = 'none'); document.getElementById(p).style.display = 'block'; document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active')); const pageNames = { dashboard: 'Anasayfa', members: 'Üyeler', stock: 'Stok', distribution: 'Dağıtım', financial: 'Gelir-Gider', reports: 'İstatistikler', settings: 'Ayarlar' }; const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(btn => btn.textContent.includes(pageNames[p])); if(activeBtn) activeBtn.classList.add('active'); if (p === 'distribution') { updateMemberSelect(); if (document.getElementById('distributionItems').children.length === 0) addDistributionItem(); document.getElementById('distribution_date').valueAsDate = new Date(); } if (p === 'reports') renderStatsChart(); if (p === 'members') { const existingFilter = document.getElementById('memberTypeFilter'); if(!existingFilter) { const filterDiv = document.createElement('div'); filterDiv.className = 'filter-select'; filterDiv.innerHTML = `<select id="memberTypeFilter"><option value="all">Tüm Üyelikler</option><option value="kurucu">Kurucu</option><option value="asil">Asıl</option><option value="onursal">Onursal</option><option value="degil">Üye Değil</option></select>`; document.querySelector('#members .table-container').prepend(filterDiv); document.getElementById('memberTypeFilter').addEventListener('change', (e) => { memberFilter = e.target.value; renderMembers(); }); } } }
+        
+        async function saveEdit() { if (!editingData || !checkAdmin()) return; if (editingData.type === 'stock') { const updates = { product_name: document.getElementById('edit_product_name').value, entry_date: document.getElementById('edit_entry_date').value, received_quantity: parseFloat(document.getElementById('edit_received_qty').value), remaining_quantity: parseFloat(document.getElementById('edit_remaining_qty').value), unit: document.getElementById('edit_unit').value }; const { error } = await supabaseClient.from('stock').update(updates).eq('id', editingData.id); if (!error) { const idx = data.stock.findIndex(s => s.id === editingData.id); if(idx!==-1) Object.assign(data.stock[idx], updates); renderStock(); updateDashboard(); closeEditModal(); showToast('Stok güncellendi', 'success'); } else showToast('Hata', 'error'); } }
+        
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); editingData = null; document.querySelector('#editModal .modal-footer .btn-primary').style.display = 'flex'; }
+        function viewMemberDetail(id) { const m = data.members.find(x => x.id === id); if (!m) return; const typeMap = { kurucu: 'Kurucu Üye', asil: 'Asıl Üye', onursal: 'Onursal Üye', degil: 'Üye Değil' }; let celiacHtml = '<div><strong>Çölyaklılar:</strong></div>'; if (m.celiacs?.length) m.celiacs.forEach(c => celiacHtml += `<div class="celiac-item"><b>${escapeHtml(c.name)} ${escapeHtml(c.surname)}</b> (${c.relation})<br><small>${escapeHtml(c.description) || ''}</small></div>`); else celiacHtml += '<p>Kayıtlı çölyaklı yok</p>'; const content = `<div class="member-detail-card"><h3>${escapeHtml(m.first_name)} ${escapeHtml(m.last_name)}</h3><p><strong>TC:</strong> ${m.tc_id} | <strong>Üyelik:</strong> ${typeMap[m.member_type]} | <strong>Meslek:</strong> ${escapeHtml(m.profession) || '-'}</p><p><strong>Telefon:</strong> ${m.phone || '-'} | <strong>Doğum:</strong> ${m.birth_date || '-'}</p>${m.description ? `<p><strong>Not:</strong> ${escapeHtml(m.description)}</p>` : ''}${celiacHtml}</div>`; document.getElementById('editModalTitle').innerHTML = '<i class="fas fa-user-circle"></i> Üye Detayı'; document.getElementById('editModalBody').innerHTML = content; document.getElementById('editModal').classList.add('active'); document.querySelector('#editModal .modal-footer .btn-primary').style.display = 'none'; }
+        function editMember(id) { if (!checkAdmin()) return; const m = data.members.find(x => x.id === id); if (!m) return; editingData = { type: 'member', id }; const content = `<div class="form-group"><label>Adı</label><input id="edit_first_name" value="${escapeHtml(m.first_name)}"></div><div class="form-group"><label>Soyadı</label><input id="edit_last_name" value="${escapeHtml(m.last_name)}"></div><div class="form-group"><label>TC</label><input id="edit_tc_id" value="${m.tc_id}"></div><div class="form-group"><label>Telefon</label><input id="edit_phone" value="${m.phone || ''}"></div><div class="form-group"><label>Üyelik Türü</label><select id="edit_member_type"><option ${m.member_type==='kurucu'?'selected':''} value="kurucu">Kurucu</option><option ${m.member_type==='asil'?'selected':''} value="asil">Asıl</option><option ${m.member_type==='onursal'?'selected':''} value="onursal">Onursal</option><option ${m.member_type==='degil'?'selected':''} value="degil">Üye Değil</option></select></div><div class="form-group"><label>Doğum Tarihi</label><input type="date" id="edit_birth_date" value="${m.birth_date || ''}"></div><div class="form-group"><label>Meslek</label><input id="edit_profession" value="${escapeHtml(m.profession) || ''}"></div><div class="form-group"><label>Açıklama</label><textarea id="edit_description">${escapeHtml(m.description) || ''}</textarea></div><div class="form-group"><label>Çölyaklılar (JSON)</label><textarea id="edit_celiacs" rows="4">${JSON.stringify(m.celiacs || [], null, 2)}</textarea></div>`; document.getElementById('editModalTitle').innerHTML = 'Üye Düzenle'; document.getElementById('editModalBody').innerHTML = content; document.getElementById('editModal').classList.add('active'); }
+        function editFinancialRecord(id) { const rec = data.financial.find(r => r.id === id); if (!rec) return; editingData = { type: 'financial', id }; const content = `<div class="form-group"><label>Tarih</label><input type="date" id="edit_fin_date" value="${rec.date}"></div><div class="form-group"><label>Tür</label><select id="edit_fin_type"><option ${rec.type==='Gelir'?'selected':''}>Gelir</option><option ${rec.type==='Gider'?'selected':''}>Gider</option></select></div><div class="form-group"><label>Ödeme Yöntemi</label><select id="edit_fin_payment"><option ${rec.payment_method==='Banka'?'selected':''}>Banka</option><option ${rec.payment_method==='Makbuz'?'selected':''}>Makbuz</option></select></div><div class="form-group"><label>Açıklama</label><textarea id="edit_fin_desc">${escapeHtml(rec.description)}</textarea></div><div class="form-group"><label>Tutar</label><input type="number" step="0.01" id="edit_fin_amount" value="${rec.amount}"></div>`; document.getElementById('editModalTitle').innerHTML = 'Finansal Düzenle'; document.getElementById('editModalBody').innerHTML = content; document.getElementById('editModal').classList.add('active'); }
+        function exportToExcel() { const wb = XLSX.utils.book_new(); const membersSheet = XLSX.utils.json_to_sheet(data.members.map(m => ({ Ad: m.first_name, Soyad: m.last_name, TC: m.tc_id, Telefon: m.phone, ÜyelikTürü: m.member_type, Doğum: m.birth_date, Meslek: m.profession, Açıklama: m.description, Çölyaklılar: JSON.stringify(m.celiacs) }))); XLSX.utils.book_append_sheet(wb, membersSheet, 'Üyeler'); const distSheet = XLSX.utils.json_to_sheet(data.distributions.map(d => ({ MakbuzNo: d.receipt_number, Tarih: d.distribution_date, ÜyeID: d.member_id, ÇölyaklıAd: d.celiac_name, Ürünler: JSON.stringify(d.items) }))); XLSX.utils.book_append_sheet(wb, distSheet, 'Dağıtımlar'); const finSheet = XLSX.utils.json_to_sheet(data.financial.map(f => ({ Tarih: f.date, Tür: f.type, ÖdemeYöntemi: f.payment_method, Açıklama: f.description, Tutar: f.amount }))); XLSX.utils.book_append_sheet(wb, finSheet, 'GelirGider'); XLSX.writeFile(wb, `colyak_verileri_${new Date().toISOString().slice(0,10)}.xlsx`); showToast('Excel dışa aktarıldı', 'success'); }
+        function exportData(format) { if (format === 'json') { const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `colyak-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('JSON indirildi', 'success'); } else { let csv = 'ÜYELER\nAd,Soyad,TC,Telefon,Üyelik Türü,Doğum,Meslek,Çölyaklılar,Açıklama\n'; data.members.forEach(m => { const celiacNames = (m.celiacs || []).map(c => `${c.name} ${c.surname}`).join('; '); csv += `"${m.first_name}","${m.last_name}","${m.tc_id}","${m.phone || ''}","${m.member_type}","${m.birth_date || ''}","${m.profession || ''}","${celiacNames}","${m.description || ''}"\n`; }); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `colyak-${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('CSV indirildi', 'success'); } }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+        window.onload = () => { document.getElementById('entry_date').valueAsDate = new Date(); document.getElementById('distribution_date').valueAsDate = new Date(); document.getElementById('date').valueAsDate = new Date(); if (sessionStorage.getItem('colyak_session')) { currentUserMode = sessionStorage.getItem('colyak_session'); showApp(); } };
+    </script>
+</body>
+</html>
