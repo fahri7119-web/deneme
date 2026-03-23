@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Çölyak Takip">
+    <title>Kırıkkale Çölyak Derneği - Mobil Takip</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary: #10b981; --primary-dark: #059669; --primary-light: #d1fae5; --primary-bg: #ecfdf5;
+            --secondary: #3b82f6; --secondary-dark: #2563eb; --danger: #ef4444; --danger-dark: #dc2626;
+            --warning: #f59e0b; --info: #06b6d4; --gray-50: #f9fafb; --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.1); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1); --radius-sm: 0.75rem; --radius-md: 1rem;
+            --radius-lg: 1.25rem; --radius-xl: 1.5rem;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-top: env(safe-area-inset-top, 0px);
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            color: var(--gray-800); 
+            line-height: 1.5; 
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+        
+        /* Mobil Giriş Ekranı */
+        #loginScreen { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(145deg, #065f46 0%, #10b981 100%); 
+            z-index: 10000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1.5rem;
+        }
+        #loginScreen.hidden { display: none; }
+        .login-card { 
+            background: rgba(255,255,255,0.98); 
+            backdrop-filter: blur(10px); 
+            border-radius: var(--radius-xl); 
+            padding: 2rem 1.5rem; 
+            width: 100%; 
+            max-width: 360px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+            text-align: center;
+        }
+        .login-logo { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem; color: white; }
+        .login-title { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.25rem; }
+        .login-subtitle { color: var(--gray-500); margin-bottom: 1.5rem; font-size: 0.8rem; }
+        .login-input { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--gray-200); border-radius: var(--radius-md); font-size: 1rem; margin-bottom: 1rem; transition: all 0.2s; background: white; }
+        .login-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .login-btn { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s; }
+        .login-error { background: #fee2e2; color: var(--danger-dark); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; display: none; font-size: 0.8rem; }
+        .login-error.show { display: block; }
+        
+        /* Mobil Alt Navigasyon */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem 0.5rem calc(0.5rem + var(--safe-bottom));
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        }
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 0;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: var(--radius-md);
+            color: var(--gray-500);
+            font-size: 0.7rem;
+        }
+        .nav-icon i { font-size: 1.4rem; }
+        .nav-icon.active { color: var(--primary); background: var(--primary-bg); font-weight: 600; }
+        .nav-icon span { font-size: 0.7rem; font-weight: 500; }
+        
+        /* Üst Bar */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem 1rem calc(1rem + var(--safe-top)) 1rem;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-area-mobile { display: flex; align-items: center; gap: 0.5rem; }
+        .logo-icon-mobile { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .logo-text-mobile h2 { font-size: 0.9rem; font-weight: 700; }
+        .logo-text-mobile p { font-size: 0.6rem; opacity: 0.9; }
+        .user-badge-mobile { background: rgba(255,255,255,0.2); padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.7rem; display: flex; align-items: center; gap: 0.4rem; }
+        .logout-btn-mobile { background: rgba(255,255,255,0.2); border: none; padding: 0.4rem 0.8rem; border-radius: 2rem; color: white; font-size: 0.7rem; cursor: pointer; }
+        
+        .main-content { padding: 1rem 1rem 1rem 1rem; max-width: 600px; margin: 0 auto; }
+        .view-banner { background: linear-gradient(90deg, var(--warning), #ea580c); color: white; padding: 0.6rem; text-align: center; border-radius: var(--radius-md); margin-bottom: 1rem; display: none; font-size: 0.75rem; }
+        .view-banner.show { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        
+        /* Mobil Kartlar */
+        .summary-cards { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+        .card { background: white; border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); }
+        .card-header { font-size: 0.75rem; font-weight: 600; color: var(--gray-500); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem; }
+        .card-value { font-size: 1.5rem; font-weight: 700; color: var(--gray-900); }
+        .product-list { font-size: 0.7rem; margin-top: 0.5rem; max-height: 100px; overflow-y: auto; }
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-top: 0.5rem; }
+        .btn { padding: 0.6rem 1rem; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; transition: all 0.2s; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), var(--danger-dark)); color: white; }
+        .btn-info { background: linear-gradient(135deg, var(--info), #0891b2); color: white; }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #ea580c); color: white; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.7rem; }
+        
+        .form-card { background: white; border-radius: var(--radius-lg); margin-bottom: 1rem; border: 1px solid var(--gray-200); overflow: hidden; }
+        .form-header { padding: 1rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+        .form-body { padding: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.4rem; }
+        .form-row { display: flex; flex-direction: column; gap: 1rem; }
+        input, select, textarea { width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.85rem; font-family: inherit; background: white; }
+        
+        .table-container { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow-x: auto; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: var(--gray-50); padding: 0.75rem 0.75rem; font-size: 0.7rem; font-weight: 600; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); text-align: left; }
+        td { padding: 0.75rem 0.75rem; border-bottom: 1px solid var(--gray-100); font-size: 0.75rem; vertical-align: top; }
+        .badge { display: inline-flex; padding: 0.2rem 0.5rem; border-radius: 2rem; font-size: 0.65rem; font-weight: 600; }
+        .badge-green { background: var(--primary-light); color: var(--primary-dark); }
+        .celiac-tag { background: var(--primary-light); color: var(--primary-dark); padding: 0.15rem 0.4rem; border-radius: 1rem; font-size: 0.6rem; display: inline-block; margin: 0.1rem; }
+        .distribution-item { background: var(--gray-50); border-radius: var(--radius-sm); padding: 0.6rem; margin-bottom: 0.6rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .distribution-item .form-row { flex: 1; margin: 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+        .modal-header { padding: 1rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .modal-footer { padding: 1rem; border-top: 1px solid var(--gray-200); display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .toast-container { position: fixed; bottom: 80px; left: 1rem; right: 1rem; z-index: 3000; display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+        .toast { background: var(--gray-800); color: white; padding: 0.7rem 1rem; border-radius: 2rem; font-size: 0.8rem; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.5rem; animation: slideUp 0.2s ease; max-width: 90%; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .empty-state { text-align: center; padding: 2rem; color: var(--gray-500); font-size: 0.8rem; }
+        .stats-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .stat-card { background: white; border-radius: var(--radius-lg); padding: 1rem; border: 1px solid var(--gray-200); }
+        #chart, #memberDistChart, #memberProductChart { height: 280px; margin-top: 0.5rem; }
+        .member-detail-card { background: var(--primary-bg); border-radius: var(--radius-md); padding: 0.8rem; margin-top: 0.5rem; }
+        
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .admin-only.viewer-hidden { display: none; }
+        body.view-mode .admin-only { display: none !important; }
+        
+        @media (min-width: 640px) {
+            .summary-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .quick-actions { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🌾</div>
+            <div class="login-title">Kırıkkale Çölyak</div>
+            <div class="login-subtitle">Takip Sistemine Hoş Geldiniz</div>
+            <div class="login-error" id="loginError">Hatalı şifre!</div>
+            <input type="password" id="loginPassword" class="login-input" placeholder="Şifrenizi giriniz..." onkeydown="if(event.key==='Enter') doLogin()">
+            <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+        </div>
+    </div>
+
+    <!-- ANA UYGULAMA -->
+    <div id="appContainer" style="display: none;">
+        <div class="app-header">
+            <div class="header-content">
+                <div class="logo-area-mobile">
+                    <div class="logo-icon-mobile"><i class="fas fa-seedling"></i></div>
+                    <div class="logo-text-mobile">
+                        <h2>Kırıkkale Çölyak</h2>
+                        <p>Takip Sistemi</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span id="mobileUserBadge" class="user-badge-mobile"><i class="fas fa-user-shield"></i> Admin</span>
+                    <button class="logout-btn-mobile" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="view-banner" id="viewModeBanner"><i class="fas fa-eye"></i> GÖRÜNTÜLEME MODU - Sadece okuma</div>
+
+            <!-- Sayfalar -->
+            <div id="dashboard" class="form-section active">
+                <div class="summary-cards" id="dashboardCards"></div>
+                <div class="card admin-only"><div class="card-header"><i class="fas fa-bolt"></i> Hızlı İşlemler</div><div class="quick-actions"><button class="btn btn-primary" onclick="showPage('members')"><i class="fas fa-user-plus"></i> Üye Ekle</button><button class="btn btn-info" onclick="showPage('stock')"><i class="fas fa-plus-circle"></i> Stok Giriş</button><button class="btn btn-warning" onclick="showPage('distribution')"><i class="fas fa-hand-holding-heart"></i> Dağıtım</button><button class="btn btn-primary" onclick="showPage('financial')"><i class="fas fa-money-bill-wave"></i> Finans</button></div></div>
+            </div>
+
+            <div id="members" class="form-section"></div>
+            <div id="stock" class="form-section"></div>
+            <div id="distribution" class="form-section"></div>
+            <div id="distributionPlan" class="form-section"></div>
+            <div id="financial" class="form-section"></div>
+            <div id="reports" class="form-section"></div>
+            <div id="settings" class="form-section"></div>
+        </div>
+
+        <!-- Mobil Alt Navigasyon -->
+        <div class="mobile-bottom-nav">
+            <div class="nav-icon" data-page="dashboard"><i class="fas fa-chart-line"></i><span>Ana Sayfa</span></div>
+            <div class="nav-icon" data-page="members"><i class="fas fa-users"></i><span>Üyeler</span></div>
+            <div class="nav-icon" data-page="stock"><i class="fas fa-boxes"></i><span>Stok</span></div>
+            <div class="nav-icon" data-page="distribution"><i class="fas fa-truck"></i><span>Dağıtım</span></div>
+            <div class="nav-icon" data-page="financial"><i class="fas fa-coins"></i><span>Gelir/Gider</span></div>
+            <div class="nav-icon" data-page="reports"><i class="fas fa-chart-bar"></i><span>İstatistik</span></div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Düzenle</div><button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="editModalBody"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeEditModal()">İptal</button><button class="btn btn-primary" onclick="saveEdit()">Kaydet</button></div></div></div>
+
+    <script>
+        const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let data = { members: [], stock: [], distributions: [], financial: [], distributionPlans: [], passwords: { admin: 'admin123', viewer: 'goruntule123' } };
+        let currentUserMode = null;
+        let editingData = null;
+        
+        function showToast(msg, type) { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast`; t.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><span>${msg}</span>`; c.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        function checkAdmin() { if (currentUserMode !== 'admin') { showToast('Admin yetkisi gerekli!', 'error'); return false; } return true; }
+        
+        async function loadPasswordsFromSupabase() { try { const { data: pwd } = await supabaseClient.from('settings').select('value').eq('key', 'passwords').single(); if (pwd?.value) data.passwords = pwd.value; } catch(e) {} }
+        async function savePasswordsToSupabase() { if (!checkAdmin()) return false; await supabaseClient.from('settings').upsert({ key: 'passwords', value: data.passwords, updated_at: new Date().toISOString() }, { onConflict: 'key' }); return true; }
+        async function changePassword(type) { if (!checkAdmin()) return; const newPw = prompt('Yeni şifre (min 4 karakter):'); if (!newPw || newPw.length < 4) { showToast('Şifre en az 4 karakter', 'warning'); return; } data.passwords[type] = newPw; if (await savePasswordsToSupabase()) showToast('Şifre değiştirildi', 'success'); }
+        
+        async function doLogin() { const pw = document.getElementById('loginPassword').value; await loadPasswordsFromSupabase(); if (pw === data.passwords.admin) { currentUserMode = 'admin'; sessionStorage.setItem('colyak_session', 'admin'); showApp(); } else if (pw === data.passwords.viewer) { currentUserMode = 'viewer'; sessionStorage.setItem('colyak_session', 'viewer'); showApp(); } else { document.getElementById('loginError').classList.add('show'); setTimeout(() => document.getElementById('loginError').classList.remove('show'), 2000); } }
+        
+        function showApp() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContainer').style.display = 'block'; const isAdmin = currentUserMode === 'admin'; document.getElementById('mobileUserBadge').innerHTML = isAdmin ? '<i class="fas fa-user-shield"></i> Admin' : '<i class="fas fa-eye"></i> Görüntüleme'; document.getElementById('viewModeBanner').classList.toggle('show', !isAdmin); document.body.classList.toggle('view-mode', !isAdmin); loadData(); }
+        
+        function doLogout() { if (confirm('Çıkış yap?')) { currentUserMode = null; sessionStorage.removeItem('colyak_session'); document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appContainer').style.display = 'none'; } }
+        
+        async function loadData() { showToast('Veriler yükleniyor...', 'info'); try { const [mr, sr, dr, fr, pr] = await Promise.all([supabaseClient.from('members').select('*').order('created_at', { ascending: false }), supabaseClient.from('stock').select('*').order('entry_date', { ascending: false }), supabaseClient.from('distributions').select('*').order('distribution_date', { ascending: false }), supabaseClient.from('financial').select('*').order('date', { ascending: false }), supabaseClient.from('distribution_plans').select('*').order('created_at', { ascending: false })]); if (mr.data) data.members = mr.data; if (sr.data) data.stock = sr.data; if (dr.data) data.distributions = dr.data; if (fr.data) data.financial = fr.data; if (pr && pr.data) data.distributionPlans = pr.data; updateDashboard(); renderMembers(); renderStock(); renderDistributions(); renderFinancial(); renderDistributionPlans(); if(document.getElementById('reports').style.display !== 'none') { renderStatsChart(); renderMemberDistStats(); renderMemberDistChart(); } showToast('Veriler yüklendi', 'success'); } catch(e) { showToast('Yükleme hatası', 'error'); } }
+        
+        function updateDashboard() { const inc = data.financial.filter(r => r.type === 'Gelir').reduce((s, r) => s + r.amount, 0); const exp = data.financial.filter(r => r.type === 'Gider').reduce((s, r) => s + r.amount, 0); const totalCeliacs = data.members.reduce((sum, m) => sum + (m.celiacs?.length || 0), 0); const activeStock = data.stock.filter(s => s.remaining_quantity > 0).length; const container = document.getElementById('dashboardCards'); if(container) container.innerHTML = `<div class="card"><div class="card-header"><i class="fas fa-users"></i> Toplam Üye</div><div class="card-value">${data.members.length}</div><div class="small-stats">Çölyaklı: ${totalCeliacs}</div></div><div class="card"><div class="card-header"><i class="fas fa-boxes"></i> Aktif Stok</div><div class="card-value">${activeStock}</div></div><div class="card"><div class="card-header"><i class="fas fa-truck"></i> Dağıtım</div><div class="card-value">${data.distributions.length}</div></div><div class="card"><div class="card-header"><i class="fas fa-wallet"></i> Bakiye</div><div class="card-value">${(inc - exp).toLocaleString('tr-TR')} ₺</div></div>`; }
+        
+        function showPage(page) { document.querySelectorAll('.form-section').forEach(el => el.style.display = 'none'); document.getElementById(page).style.display = 'block'; document.querySelectorAll('.nav-icon').forEach(btn => btn.classList.remove('active')); document.querySelector(`.nav-icon[data-page="${page}"]`).classList.add('active'); if (page === 'reports') { renderStatsChart(); renderMemberDistStats(); renderMemberDistChart(); } if (page === 'distribution' && !document.getElementById('distributionItems')?.children.length) addDistributionItem(); if (page === 'distributionPlan' && !document.getElementById('planDistributionItems')?.children.length) addPlanDistributionItem(); if (page === 'members') renderMembers(); if (page === 'stock') renderStock(); if (page === 'financial') renderFinancial(); if (page === 'distributionPlan') renderDistributionPlans(); }
+        
+        // Basit render fonksiyonları (önceki mantıkla aynı, mobil için kısaltılmış)
+        function renderMembers() { const container = document.getElementById('members'); if(!container) return; let html = `<div class="form-card admin-only"><div class="form-header"><i class="fas fa-user-plus"></i> Yeni Üye</div><div class="form-body"><form id="memberForm" onsubmit="addMember(event)"><div class="form-group"><input type="text" id="first_name" placeholder="Ad" required></div><div class="form-group"><input type="text" id="last_name" placeholder="Soyad" required></div><div class="form-group"><input type="text" id="tc_id" placeholder="TC Kimlik" maxlength="11"></div><div class="form-group"><select id="member_type"><option value="kurucu">Kurucu</option><option value="asil">Asıl</option><option value="onursal">Onursal</option><option value="degil">Üye Değil</option></select></div><div id="celiacListContainer"></div><button type="button" class="btn btn-secondary btn-small" onclick="addCeliacField()">+ Çölyaklı Ekle</button><button type="submit" class="btn btn-primary">Kaydet</button></form></div></div><div class="table-container"><table><thead><tr><th>Ad Soyad</th><th>Üyelik</th><th>Çölyaklılar</th><th class="admin-only">İşlem</th></tr></thead><tbody id="membersTableBody"></tbody></table></div>`; container.innerHTML = html; const tbody = document.getElementById('membersTableBody'); if(tbody) tbody.innerHTML = data.members.map(m => `<tr><td><strong>${escapeHtml(m.first_name)} ${escapeHtml(m.last_name)}</strong><br><small>${m.tc_id}</small></td><td><span class="badge badge-green">${m.member_type}</span></td><td>${(m.celiacs || []).map(c => `<span class="celiac-tag">${c.name} ${c.surname}</span>`).join(' ') || '-'}</td><td class="admin-only"><button class="btn btn-info btn-small" onclick="viewMemberDetail('${m.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }
+        
+        function addCeliacField() { const container = document.getElementById('celiacListContainer'); if(!container) return; const div = document.createElement('div'); div.className = 'celiac-card'; div.style.background = 'var(--gray-50)'; div.style.padding = '0.5rem'; div.style.marginBottom = '0.5rem'; div.style.borderRadius = '0.5rem'; div.innerHTML = `<input type="text" name="celiac_name" placeholder="Çölyaklı Adı" style="width:48%;display:inline-block;margin-right:2%"><input type="text" name="celiac_surname" placeholder="Soyadı" style="width:48%"><button type="button" class="btn btn-danger btn-small" style="margin-top:0.3rem" onclick="this.parentElement.remove()">Sil</button>`; container.appendChild(div); }
+        
+        async function addMember(e) { e.preventDefault(); if(!checkAdmin()) return; const celiacs = []; document.querySelectorAll('#celiacListContainer .celiac-card').forEach(card => { const name = card.querySelector('input[name="celiac_name"]')?.value.trim(); const surname = card.querySelector('input[name="celiac_surname"]')?.value.trim(); if(name && surname) celiacs.push({ name, surname, relation: 'Diğer', description: '' }); }); const member = { id: crypto.randomUUID(), first_name: document.getElementById('first_name').value.trim(), last_name: document.getElementById('last_name').value.trim(), tc_id: document.getElementById('tc_id').value.trim(), phone: null, member_type: document.getElementById('member_type').value, birth_date: null, profession: null, celiacs, description: null, created_at: new Date().toISOString() }; const { error } = await supabaseClient.from('members').insert(member); if(!error){ data.members.unshift(member); renderMembers(); updateDashboard(); showToast('Üye kaydedildi','success'); } else showToast('Hata','error'); }
+        
+        async function deleteMember(id) { if(!checkAdmin()||!confirm('Sil?')) return; await supabaseClient.from('members').delete().eq('id', id); data.members = data.members.filter(m=>m.id!==id); renderMembers(); updateDashboard(); }
+        
+        function viewMemberDetail(id) { const m = data.members.find(x=>x.id===id); if(!m) return; alert(`Ad: ${m.first_name} ${m.last_name}\nTC: ${m.tc_id}\nÜyelik: ${m.member_type}\nÇölyaklılar: ${(m.celiacs||[]).map(c=>c.name+' '+c.surname).join(', ')}`); }
+        
+        function addDistributionItem() { const container = document.getElementById('distributionItems'); if(!container) return; const products = [...new Set(data.stock.map(s=>s.product_name))]; const div = document.createElement('div'); div.className = 'distribution-item'; div.innerHTML = `<select class="dist-product" required style="flex:1"><option value="">Ürün</option>${products.map(p=>`<option>${escapeHtml(p)}</option>`).join('')}</select><input type="number" class="dist-qty" placeholder="Miktar" style="width:100px"><button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>`; container.appendChild(div); }
+        function addPlanDistributionItem() { const container = document.getElementById('planDistributionItems'); if(!container) return; const products = [...new Set(data.stock.map(s=>s.product_name))]; const div = document.createElement('div'); div.className = 'distribution-item'; div.innerHTML = `<select class="plan-dist-product" required style="flex:1"><option value="">Ürün</option>${products.map(p=>`<option>${escapeHtml(p)}</option>`).join('')}</select><input type="number" class="plan-dist-qty" placeholder="Miktar" style="width:100px"><button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>`; container.appendChild(div); }
+        
+        function renderStock() { const container = document.getElementById('stock'); if(!container) return; container.innerHTML = `<div class="form-card admin-only"><div class="form-header">Stok Girişi</div><div class="form-body"><form id="stockForm" onsubmit="addStock(event)"><input type="text" id="product_name" placeholder="Ürün Adı" required><input type="date" id="entry_date" required><input type="number" id="received_quantity" step="0.01" placeholder="Miktar" required><select id="unit"><option>Adet</option><option>Kg</option></select><button class="btn btn-primary">Ekle</button></form></div></div><div class="table-container"><table><thead><tr><th>Ürün</th><th>Miktar</th><th>Kalan</th><th class="admin-only">İşlem</th></tr></thead><tbody id="stockTableBody"></tbody></table></div>`; const tbody = document.getElementById('stockTableBody'); if(tbody) tbody.innerHTML = data.stock.map((s,i)=>`<tr><td>${escapeHtml(s.product_name)}</td><td>${s.received_quantity} ${s.unit}</td><td><strong>${s.remaining_quantity} ${s.unit}</strong></td><td class="admin-only"><button class="btn btn-danger btn-small" onclick="deleteStock('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }
+        
+        async function addStock(e) { e.preventDefault(); if(!checkAdmin()) return; const stock = { id: crypto.randomUUID(), product_name: document.getElementById('product_name').value.trim(), entry_date: document.getElementById('entry_date').value, received_quantity: parseFloat(document.getElementById('received_quantity').value), remaining_quantity: parseFloat(document.getElementById('received_quantity').value), unit: document.getElementById('unit').value, created_at: new Date().toISOString() }; await supabaseClient.from('stock').insert(stock); data.stock.unshift(stock); renderStock(); updateDashboard(); showToast('Stok eklendi','success'); }
+        async function deleteStock(id) { if(!checkAdmin()) return; await supabaseClient.from('stock').delete().eq('id', id); data.stock = data.stock.filter(s=>s.id!==id); renderStock(); updateDashboard(); }
+        
+        function renderDistributions() { const cont = document.getElementById('distribution'); if(!cont) return; cont.innerHTML = `<div class="form-card admin-only"><div class="form-header">Yeni Dağıtım</div><div class="form-body"><form id="distributionForm" onsubmit="addDistribution(event)"><input type="text" id="receipt_number" placeholder="Makbuz No"><input type="date" id="distribution_date"><select id="member_id"><option value="">Üye seç</option>${data.members.map(m=>`<option value="${m.id}">${m.first_name} ${m.last_name}</option>`).join('')}</select><div id="distributionItems"></div><button type="button" class="btn btn-secondary" onclick="addDistributionItem()">+ Ürün Ekle</button><button class="btn btn-primary">Dağıtım Yap</button></form></div></div><div class="table-container"><table><thead><tr><th>Makbuz</th><th>Üye</th><th>Ürünler</th><th class="admin-only">İşlem</th></tr></thead><tbody id="distributionTableBody"></tbody></table></div>`; const tbody = document.getElementById('distributionTableBody'); if(tbody) tbody.innerHTML = data.distributions.map(d=>`<tr><td>${d.receipt_number}</td><td>${data.members.find(m=>m.id===d.member_id)?.first_name || '-'}</td><td>${d.items.map(i=>i.productName).join(',')}</td><td class="admin-only"><button class="btn btn-danger btn-small" onclick="deleteDistribution('${d.id}')">Sil</button></td></tr>`).join(''); }
+        
+        async function addDistribution(e) { e.preventDefault(); if(!checkAdmin()) return; const memberId = document.getElementById('member_id').value; if(!memberId) return showToast('Üye seçin','warning'); const items = []; document.querySelectorAll('.distribution-item').forEach(it=>{ const p = it.querySelector('.dist-product')?.value; const q = parseFloat(it.querySelector('.dist-qty')?.value); if(p && q>0) items.push({productName:p, quantity:q, unit:'Adet'}); }); if(!items.length) return showToast('Ürün ekleyin','warning'); const dist = { id:crypto.randomUUID(), receipt_number: document.getElementById('receipt_number').value, member_id: memberId, celiac_name:'', distribution_date: document.getElementById('distribution_date').value, items, created_at: new Date().toISOString() }; await supabaseClient.from('distributions').insert(dist); data.distributions.unshift(dist); renderDistributions(); updateDashboard(); showToast('Dağıtım kaydedildi','success'); }
+        async function deleteDistribution(id) { if(!checkAdmin()||!confirm('Sil?')) return; await supabaseClient.from('distributions').delete().eq('id',id); data.distributions = data.distributions.filter(d=>d.id!==id); renderDistributions(); updateDashboard(); }
+        
+        function renderFinancial() { const cont = document.getElementById('financial'); if(!cont) return; const inc = data.financial.filter(r=>r.type==='Gelir').reduce((s,r)=>s+r.amount,0); const exp = data.financial.filter(r=>r.type==='Gider').reduce((s,r)=>s+r.amount,0); cont.innerHTML = `<div class="form-card admin-only"><div class="form-header">Yeni Kayıt</div><div class="form-body"><form id="financialForm" onsubmit="addFinancial(event)"><input type="date" id="date" required><select id="type"><option>Gelir</option><option>Gider</option></select><select id="payment_method"><option>Banka</option><option>Makbuz</option></select><textarea id="financial_description" placeholder="Açıklama"></textarea><input type="number" id="amount" placeholder="Tutar" step="0.01"><button class="btn btn-primary">Ekle</button></form></div></div><div class="financial-summary" style="display:flex;gap:0.5rem;margin-bottom:1rem"><div class="card" style="flex:1"><div>Gelir</div><div>${inc.toLocaleString()} ₺</div></div><div class="card" style="flex:1"><div>Gider</div><div>${exp.toLocaleString()} ₺</div></div><div class="card" style="flex:1"><div>Bakiye</div><div>${(inc-exp).toLocaleString()} ₺</div></div></div><div class="table-container"><table><thead><tr><th>Tarih</th><th>Tür</th><th>Tutar</th><th class="admin-only">İşlem</th></tr></thead><tbody id="financialTableBody"></tbody></table></div>`; const tbody = document.getElementById('financialTableBody'); if(tbody) tbody.innerHTML = data.financial.map(f=>`<tr><td>${f.date}</td><td>${f.type}</td><td>${f.amount} ₺</td><td class="admin-only"><button class="btn btn-danger btn-small" onclick="deleteFinancial('${f.id}')">Sil</button></td></tr>`).join(''); }
+        async function addFinancial(e) { e.preventDefault(); if(!checkAdmin()) return; const rec = { id:crypto.randomUUID(), date:document.getElementById('date').value, type:document.getElementById('type').value, payment_method:document.getElementById('payment_method').value, description:document.getElementById('financial_description').value, amount:parseFloat(document.getElementById('amount').value), created_at:new Date().toISOString() }; await supabaseClient.from('financial').insert(rec); data.financial.unshift(rec); renderFinancial(); updateDashboard(); showToast('Kayıt eklendi','success'); }
+        async function deleteFinancial(id) { if(!checkAdmin()||!confirm('Sil?')) return; await supabaseClient.from('financial').delete().eq('id',id); data.financial = data.financial.filter(f=>f.id!==id); renderFinancial(); updateDashboard(); }
+        
+        function renderDistributionPlans() { const cont = document.getElementById('distributionPlan'); if(!cont) return; cont.innerHTML = `<div class="form-card admin-only"><div class="form-header">Plan Oluştur</div><div class="form-body"><form id="planForm" onsubmit="addDistributionPlan(event)"><input type="date" id="plan_date"><select id="plan_member_id">${data.members.map(m=>`<option value="${m.id}">${m.first_name} ${m.last_name}</option>`).join('')}</select><div id="planDistributionItems"></div><button type="button" class="btn btn-secondary" onclick="addPlanDistributionItem()">+ Ürün</button><button class="btn btn-warning">Planla</button></form></div></div><div class="table-container"><table><thead><tr><th>Tarih</th><th>Üye</th><th>Ürünler</th><th class="admin-only">İşlem</th></tr></thead><tbody id="planTableBody"></tbody></table></div>`; const tbody = document.getElementById('planTableBody'); if(tbody) tbody.innerHTML = data.distributionPlans.map(p=>`<tr><td>${p.planned_date}</td><td>${data.members.find(m=>m.id===p.member_id)?.first_name||'-'}</td><td>${p.items.map(i=>i.productName).join(',')}</td><td class="admin-only"><button class="btn btn-danger btn-small" onclick="deleteDistributionPlan('${p.id}')">Sil</button></td></tr>`).join(''); }
+        async function addDistributionPlan(e) { e.preventDefault(); if(!checkAdmin()) return; const items = []; document.querySelectorAll('#planDistributionItems .distribution-item').forEach(it=>{ const p = it.querySelector('.plan-dist-product')?.value; const q = parseFloat(it.querySelector('.plan-dist-qty')?.value); if(p && q>0) items.push({productName:p, quantity:q, unit:'Adet'}); }); if(!items.length) return; const plan = { id:crypto.randomUUID(), member_id:document.getElementById('plan_member_id').value, celiac_name:'', items, planned_date:document.getElementById('plan_date').value, notes:'', status:'planned', created_at:new Date().toISOString() }; await supabaseClient.from('distribution_plans').insert(plan); data.distributionPlans.unshift(plan); renderDistributionPlans(); updateDashboard(); showToast('Planlandı','success'); }
+        async function deleteDistributionPlan(id) { if(!checkAdmin()||!confirm('Sil?')) return; await supabaseClient.from('distribution_plans').delete().eq('id',id); data.distributionPlans = data.distributionPlans.filter(p=>p.id!==id); renderDistributionPlans(); updateDashboard(); }
+        
+        function renderStatsChart() { const productTotals = new Map(); data.distributions.forEach(d=>d.items.forEach(item=>productTotals.set(item.productName, (productTotals.get(item.productName)||0)+item.quantity))); const categories = Array.from(productTotals.keys()); const seriesData = categories.map(c=>productTotals.get(c)); const chartDiv = document.querySelector("#chart"); if(chartDiv && window.ApexCharts) new ApexCharts(chartDiv, { chart:{type:'bar', height:280}, series:[{name:'Dağıtım', data:seriesData}], xaxis:{categories:categories}, colors:['#10b981'] }).render(); }
+        function renderMemberDistStats() { const cont = document.getElementById('memberDistributionStats'); if(cont) cont.innerHTML = '<div class="empty-state">Dağıtım verisi için grafikler</div>'; }
+        function renderMemberDistChart() { const chartDiv = document.querySelector("#memberDistChart"); if(chartDiv && window.ApexCharts) new ApexCharts(chartDiv, { chart:{type:'pie', height:280}, series:[1,2,3], labels:['Örnek'] }).render(); }
+        
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        
+        window.onload = () => { if (sessionStorage.getItem('colyak_session')) { currentUserMode = sessionStorage.getItem('colyak_session'); showApp(); } };
+    </script>
+</body>
+</html>
