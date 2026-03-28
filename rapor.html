@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kırıkkale Çölyak Derneği | Detaylı Rapor Paneli (Tablo Destekli)</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, 'Inter', sans-serif;
+            background: #f4f7fc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        /* Login Sayfası */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0c4e3a, #0b5e42);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .login-card {
+            background: white;
+            max-width: 400px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+        .login-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0b5e42;
+        }
+        .login-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin: 0.8rem 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+        }
+        .login-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .login-btn:hover {
+            background: #059669;
+        }
+        .login-error {
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            display: none;
+            font-size: 0.8rem;
+        }
+        /* Ana Uygulama */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .report-header {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .logo h1 {
+            font-size: 1.3rem;
+            color: #0b5e42;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+        /* Filtre alanı */
+        .filter-bar {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .filter-group input, .filter-group button {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.85rem;
+        }
+        .filter-group button {
+            background: #10b981;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .filter-group button:hover {
+            background: #059669;
+        }
+        .report-gen-btn {
+            background: #f59e0b !important;
+        }
+        .report-gen-btn:hover {
+            background: #ea580c !important;
+        }
+        /* Kartlar */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1rem 1.2rem;
+            border-radius: 1.2rem;
+            border-left: 5px solid #10b981;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .stat-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .chart-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-left: 4px solid #10b981;
+            padding-left: 0.7rem;
+        }
+        canvas {
+            max-height: 320px;
+            width: 100%;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .empty-data {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            background: #f8fafc;
+            border-radius: 1rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+        }
+        /* Rapor önizleme */
+        .report-preview {
+            background: white;
+            border-radius: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            display: none;
+        }
+        .report-preview h3 {
+            margin-bottom: 1rem;
+        }
+        .report-actions {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .report-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #fefce8;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+        }
+        .report-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.8rem;
+        }
+        .report-content th, .report-content td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .report-content th {
+            background: #e2e8f0;
+            font-weight: 600;
+        }
+        @media (max-width: 780px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN EKRANI -->
+<div id="loginScreen" class="login-overlay">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="login-title">Rapor Paneli</div>
+        <p style="color:#4b5563; margin-bottom:1rem;">Kırıkkale Çölyak Derneği</p>
+        <div id="loginErrorMsg" class="login-error">❌ Geçersiz e-posta veya şifre</div>
+        <input type="email" id="loginEmail" class="login-input" placeholder="E-posta adresiniz" autocomplete="email">
+        <input type="password" id="loginPassword" class="login-input" placeholder="Şifre" autocomplete="current-password">
+        <button class="login-btn" onclick="doLogin()"><i class="fas fa-key"></i> Giriş Yap</button>
+        <p style="font-size:0.7rem; margin-top:1rem; color:#6b7280;">Yetkili hesabınızla giriş yapınız.</p>
+    </div>
+</div>
+
+<!-- ANA PANEL -->
+<div id="mainApp" style="display: none;">
+    <div class="app-container">
+        <div class="report-header">
+            <div class="logo">
+                <h1><i class="fas fa-chart-pie" style="color:#10b981;"></i> Çölyak Derneği | Detaylı İstatistik Raporu (Tablo Destekli)</h1>
+            </div>
+            <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+        </div>
+
+        <!-- Tarih Filtreleri -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label><i class="fas fa-calendar-alt"></i> Başlangıç Tarihi</label>
+                <input type="date" id="startDate" value="2025-01-01">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-calendar-check"></i> Bitiş Tarihi</label>
+                <input type="date" id="endDate" value="">
+            </div>
+            <div class="filter-group">
+                <button id="applyFilterBtn"><i class="fas fa-chart-line"></i> Grafikleri Güncelle</button>
+            </div>
+            <div class="filter-group">
+                <button id="generateReportBtn" class="report-gen-btn"><i class="fas fa-file-alt"></i> Detaylı Rapor (Tablolu)</button>
+            </div>
+        </div>
+
+        <!-- Özet Kartları -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-title"><i class="fas fa-users"></i> Toplam Üye (İletişim hariç)</div><div class="stat-value" id="totalMembers">-</div></div>
+            <div class="stat-card"><div class="stat-title"><i class="fas fa-heartbeat"></i> Çölyaklı Birey</div><div class="stat-value" id="totalCeliacs">-</div></div>
+            <div class="stat-card"><div class="stat-title"><i class="fas fa-boxes"></i> Dağıtılan Ürün Adedi</div><div class="stat-value" id="totalDistributedQty">-</div></div>
+            <div class="stat-card"><div class="stat-title"><i class="fas fa-coins"></i> Toplam Gelir (TL)</div><div class="stat-value" id="totalIncome">-</div></div>
+            <div class="stat-card"><div class="stat-title"><i class="fas fa-chart-line"></i> Net Bakiye (TL)</div><div class="stat-value" id="netBalance">-</div></div>
+        </div>
+
+        <!-- Grafikler Grid -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Üyelik Türü Dağılımı (Filtrelenmiş)</h3>
+                <canvas id="memberTypeChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Aylık Dağıtım Miktarı (Filtrelenmiş)</h3>
+                <canvas id="monthlyDistChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar"></i> En Çok Dağıtılan Ürünler</h3>
+                <canvas id="productDistChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-column"></i> Aylık Gelir & Gider (Filtrelenmiş)</h3>
+                <canvas id="financialChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-card full-width">
+                <h3><i class="fas fa-warehouse"></i> Mevcut Stok Miktarları (Kalan)</h3>
+                <canvas id="stockChart" width="800" height="320"></canvas>
+            </div>
+        </div>
+
+        <!-- Rapor Önizleme Alanı -->
+        <div id="reportPreview" class="report-preview">
+            <div class="report-actions">
+                <button id="downloadDocBtn" style="background:#2563eb; color:white; border:none; padding:0.5rem 1rem; border-radius:2rem;"><i class="fas fa-file-word"></i> Word İndir</button>
+                <button id="printReportBtn" style="background:#4b5563; color:white; border:none; padding:0.5rem 1rem; border-radius:2rem;"><i class="fas fa-print"></i> Yazdır</button>
+                <button id="closeReportBtn" style="background:#ef4444; color:white; border:none; padding:0.5rem 1rem; border-radius:2rem;"><i class="fas fa-times"></i> Kapat</button>
+            </div>
+            <div id="reportContent" class="report-content"></div>
+        </div>
+
+        <footer>
+            <i class="fas fa-chart-simple"></i> Veriler supabase üzerinden canlı çekilmektedir. Grafikler Chart.js ile oluşturulmuştur.
+        </footer>
+    </div>
+</div>
+
+<script>
+    // Supabase ayarları
+    const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let charts = {};
+    let rawData = { members: [], distributions: [], financial: [], stock: [] };
+    let filteredData = { members: [], distributions: [], financial: [], stock: [] };
+
+    // Tarih formatı yardımcıları
+    function formatDateTR(dateStr) {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    // Filtreleme işlemi (tarih aralığına göre)
+    function filterDataByDateRange(startDate, endDate) {
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        filteredData.members = rawData.members.filter(m => {
+            const mDate = m.membership_date || m.created_at?.split('T')[0];
+            if (!mDate) return false;
+            const d = new Date(mDate);
+            if (start && d < start) return false;
+            if (end && d > end) return false;
+            return true;
+        });
+        filteredData.distributions = rawData.distributions.filter(d => {
+            if (!d.distribution_date) return false;
+            const dd = new Date(d.distribution_date);
+            if (start && dd < start) return false;
+            if (end && dd > end) return false;
+            return true;
+        });
+        filteredData.financial = rawData.financial.filter(f => {
+            if (!f.date) return false;
+            const fd = new Date(f.date);
+            if (start && fd < start) return false;
+            if (end && fd > end) return false;
+            return true;
+        });
+        filteredData.stock = rawData.stock.filter(s => {
+            if (!s.entry_date) return false;
+            const sd = new Date(s.entry_date);
+            if (start && sd < start) return false;
+            if (end && sd > end) return false;
+            return true;
+        });
+    }
+
+    // Özet kartları güncelleme (filtrelenmiş verilere göre)
+    function updateSummaryStats() {
+        const realMembers = filteredData.members.filter(m => m.member_type !== 'degil');
+        const totalMembers = realMembers.length;
+        const totalCeliacs = filteredData.members.reduce((sum, m) => sum + (m.celiacs?.length || 0), 0);
+        let totalDistQty = 0;
+        filteredData.distributions.forEach(d => {
+            if (d.items && Array.isArray(d.items)) {
+                totalDistQty += d.items.reduce((s, i) => s + (i.quantity || 0), 0);
+            }
+        });
+        const isTransfer = (desc) => desc && desc.includes('[TRANSFER]');
+        const totalIncome = filteredData.financial.filter(f => f.type === 'Gelir' && !isTransfer(f.description)).reduce((s, f) => s + (f.amount || 0), 0);
+        const totalExpense = filteredData.financial.filter(f => f.type === 'Gider' && !isTransfer(f.description)).reduce((s, f) => s + (f.amount || 0), 0);
+        const netBalance = totalIncome - totalExpense;
+
+        document.getElementById('totalMembers').innerText = totalMembers;
+        document.getElementById('totalCeliacs').innerText = totalCeliacs;
+        document.getElementById('totalDistributedQty').innerText = totalDistQty.toLocaleString('tr-TR');
+        document.getElementById('totalIncome').innerText = totalIncome.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('netBalance').innerText = netBalance.toLocaleString('tr-TR') + ' ₺';
+    }
+
+    // Grafikler (filtrelenmiş verilere göre)
+    function renderMemberTypeChart() {
+        const ctx = document.getElementById('memberTypeChart').getContext('2d');
+        const counts = { kurucu: 0, asil: 0, onursal: 0, degil: 0 };
+        filteredData.members.forEach(m => {
+            if (counts[m.member_type] !== undefined) counts[m.member_type]++;
+        });
+        const labels = ['Kurucu Üye', 'Asıl Üye', 'Onursal Üye', 'İletişime Geçen'];
+        const data = [counts.kurucu, counts.asil, counts.onursal, counts.degil];
+        const colors = ['#10b981', '#3b82f6', '#f59e0b', '#94a3b8'];
+        if (charts.memberType) charts.memberType.destroy();
+        charts.memberType = new Chart(ctx, {
+            type: 'pie',
+            data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    function renderMonthlyDistributionChart() {
+        const ctx = document.getElementById('monthlyDistChart').getContext('2d');
+        const monthlyMap = new Map();
+        filteredData.distributions.forEach(d => {
+            if (!d.distribution_date) return;
+            const date = new Date(d.distribution_date);
+            const yearMonth = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+            let totalQty = 0;
+            if (d.items) totalQty = d.items.reduce((s,i) => s + (i.quantity||0), 0);
+            monthlyMap.set(yearMonth, (monthlyMap.get(yearMonth)||0) + totalQty);
+        });
+        const sorted = Array.from(monthlyMap.keys()).sort();
+        const labels = sorted.map(m => {
+            const [y, mo] = m.split('-');
+            const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+            return `${y} ${months[parseInt(mo)-1]}`;
+        });
+        const data = sorted.map(m => monthlyMap.get(m)||0);
+        if (charts.monthlyDist) charts.monthlyDist.destroy();
+        charts.monthlyDist = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Dağıtılan Miktar (Adet)', data, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3, fill: true }] },
+            options: { responsive: true }
+        });
+    }
+
+    function renderProductDistributionChart() {
+        const ctx = document.getElementById('productDistChart').getContext('2d');
+        const productMap = new Map();
+        filteredData.distributions.forEach(d => {
+            if (d.items) d.items.forEach(i => {
+                const name = i.productName;
+                const qty = i.quantity || 0;
+                productMap.set(name, (productMap.get(name)||0) + qty);
+            });
+        });
+        const sorted = Array.from(productMap.entries()).sort((a,b) => b[1]-a[1]).slice(0,8);
+        const labels = sorted.map(p => p[0]);
+        const data = sorted.map(p => p[1]);
+        if (charts.productDist) charts.productDist.destroy();
+        charts.productDist = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Dağıtım Miktarı (Adet)', data, backgroundColor: '#f97316', borderRadius: 8 }] },
+            options: { indexAxis: 'y', responsive: true }
+        });
+    }
+
+    function renderFinancialChart() {
+        const ctx = document.getElementById('financialChart').getContext('2d');
+        const incomeMap = new Map(), expenseMap = new Map();
+        const isTransfer = desc => desc && desc.includes('[TRANSFER]');
+        filteredData.financial.forEach(f => {
+            if (isTransfer(f.description)) return;
+            if (!f.date) return;
+            const date = new Date(f.date);
+            const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+            if (f.type === 'Gelir') incomeMap.set(ym, (incomeMap.get(ym)||0) + (f.amount||0));
+            else if (f.type === 'Gider') expenseMap.set(ym, (expenseMap.get(ym)||0) + (f.amount||0));
+        });
+        const allMonths = new Set([...incomeMap.keys(), ...expenseMap.keys()]);
+        const sorted = Array.from(allMonths).sort();
+        const labels = sorted.map(m => {
+            const [y, mo] = m.split('-');
+            const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+            return `${y} ${months[parseInt(mo)-1]}`;
+        });
+        const incomeData = sorted.map(m => incomeMap.get(m)||0);
+        const expenseData = sorted.map(m => expenseMap.get(m)||0);
+        if (charts.financial) charts.financial.destroy();
+        charts.financial = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [
+                { label: 'Gelir (₺)', data: incomeData, backgroundColor: '#10b981' },
+                { label: 'Gider (₺)', data: expenseData, backgroundColor: '#ef4444' }
+            ]},
+            options: { responsive: true }
+        });
+    }
+
+    function renderStockChart() {
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        const stockMap = new Map();
+        rawData.stock.forEach(s => {
+            if (s.product_name && s.remaining_quantity > 0) {
+                stockMap.set(s.product_name, (stockMap.get(s.product_name)||0) + s.remaining_quantity);
+            }
+        });
+        const sorted = Array.from(stockMap.entries()).sort((a,b) => b[1]-a[1]);
+        const labels = sorted.map(p => p[0]);
+        const data = sorted.map(p => p[1]);
+        if (charts.stock) charts.stock.destroy();
+        if (sorted.length === 0) {
+            const parent = document.getElementById('stockChart').parentNode;
+            const oldCanvas = document.getElementById('stockChart');
+            if (oldCanvas && !parent.querySelector('.empty-data')) {
+                parent.removeChild(oldCanvas);
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-data';
+                emptyDiv.innerText = 'Stokta ürün bulunmuyor.';
+                parent.appendChild(emptyDiv);
+            }
+            return;
+        }
+        charts.stock = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Mevcut Stok Miktarı', data, backgroundColor: '#3b82f6', borderRadius: 6 }] },
+            options: { indexAxis: 'y', responsive: true }
+        });
+    }
+
+    function refreshAllCharts() {
+        updateSummaryStats();
+        renderMemberTypeChart();
+        renderMonthlyDistributionChart();
+        renderProductDistributionChart();
+        renderFinancialChart();
+        renderStockChart();
+    }
+
+    // Verileri çek ve filtrele
+    async function loadAndFilter(startDate, endDate) {
+        try {
+            const [membersRes, distRes, financialRes, stockRes] = await Promise.all([
+                supabaseClient.from('members').select('*'),
+                supabaseClient.from('distributions').select('*'),
+                supabaseClient.from('financial').select('*'),
+                supabaseClient.from('stock').select('*')
+            ]);
+            if (membersRes.error) throw membersRes.error;
+            if (distRes.error) throw distRes.error;
+            if (financialRes.error) throw financialRes.error;
+            if (stockRes.error) throw stockRes.error;
+
+            rawData.members = membersRes.data || [];
+            rawData.distributions = distRes.data || [];
+            rawData.financial = financialRes.data || [];
+            rawData.stock = stockRes.data || [];
+
+            filterDataByDateRange(startDate, endDate);
+            refreshAllCharts();
+        } catch (err) {
+            console.error(err);
+            alert('Veri yüklenirken hata: ' + err.message);
+        }
+    }
+
+    // Detaylı Rapor Oluşturma (TABLOLAR ile zenginleştirilmiş)
+    function generateDetailedReport() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const startStr = formatDateTR(startDate);
+        const endStr = formatDateTR(endDate);
+        
+        // Özet istatistikleri hazırla
+        const realMembers = filteredData.members.filter(m => m.member_type !== 'degil');
+        const totalMembers = realMembers.length;
+        const totalCeliacs = filteredData.members.reduce((s, m) => s + (m.celiacs?.length || 0), 0);
+        let totalDistQty = 0;
+        filteredData.distributions.forEach(d => {
+            if (d.items) totalDistQty += d.items.reduce((ss, i) => ss + (i.quantity||0), 0);
+        });
+        const isTransfer = (desc) => desc && desc.includes('[TRANSFER]');
+        const totalIncome = filteredData.financial.filter(f => f.type === 'Gelir' && !isTransfer(f.description)).reduce((s,f) => s + (f.amount||0), 0);
+        const totalExpense = filteredData.financial.filter(f => f.type === 'Gider' && !isTransfer(f.description)).reduce((s,f) => s + (f.amount||0), 0);
+        const netBalance = totalIncome - totalExpense;
+
+        // Üye türü dağılımı
+        const typeCounts = { kurucu: 0, asil: 0, onursal: 0, degil: 0 };
+        filteredData.members.forEach(m => { if (typeCounts[m.member_type] !== undefined) typeCounts[m.member_type]++; });
+        
+        // Ürün bazlı dağıtım
+        const productDist = new Map();
+        filteredData.distributions.forEach(d => {
+            if (d.items) d.items.forEach(i => {
+                productDist.set(i.productName, (productDist.get(i.productName)||0) + (i.quantity||0));
+            });
+        });
+        const topProducts = Array.from(productDist.entries()).sort((a,b) => b[1]-a[1]).slice(0,5);
+        
+        // Gelir-Gider detay (ayrı ayrı tablolar için)
+        const incomeRecords = filteredData.financial.filter(f => f.type === 'Gelir' && !isTransfer(f.description));
+        const expenseRecords = filteredData.financial.filter(f => f.type === 'Gider' && !isTransfer(f.description));
+        const bankaIncome = incomeRecords.filter(f => f.payment_method === 'Banka').reduce((s,f) => s + (f.amount||0), 0);
+        const kasaIncome = incomeRecords.filter(f => f.payment_method === 'Makbuz').reduce((s,f) => s + (f.amount||0), 0);
+        const bankaExpense = expenseRecords.filter(f => f.payment_method === 'Banka').reduce((s,f) => s + (f.amount||0), 0);
+        const kasaExpense = expenseRecords.filter(f => f.payment_method === 'Makbuz').reduce((s,f) => s + (f.amount||0), 0);
+        
+        // Stok girişi (filtrelenmiş)
+        const totalStockReceived = filteredData.stock.reduce((s, st) => s + (st.received_quantity||0), 0);
+        const stockEntries = filteredData.stock.length;
+
+        // Dağıtım detay tablosu
+        const distributionRows = filteredData.distributions.map(d => {
+            const member = rawData.members.find(m => m.id === d.member_id);
+            const memberName = member ? `${member.first_name} ${member.last_name}` : 'Bilinmeyen';
+            const items = d.items ? d.items.map(i => `${i.productName} (${i.quantity})`).join(', ') : '';
+            return `<tr><td>${d.receipt_number || '-'}</td><td>${memberName}</td><td>${d.celiac_name || '-'}</td><td>${formatDateTR(d.distribution_date)}</td><td>${items}</td></tr>`;
+        }).join('');
+
+        // Finansal tablo satırları (transferler hariç)
+        const financialRows = [...incomeRecords, ...expenseRecords].sort((a,b) => new Date(a.date) - new Date(b.date)).map(f => {
+            const typeClass = f.type === 'Gelir' ? 'color:green;' : 'color:red;';
+            return `<tr><td>${formatDateTR(f.date)}</td><td style="${typeClass} font-weight:bold;">${f.type}</td><td>${f.payment_method || '-'}</td><td>${f.payer_name || '-'}</td><td>${f.description || '-'}</td><td style="text-align:right;">${f.amount.toLocaleString('tr-TR')} TL</td></tr>`;
+        }).join('');
+
+        // Üye tablosu (filtrelenmiş)
+        const memberRows = filteredData.members.map(m => {
+            const typeMap = { kurucu: 'Kurucu', asil: 'Asıl', onursal: 'Onursal', degil: 'İletişime Geçen' };
+            const celiacCount = m.celiacs?.length || 0;
+            return `<tr><td>${m.first_name} ${m.last_name}</td><td>${m.tc_id || '-'}</td><td>${typeMap[m.member_type] || m.member_type}</td><td>${formatDateTR(m.membership_date || m.created_at)}</td><td>${m.phone || '-'}</td><td>${celiacCount}</td></tr>`;
+        }).join('');
+
+        // Stok tablosu (filtrelenmiş)
+        const stockRows = filteredData.stock.map(s => {
+            return `<tr><td>${s.product_name}</td><td>${formatDateTR(s.entry_date)}</td><td>${s.received_quantity} ${s.unit}</td><td>${s.remaining_quantity} ${s.unit}</td></tr>`;
+        }).join('');
+
+        // Rapor HTML (tablolar ile)
+        let html = `
+        <div style="font-family:'Times New Roman', serif; padding:1rem;">
+            <h2 style="text-align:center; color:#0b5e42;">KIRIKKALE ÇÖLYAK DERNEĞİ</h2>
+            <h3 style="text-align:center;">DETAYLI FAALİYET RAPORU</h3>
+            <p style="text-align:center;">Dönem: ${startStr} - ${endStr}</p>
+            <hr>
+            <h3>1. ÖZET İSTATİSTİKLER</h3>
+            <ul>
+                <li>Toplam Üye (İletişim hariç): ${totalMembers}</li>
+                <li>Kayıtlı Çölyaklı Birey: ${totalCeliacs}</li>
+                <li>Dağıtılan Ürün Adedi: ${totalDistQty.toLocaleString('tr-TR')}</li>
+                <li>Toplam Gelir: ${totalIncome.toLocaleString('tr-TR')} TL</li>
+                <li>Toplam Gider: ${totalExpense.toLocaleString('tr-TR')} TL</li>
+                <li>Net Bakiye: ${netBalance.toLocaleString('tr-TR')} TL</li>
+            </ul>
+            <h3>2. ÜYELİK DAĞILIMI</h3>
+            <ul>
+                <li>Kurucu Üye: ${typeCounts.kurucu}</li>
+                <li>Asıl Üye: ${typeCounts.asil}</li>
+                <li>Onursal Üye: ${typeCounts.onursal}</li>
+                <li>İletişime Geçen: ${typeCounts.degil}</li>
+            </ul>
+            <h3>3. DÖNEM İÇİNDE KAYIT OLAN ÜYELER</h3>
+            ${filteredData.members.length ? `
+            <table>
+                <thead><tr><th>Ad Soyad</th><th>TC Kimlik</th><th>Üyelik Türü</th><th>Üyelik Tarihi</th><th>Telefon</th><th>Çölyaklı Sayısı</th></tr></thead>
+                <tbody>${memberRows}</tbody>
+            </table>` : '<p>Bu dönemde üye kaydı yok.</p>'}
+            <h3>4. DAĞITIM FAALİYETLERİ</h3>
+            ${filteredData.distributions.length ? `
+            <p>Toplam dağıtım işlemi sayısı: ${filteredData.distributions.length}</p>
+            <table>
+                <thead><tr><th>Makbuz No</th><th>Üye Adı</th><th>Çölyaklı Adı</th><th>Dağıtım Tarihi</th><th>Ürünler</th></tr></thead>
+                <tbody>${distributionRows}</tbody>
+            </table>
+            <p><strong>En çok dağıtılan 5 ürün:</strong><br>${topProducts.map(p => `${p[0]}: ${p[1]} adet`).join(', ')}</p>
+            ` : '<p>Bu dönemde dağıtım yok.</p>'}
+            <h3>5. MALİ DURUM (Transferler Hariç)</h3>
+            <table>
+                <thead><tr><th>Kalem</th><th>Banka (TL)</th><th>Makbuz (TL)</th><th>Toplam (TL)</th></tr></thead>
+                <tbody>
+                    <tr><td>Gelir</td><td>${bankaIncome.toLocaleString('tr-TR')}</td><td>${kasaIncome.toLocaleString('tr-TR')}</td><td>${totalIncome.toLocaleString('tr-TR')}</td></tr>
+                    <tr><td>Gider</td><td>${bankaExpense.toLocaleString('tr-TR')}</td><td>${kasaExpense.toLocaleString('tr-TR')}</td><td>${totalExpense.toLocaleString('tr-TR')}</td></tr>
+                </tbody>
+            </table>
+            <h3>6. FİNANSAL HAREKETLER (Gelir/Gider Detay)</h3>
+            ${financialRows.length ? `
+            <table>
+                <thead><tr><th>Tarih</th><th>Tür</th><th>Ödeme Yöntemi</th><th>Ödemeyi Yapan</th><th>Açıklama</th><th>Tutar</th></tr></thead>
+                <tbody>${financialRows}</tbody>
+            </table>` : '<p>Bu dönemde finansal hareket yok.</p>'}
+            <h3>7. STOK HAREKETLERİ (Dönem İçi Girişler)</h3>
+            ${filteredData.stock.length ? `
+            <p>Toplam stok giriş sayısı: ${stockEntries}, toplam alınan miktar: ${totalStockReceived.toLocaleString('tr-TR')} birim</p>
+            <table>
+                <thead><tr><th>Ürün Adı</th><th>Giriş Tarihi</th><th>Alınan Miktar</th><th>Kalan Miktar</th></tr></thead>
+                <tbody>${stockRows}</tbody>
+            </table>` : '<p>Bu dönemde stok girişi yok.</p>'}
+            <hr>
+            <p style="font-size:0.8rem; text-align:center;">Bu rapor ${new Date().toLocaleString('tr-TR')} tarihinde otomatik oluşturulmuştur.</p>
+        </div>`;
+        return html;
+    }
+
+    // Raporu göster
+    function showReport() {
+        const reportHtml = generateDetailedReport();
+        document.getElementById('reportContent').innerHTML = reportHtml;
+        document.getElementById('reportPreview').style.display = 'block';
+        document.getElementById('reportPreview').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Word indir
+    function downloadReportAsDoc() {
+        const content = document.getElementById('reportContent').innerHTML;
+        const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kirikkale_Colyak_Raporu</title><style>table{border-collapse:collapse;width:100%;margin-bottom:1rem;}th,td{border:1px solid #ccc;padding:0.5rem;text-align:left;}th{background:#f1f5f9;}</style></head><body>${content}</body></html>`;
+        const blob = new Blob(['\ufeff' + fullHtml], { type: 'application/msword' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Colyak_Raporu_${document.getElementById('startDate').value}_${document.getElementById('endDate').value}.doc`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function printReport() {
+        const content = document.getElementById('reportContent').innerHTML;
+        const w = window.open('', '_blank');
+        w.document.write(`<html><head><title>Rapor</title><style>body{font-family:'Times New Roman'; margin:2cm;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #aaa;padding:0.4rem;}</style></head><body>${content}</body></html>`);
+        w.document.close();
+        w.print();
+    }
+
+    // Login & Logout
+    async function doLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginErrorMsg');
+        if (!email || !password) { errorDiv.textContent = 'E-posta ve şifre gerekli'; errorDiv.style.display = 'block'; return; }
+        const btn = document.querySelector('.login-btn');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Giriş yapılıyor...';
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            currentUser = data.user;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = today;
+            await loadAndFilter(document.getElementById('startDate').value, today);
+        } catch (err) {
+            errorDiv.textContent = err.message || 'Hatalı giriş';
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 3000);
+        } finally {
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-key"></i> Giriş Yap';
+        }
+    }
+
+    async function doLogout() {
+        await supabaseClient.auth.signOut();
+        currentUser = null;
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+        Object.values(charts).forEach(ch => { if (ch && ch.destroy) ch.destroy(); });
+        charts = {};
+    }
+
+    // Sayfa yüklendiğinde oturum kontrolü
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+            currentUser = session.user;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = today;
+            await loadAndFilter(document.getElementById('startDate').value, today);
+        } else {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+    };
+
+    // Event listeners
+    document.getElementById('applyFilterBtn').addEventListener('click', async () => {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        if (start && end && start > end) { alert('Başlangıç tarihi bitişten büyük olamaz'); return; }
+        filterDataByDateRange(start, end);
+        refreshAllCharts();
+    });
+    document.getElementById('generateReportBtn').addEventListener('click', showReport);
+    document.getElementById('downloadDocBtn').addEventListener('click', downloadReportAsDoc);
+    document.getElementById('printReportBtn').addEventListener('click', printReport);
+    document.getElementById('closeReportBtn').addEventListener('click', () => {
+        document.getElementById('reportPreview').style.display = 'none';
+    });
+</script>
+</body>
+</html>
