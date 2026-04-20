@@ -1,0 +1,46 @@
+{
+  "author": {
+    "name": "Uzm. Dr. Ayşe Demir",
+    "title": "Çocuk Gastroenteroloji Uzmanı",
+    "avatar": "img/author-ayse.jpg",
+    "bio": "Çölyak hastalığı ve glutensiz beslenme konusunda 10 yıllık deneyim. Kırıkkale Üniversitesi Tıp Fakültesi Çocuk Gastroenteroloji Bölümü'nde görev yapmaktadır."
+  },
+  "articles": [
+    {
+      "id": 101,
+      "title": "Glutensiz Beslenmede 5 Altın Kural",
+      "summary": "Sağlıklı ve lezzetli bir glutensiz diyet için püf noktalar. Glutensiz yaşama geçişte dikkat edilmesi gerekenler.",
+      "fullContent": "<p>Glutensiz beslenmeye yeni başlayanlar için en önemli kurallar:</p><ul><li><strong>Etiket okuma alışkanlığı edinin</strong> - İşlenmiş gıdalarda gizli gluten kaynaklarına dikkat edin.</li><li><strong>Doğal gıdalara yönelin</strong> - Meyve, sebze, et, balık, yumurta, bakliyat ve pirinç gibi doğal glutensiz besinleri tercih edin.</li><li><strong>Çapraz bulaşmadan kaçının</strong> - Evde ayrı kesme tahtası, tost makinesi ve tencereler kullanın.</li><li><strong>Güvendiğiniz markaları belirleyin</strong> - Sertifikalı glutensiz ürünleri tercih edin.</li><li><strong>Destek gruplarına katılın</strong> - Deneyim paylaşımı ve motivasyon için derneğimizin etkinliklerine katılın.</li></ul><p>Unutmayın, glutensiz diyet sadece bir kısıtlama değil, aynı zamanda daha sağlıklı beslenme fırsatıdır. Doğru planlama ile lezzetli ve çeşitli bir beslenme düzeni oluşturabilirsiniz.</p>",
+      "pubDate": "15 Mart 2026",
+      "authorName": "Uzm. Dr. Ayşe Demir",
+      "authorAvatar": "img/author-ayse.jpg"
+    },
+    {
+      "id": 102,
+      "title": "Kırıkkale'de Glutensiz Restoranlar",
+      "summary": "Şehrimizde güvenle yemek yiyebileceğiniz mekanlar ve öneriler.",
+      "fullContent": "<p>Kırıkkale'de artık birçok restoran glutensiz menü sunuyor. İşte deneyimlediğimiz ve güvenle tercih edebileceğiniz adresler:</p><ul><li><strong>Glutensiz Lezzet Dünyası</strong> - Ankara Yolu üzerinde, özel glutensiz mutfaklarıyla hizmet veriyor.</li><li><strong>Doğal Tatlar Cafe</strong> - Fabrikalar Mahallesi'nde, glutensiz tatlı çeşitleriyle ünlü.</li><li><strong>Çölyak Dostu Mutfak</strong> - Yenişehir bölgesinde, ayrı pişirme alanları mevcut.</li></ul><p>Bu mekanlarda ayrı pişirme alanları ve özel ekipmanlar kullanılmaktadır. Randevu alırken glutensiz ihtiyacınızı belirtmeyi unutmayın. Ayrıca derneğimizin düzenlediği 'Glutensiz Sofralar' etkinliklerine katılarak yeni mekanlar keşfedebilirsiniz.</p>",
+      "pubDate": "02 Şubat 2026",
+      "authorName": "Uzm. Dr. Ayşe Demir",
+      "authorAvatar": "img/author-ayse.jpg"
+    },
+    {
+      "id": 103,
+      "title": "Çölyak ve Psikolojik Destek",
+      "summary": "Duygusal yolculukta yalnız değilsiniz. Psikolojik desteğin önemi ve derneğimizin çalışmaları.",
+      "fullContent": "<p>Çölyak tanısı almak sadece fiziksel değil, ruhsal bir süreçtir. Tanı sonrası yaşanan kaygı, sosyal ortamlarda dışlanma korkusu ve sürekli tetikte olma hali psikolojik desteği gerekli kılar.</p><p><strong>Yaşanan psikolojik zorluklar:</strong></p><ul><li>Dışarıda yemek yeme korkusu</li><li>Arkadaş ortamlarında farklı hissetme</li><li>Sürekli etiket kontrolü nedeniyle oluşan yorgunluk</li><li>Aile içinde ekstra yük hissi</li></ul><p>Derneğimiz bünyesinde düzenli olarak psikolog eşliğinde destek grupları oluşturuyoruz. Ayda iki kez düzenlenen 'Glutensiz Sohbetler' etkinliklerimizde hem bilgilendirme hem de duygusal paylaşım yapıyoruz. Yalnız olmadığınızı bilin, her zaman yanınızdayız.</p>",
+      "pubDate": "10 Ocak 2026",
+      "authorName": "Uzm. Dr. Ayşe Demir",
+      "authorAvatar": "img/author-ayse.jpg"
+    },
+    {
+      "id": 104,
+      "title": "Çocuklarda Çölyak Belirtileri",
+      "summary": "Çocuklarda çölyak hastalığının erken belirtileri ve dikkat edilmesi gerekenler.",
+      "fullContent": "<p>Çocuklarda çölyak hastalığı erken dönemde fark edilmediğinde büyüme-gelişme geriliğine yol açabilir. İşte dikkat etmeniz gereken belirtiler:</p><ul><li><strong>Kronik ishal veya kabızlık</strong> - Uzun süreli sindirim sorunları</li><li><strong>Karın şişliği ve gaz</strong> - Özellikle yemeklerden sonra belirgin</li><li><strong>Kilo alamama veya kilo kaybı</strong></li><li><strong>Demir eksikliği anemisi</strong> - Tedaviye yanıt vermeyen kansızlık</li><li><strong>Boy kısalığı</strong> - Yaşıtlarına göre belirgin kısalık</li><li><strong>Huzursuzluk ve davranış değişiklikleri</strong></li></ul><p>Bu belirtilerden bir veya birkaçını gözlemliyorsanız, bir çocuk gastroenteroloji uzmanına başvurmanızı öneririm. Erken tanı ve glutensiz diyet ile çocuğunuzun sağlıklı gelişimi desteklenebilir.</p>",
+      "pubDate": "25 Aralık 2025",
+      "authorName": "Uzm. Dr. Ayşe Demir",
+      "authorAvatar": "img/author-ayse.jpg"
+    }
+  ]
+}

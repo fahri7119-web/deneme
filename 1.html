@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0JW6387DD4"></script>
+<script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-0JW6387DD4'); </script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=107216982', 'ym');
+
+    ym(107216982, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/107216982" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    
+    <!-- SEO -->
+    <title>Kırıkkale Çölyak Derneği | Ana Sayfa - Glutensiz Yaşam Desteği</title>
+    <meta name="description" content="Kırıkkale Çölyak Derneği, çölyak hastalarına destek ve glutensiz yaşam rehberi sunar.">
+    <meta name="keywords" content="Kırıkkale çölyak, glutensiz yaşam, çölyak derneği">
+    <meta name="author" content="Kırıkkale Çölyak Derneği">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.kirikkalecolyak.org.tr/">
+    <meta property="og:title" content="Kırıkkale Çölyak Derneği | Glutensiz Yaşam Desteği">
+    <meta property="og:description" content="Çölyak hastalarına destek ve glutensiz yaşam rehberi.">
+    <meta property="og:image" content="https://www.kirikkalecolyak.org.tr/img/logo.png">
+    
+    <meta name="theme-color" content="#059669">
+    <link rel="canonical" href="https://www.kirikkalecolyak.org.tr/">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* ========== NAVBAR STILLERİ ========== */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        .logo-img img {
+            height: 50px;
+            width: auto;
+        }
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #059669;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #4b5563;
+            margin: 0;
+        }
+        .nav-menu ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #059669;
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #374151;
+        }
+        .mobile-menu {
+            display: none;
+            background: white;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .mobile-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .mobile-menu li a {
+            display: block;
+            padding: 0.75rem;
+            text-decoration: none;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .mobile-menu li a.active {
+            color: #059669;
+            font-weight: 600;
+        }
+        .mobile-menu.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .mobile-menu-btn { display: block; }
+        }
+        
+        /* ========== HERO SLIDER STILLERİ ========== */
+        .hero-slider-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .hero-slider {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            cursor: grab;
+            border-radius: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hero-slider:active { cursor: grabbing; }
+        .hero-slide {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        .hero-section {
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            padding: 3rem;
+            border-radius: 1rem;
+        }
+        .slider-nav-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1rem;
+        }
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .slider-dot.active {
+            background-color: #059669;
+            width: 24px;
+            border-radius: 20px;
+        }
+        .slider-arrow-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border-radius: 9999px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        .slider-arrow-left { left: 16px; }
+        .slider-arrow-right { right: 16px; }
+        .slider-arrow-btn:hover { background: white; color: #059669; }
+        
+        @media (max-width: 768px) {
+            .hero-section { min-height: 400px; padding: 2rem; }
+            .slider-arrow-btn { width: 32px; height: 32px; font-size: 1rem; }
+        }
+        
+        /* ========== HABER DETAY ========== */
+        #haberDetayBolumu.hidden { display: none; }
+        .prose img { max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
+        
+        /* ========== HABER KARTLARI ========== */
+        .news-scroll {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 0.5rem 0 1rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .news-card {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            width: 300px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .news-card:hover { transform: translateY(-4px); }
+        .hide-scrollbar::-webkit-scrollbar { height: 6px; }
+        .hide-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .hide-scrollbar::-webkit-scrollbar-thumb { background: #059669; border-radius: 10px; }
+        
+        .btn-primary {
+            background-color: #059669;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-primary:hover { background-color: #047857; transform: scale(1.02); }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <div class="logo-img">
+                        <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart\'></i>';">
+                    </div>
+                    <div class="logo-text">
+                        <h1>Kırıkkale</h1>
+                        <p>Çölyak Derneği</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu" aria-label="Ana menü">
+                <ul>
+                    <li><a href="index.html" class="active">Ana Sayfa</a></li>
+                    <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                    <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                    <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                    <li><a href="bagis.html">Bağış Yap</a></li>
+                    <li><a href="iletisim.html">İletişim</a></li>
+                </ul>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menüyü aç/kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="mobile-menu">
+            <ul>
+                <li><a href="index.html" class="active">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                <li><a href="bagis.html">Bağış Yap</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+       
+        <!-- Hero Slider Alanı -->
+        <div id="hero-slider-container" class="hero-slider-container"></div>
+
+        <!-- Haber Detay Bölümü -->
+        <section id="haberDetayBolumu" class="hidden bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
+            <div class="flex justify-between items-start border-b border-gray-200 pb-3 mb-4">
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-file-alt text-emerald-600 mr-3"></i>
+                    <span id="detayBaslik"></span>
+                </h3>
+                <button id="kapatDetayBtn" class="text-gray-400 hover:text-red-500 text-2xl">✕</button>
+            </div>
+            <div id="detayIcerik" class="prose max-w-none text-gray-700"></div>
+        </section>
+
+        <!-- Duyuru Panosu -->
+        <section id="duyuruPanosu" class="bg-amber-50 border-l-4 border-amber-500 p-6 mb-8 rounded-r-xl">
+            <div class="flex items-start gap-4">
+                <i class="fas fa-bullhorn text-amber-600 text-2xl"></i>
+                <div>
+                    <h3 class="text-xl font-bold text-amber-900 mb-2">📢 OLAĞANÜSTÜ GENEL KURUL TOPLANTISI</h3>
+                    <p><strong>03 Mayıs 2026 Pazar</strong> günü saat <strong>18:00'da</strong> dernek merkezinde yapılacaktır.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Çölyak Nedir? -->
+        <section id="colyakNedir" class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-3">
+                <i class="fas fa-heartbeat text-emerald-600 mr-3"></i>Çölyak Nedir?
+            </h3>
+            <p class="text-gray-600">Çölyak hastalığı, gluten proteinine karşı ince bağırsağın gösterdiği otoimmün bir reaksiyondur. Tek tedavisi ömür boyu glutensiz diyettir.</p>
+        </section>
+
+        <!-- Video Section -->
+        <section id="videoSection" class="mb-8">
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-video text-emerald-600 mr-3"></i>
+                    <span id="video-title">Video Başlığı</span>
+                </h3>
+                <div class="video-container">
+                    <video id="mainVideo" controls class="w-full rounded-lg" style="max-height: 400px;">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+                <div class="flex justify-center gap-4 mt-4">
+                    <button id="prev-video" class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">◀ Önceki</button>
+                    <button id="next-video" class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">Sonraki ▶</button>
+                </div>
+                <p id="video-description" class="text-gray-600 mt-3 text-center"></p>
+            </div>
+        </section>
+
+        <!-- Diğer Haberler -->
+        <section class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-newspaper text-emerald-600 mr-3"></i>Diğer Haberler
+                </h3>
+                <button onclick="refreshNews()" class="text-emerald-600 hover:text-emerald-800">
+                    <i class="fas fa-sync-alt"></i> Yenile
+                </button>
+            </div>
+            <div id="newsScrollContainer" class="news-scroll hide-scrollbar"></div>
+            <div id="emptyState" class="hidden text-center py-8 text-gray-500">Haber bulunamadı.</div>
+        </section>
+
+        <!-- İstatistikler -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl text-center shadow-sm"><i class="fas fa-users text-2xl text-emerald-600"></i><div class="text-2xl font-bold">450+</div><div class="text-gray-500 text-sm">Çölyaklı</div></div>
+            <div class="bg-white p-4 rounded-xl text-center shadow-sm"><i class="fas fa-hand-holding-heart text-2xl text-emerald-600"></i><div class="text-2xl font-bold">100+</div><div class="text-gray-500 text-sm">Desteklenen Aile</div></div>
+            <div class="bg-white p-4 rounded-xl text-center shadow-sm"><i class="fas fa-store text-2xl text-emerald-600"></i><div class="text-2xl font-bold">50+</div><div class="text-gray-500 text-sm">Aktif Üye</div></div>
+            <div class="bg-white p-4 rounded-xl text-center shadow-sm"><i class="fas fa-calendar-check text-2xl text-emerald-600"></i><div class="text-2xl font-bold">7/24</div><div class="text-gray-500 text-sm">Destek</div></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-8 text-center text-white">
+            <h3 class="text-2xl font-bold mb-3">Aramıza Katılın</h3>
+            <a href="#" class="bg-white text-emerald-600 px-6 py-2 rounded-full font-semibold inline-block">WhatsApp Grubu</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2026 Kırıkkale Çölyak Derneği. Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ========== MOBİL MENÜ ==========
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('show');
+                const expanded = mobileMenu.classList.contains('show');
+                mobileBtn.setAttribute('aria-expanded', expanded);
+            });
+        }
+
+        // ========== HERO SLIDER ==========
+        let heroSlides = [];
+        let heroScrollContainer = null;
+        let autoScrollInterval = null;
+        let isDragging = false;
+        let startX, scrollLeftStart;
+
+        async function fetchHeroSlides() {
+            try {
+                const response = await fetch('hero.json');
+                if (!response.ok) throw new Error();
+                heroSlides = await response.json();
+                if (!heroSlides.length) throw new Error();
+            } catch (error) {
+                heroSlides = [{
+                    id: 1,
+                    title: "Kırıkkale Çölyak Derneği",
+                    subtitle: "Çölyak hastalarının yanında, glutensiz yaşamın her adımında destekçiniz.",
+                    buttonText: "Haberi Oku",
+                    bgImage: "img/arka.jpg",
+                    fullDescription: "<p>Derneğimiz, Kırıkkale'de çölyak hastalarına destek olmaktadır.</p>"
+                }];
+            }
+            renderHeroSlider();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        function renderHeroSlider() {
+            const container = document.getElementById('hero-slider-container');
+            if (!container) return;
+
+            const sliderWrapper = document.createElement('div');
+            sliderWrapper.className = 'hero-slider';
+            
+            const slidesDiv = document.createElement('div');
+            slidesDiv.className = 'flex';
+            
+            heroSlides.forEach((slide, idx) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'hero-slide';
+                const bgImg = slide.bgImage || 'img/arka.jpg';
+                slideDiv.innerHTML = `
+                    <div class="hero-section" style="background: linear-gradient(135deg, rgba(5,150,105,0.8), rgba(0,0,0,0.4)), url('${escapeHtml(bgImg)}'); background-size: cover; background-position: center;">
+                        <div class="max-w-2xl text-white">
+                            <h2 class="text-3xl md:text-5xl font-bold mb-4">${escapeHtml(slide.title)}</h2>
+                            <p class="text-base md:text-lg mb-6">${escapeHtml(slide.subtitle)}</p>
+                            <button class="btn-hero-news btn-primary" data-haber-id="${slide.id}">${escapeHtml(slide.buttonText || 'Haberi Oku')}</button>
+                        </div>
+                    </div>
+                `;
+                slidesDiv.appendChild(slideDiv);
+            });
+            sliderWrapper.appendChild(slidesDiv);
+            
+            // Oklar
+            if (heroSlides.length > 1) {
+                const leftArrow = document.createElement('div');
+                leftArrow.className = 'slider-arrow-btn slider-arrow-left';
+                leftArrow.innerHTML = '←';
+                const rightArrow = document.createElement('div');
+                rightArrow.className = 'slider-arrow-btn slider-arrow-right';
+                rightArrow.innerHTML = '→';
+                sliderWrapper.appendChild(leftArrow);
+                sliderWrapper.appendChild(rightArrow);
+                
+                leftArrow.onclick = () => {
+                    if (heroScrollContainer) {
+                        const slideWidth = heroScrollContainer.clientWidth;
+                        heroScrollContainer.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+                        resetAutoScroll();
+                    }
+                };
+                rightArrow.onclick = () => {
+                    if (heroScrollContainer) {
+                        const slideWidth = heroScrollContainer.clientWidth;
+                        heroScrollContainer.scrollBy({ left: slideWidth, behavior: 'smooth' });
+                        resetAutoScroll();
+                    }
+                };
+            }
+            
+            // Dotlar
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'slider-nav-dots';
+            heroSlides.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `slider-dot ${idx === 0 ? 'active' : ''}`;
+                dot.onclick = () => {
+                    if (heroScrollContainer) {
+                        const slideWidth = heroScrollContainer.clientWidth;
+                        heroScrollContainer.scrollTo({ left: slideWidth * idx, behavior: 'smooth' });
+                        resetAutoScroll();
+                    }
+                };
+                dotsContainer.appendChild(dot);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(sliderWrapper);
+            container.appendChild(dotsContainer);
+            
+            heroScrollContainer = sliderWrapper;
+            
+            // Scroll olayı ile dot güncelleme
+            heroScrollContainer.addEventListener('scroll', () => {
+                if (heroScrollContainer) {
+                    const slideWidth = heroScrollContainer.clientWidth;
+                    const targetIndex = Math.round(heroScrollContainer.scrollLeft / slideWidth);
+                    const dots = document.querySelectorAll('.slider-dot');
+                    dots.forEach((dot, i) => dot.classList.toggle('active', i === targetIndex));
+                }
+            });
+            
+            // Drag desteği
+            heroScrollContainer.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - heroScrollContainer.offsetLeft;
+                scrollLeftStart = heroScrollContainer.scrollLeft;
+                heroScrollContainer.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const x = e.pageX - heroScrollContainer.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                heroScrollContainer.scrollLeft = scrollLeftStart - walk;
+            });
+            
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                if (heroScrollContainer) heroScrollContainer.style.cursor = 'grab';
+            });
+            
+            heroScrollContainer.addEventListener('dragstart', (e) => e.preventDefault());
+            
+            // Hero butonları
+            document.querySelectorAll('.btn-hero-news').forEach(btn => {
+                btn.onclick = () => {
+                    const haberId = parseInt(btn.getAttribute('data-haber-id'));
+                    const haber = heroSlides.find(h => h.id === haberId);
+                    if (haber) showNewsDetail(haber.title, haber.fullDescription || haber.subtitle);
+                };
+            });
+            
+            startAutoScroll();
+        }
+        
+        function startAutoScroll() {
+            if (heroSlides.length <= 1) return;
+            autoScrollInterval = setInterval(() => {
+                if (heroScrollContainer && !isDragging) {
+                    const slideWidth = heroScrollContainer.clientWidth;
+                    const currentIndex = Math.round(heroScrollContainer.scrollLeft / slideWidth);
+                    let nextIndex = currentIndex + 1;
+                    if (nextIndex >= heroSlides.length) nextIndex = 0;
+                    heroScrollContainer.scrollTo({ left: slideWidth * nextIndex, behavior: 'smooth' });
+                }
+            }, 5000);
+        }
+        
+        function resetAutoScroll() {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                startAutoScroll();
+            }
+        }
+
+        // ========== HABER DETAY ==========
+        function showNewsDetail(baslik, icerik) {
+            const detay = document.getElementById('haberDetayBolumu');
+            if (!detay) return;
+            document.getElementById('detayBaslik').innerText = baslik;
+            document.getElementById('detayIcerik').innerHTML = icerik || 'Detay bulunamadı.';
+            detay.classList.remove('hidden');
+            ['duyuruPanosu', 'colyakNedir', 'videoSection'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            detay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.getElementById('kapatDetayBtn')?.addEventListener('click', () => {
+            document.getElementById('haberDetayBolumu')?.classList.add('hidden');
+            ['duyuruPanosu', 'colyakNedir', 'videoSection'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
+        });
+
+        // ========== DİĞER HABERLER ==========
+        let allNewsItems = [];
+        
+        async function fetchNews() {
+            try {
+                const response = await fetch('news.json');
+                if (!response.ok) throw new Error();
+                allNewsItems = await response.json();
+                renderNews(allNewsItems);
+            } catch (error) {
+                console.error('Haber yüklenemedi');
+                document.getElementById('emptyState')?.classList.remove('hidden');
+            }
+        }
+        
+        function renderNews(items) {
+            const container = document.getElementById('newsScrollContainer');
+            const emptyState = document.getElementById('emptyState');
+            if (!container) return;
+            if (!items || !items.length) {
+                container.innerHTML = '';
+                if (emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+            if (emptyState) emptyState.classList.add('hidden');
+            
+            container.innerHTML = items.map(item => `
+                <div class="news-card bg-white rounded-xl border shadow-sm" data-id="${item.id}">
+                    ${item.imageUrl ? `<img src="${item.imageUrl}" class="w-full h-40 object-cover rounded-t-xl">` : `<div class="w-full h-40 bg-emerald-100 rounded-t-xl flex items-center justify-center"><i class="fas fa-newspaper text-4xl text-emerald-400"></i></div>`}
+                    <div class="p-4">
+                        <div class="text-xs text-gray-500">${item.pubDate || ''}</div>
+                        <h4 class="font-bold mt-2 line-clamp-2">${escapeHtml(item.title)}</h4>
+                        <p class="text-sm text-gray-600 line-clamp-3 mt-1">${escapeHtml(item.description)}</p>
+                        <button class="btn-news-detail mt-3 text-emerald-600 text-sm font-semibold">Detayı Göster →</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.news-card').forEach(card => {
+                const id = parseInt(card.getAttribute('data-id'));
+                card.onclick = (e) => {
+                    if (e.target.classList.contains('btn-news-detail')) e.stopPropagation();
+                    const haber = allNewsItems.find(h => h.id === id);
+                    if (haber) showNewsDetail(haber.title, haber.fullDescription || haber.description);
+                };
+            });
+        }
+        
+        function refreshNews() {
+            fetchNews();
+        }
+
+        // ========== VİDEOLAR ==========
+        let videos = [], currentVideo = 0;
+        
+        async function fetchVideos() {
+            try {
+                const response = await fetch('videos.json');
+                if (!response.ok) throw new Error();
+                videos = await response.json();
+                if (videos.length) updateVideo();
+            } catch (error) {
+                console.error('Video yüklenemedi');
+            }
+        }
+        
+        function updateVideo() {
+            if (!videos.length) return;
+            const video = videos[currentVideo];
+            document.getElementById('video-title').innerText = video.title;
+            document.getElementById('video-description').innerText = video.description;
+            const videoEl = document.getElementById('mainVideo');
+            const source = videoEl.querySelector('source');
+            if (source) source.src = video.videoUrl;
+            videoEl.load();
+        }
+        
+        document.getElementById('prev-video')?.addEventListener('click', () => {
+            if (currentVideo > 0) { currentVideo--; updateVideo(); }
+        });
+        document.getElementById('next-video')?.addEventListener('click', () => {
+            if (currentVideo < videos.length - 1) { currentVideo++; updateVideo(); }
+        });
+
+        // Sayfa yükleme
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchHeroSlides();
+            fetchNews();
+            fetchVideos();
+        });
+    </script>
+</body>
+</html>
