@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kırıkkale Çölyak Derneği - Yazar Paneli</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- TinyMCE Self-Hosted CSS ve JS (API anahtarı GEREKMEZ!) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/skins/ui/oxide/skin.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/themes/silver/theme.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/icons/default/icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/models/dom/model.min.js"></script>
+    
+    <!-- TinyMCE eklentileri -->
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/plugins/advlist/plugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/plugins/lists/plugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/plugins/link/plugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/plugins/table/plugin.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #2ecc71, #27ae60); border-radius: 10px; }
+
+        /* TinyMCE özel düzenlemeler */
+        .tox-tinymce {
+            border-radius: 16px !important;
+            border: 2px solid #e9ecef !important;
+        }
+        .tox-tinymce:focus-within {
+            border-color: #2ecc71 !important;
+        }
+
+        /* Login Page */
+        .login-container {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 460px;
+            max-width: 92%;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 40px 35px;
+            text-align: center;
+        }
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .login-logo img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+        .login-logo .logo-fallback {
+            width: 70px;
+            height: 70px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+        .login-header h1 { font-size: 22px; margin-bottom: 8px; font-weight: 700; }
+        .login-header p { opacity: 0.9; font-size: 13px; letter-spacing: 0.5px; }
+        .login-body { padding: 40px 35px; }
+        .input-group { margin-bottom: 24px; }
+        .input-group label { display: block; margin-bottom: 10px; color: #2c3e50; font-weight: 600; font-size: 13px; }
+        .input-group input {
+            width: 100%; padding: 14px 18px; border: 2px solid #e9ecef; border-radius: 14px;
+            font-size: 15px; transition: all 0.3s; background: #f8f9fa;
+        }
+        .input-group input:focus {
+            outline: none; border-color: #2ecc71; background: white; box-shadow: 0 0 0 4px rgba(46,204,113,0.1);
+        }
+        .login-btn {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(46,204,113,0.3); }
+        .error-message {
+            background: #fee; color: #e74c3c; padding: 14px; border-radius: 14px;
+            margin-bottom: 20px; display: none; font-size: 13px; border-left: 4px solid #e74c3c;
+        }
+
+        /* Dashboard */
+        .navbar {
+            background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 12px 30px; display: flex; justify-content: space-between;
+            align-items: center; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-img {
+            width: 50px; height: 50px; background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(46,204,113,0.2); overflow: hidden;
+        }
+        .logo-img img { width: 38px; height: 38px; object-fit: contain; }
+        .logo-img .logo-fallback {
+            width: 38px; height: 38px; background: white; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold; color: #2ecc71;
+        }
+        .logo-text h2 { color: #2c3e50; font-size: 18px; font-weight: 700; }
+        .logo-text p { font-size: 10px; color: #2ecc71; font-weight: 600; letter-spacing: 1px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logout-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none;
+            padding: 10px 22px; border-radius: 40px; cursor: pointer; font-weight: 600;
+            font-size: 13px; transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(231,76,60,0.3); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+        .header-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px; margin-bottom: 30px; background: white;
+            padding: 15px 25px; border-radius: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .filter-buttons {
+            display: flex; gap: 8px; background: #f0f2f5; padding: 5px; border-radius: 50px;
+        }
+        .filter-btn {
+            padding: 8px 24px; border: none; border-radius: 40px; cursor: pointer;
+            font-size: 13px; font-weight: 600; background: transparent; color: #7f8c8d;
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white; box-shadow: 0 2px 8px rgba(46,204,113,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white;
+            border: none; padding: 12px 28px; border-radius: 40px; cursor: pointer;
+            font-weight: 600; font-size: 14px; display: inline-flex; align-items: center;
+            gap: 10px; box-shadow: 0 2px 8px rgba(46,204,113,0.2);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,204,113,0.3); }
+        .search-box { flex: 1; max-width: 320px; }
+        .search-box input {
+            width: 100%; padding: 12px 20px; border: 2px solid #e9ecef;
+            border-radius: 40px; font-size: 14px; background: #f8f9fa;
+        }
+        .search-box input:focus { outline: none; border-color: #2ecc71; background: white; }
+        .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 24px; }
+        .article-card {
+            background: white; border-radius: 24px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s; position: relative;
+        }
+        .article-card:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .article-card.unpublished { border-left: 5px solid #e74c3c; }
+        .article-card.published { border-left: 5px solid #2ecc71; }
+        .status-badge {
+            position: absolute; top: 20px; right: 20px; padding: 5px 14px;
+            border-radius: 30px; font-size: 10px; font-weight: 700;
+        }
+        .status-published { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; }
+        .status-draft { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .article-title {
+            font-size: 18px; font-weight: 700; color: #2c3e50; margin-bottom: 12px;
+            cursor: pointer; line-height: 1.4; padding-right: 85px;
+        }
+        .article-title:hover { color: #2ecc71; }
+        .article-summary { color: #7f8c8d; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
+        .article-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid #ecf0f1;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .article-date { color: #95a5a6; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+        .article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-view, .btn-edit, .btn-delete, .btn-publish, .btn-unpublish {
+            padding: 6px 14px; border-radius: 30px; cursor: pointer; font-size: 11px;
+            font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-view { background: #3498db; color: white; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-delete { background: #e74c3c; color: white; }
+        .btn-publish { background: #2ecc71; color: white; }
+        .btn-unpublish { background: #95a5a6; color: white; }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; border-radius: 32px; width: 100%; max-width: 1000px;
+            max-height: 90vh; overflow-y: auto; padding: 30px; animation: slideUp 0.3s ease;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f2f5;
+        }
+        .modal-header h2 { font-size: 22px; color: #2c3e50; font-weight: 700; }
+        .close { font-size: 32px; cursor: pointer; color: #999; line-height: 1; }
+        .close:hover { color: #e74c3c; }
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 700; color: #2c3e50; font-size: 13px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 14px 18px; border: 2px solid #e9ecef;
+            border-radius: 16px; font-size: 14px; background: #f8f9fa;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #2ecc71; background: white;
+        }
+        .form-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .form-actions button { flex: 1; padding: 14px; border-radius: 40px; font-weight: 700; }
+        .btn-save-draft { background: #95a5a6; color: white; border: none; cursor: pointer; }
+        .btn-save-publish { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; border: none; cursor: pointer; }
+        .loading { text-align: center; padding: 60px; color: #7f8c8d; }
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: #2c3e50;
+            color: white; padding: 14px 24px; border-radius: 50px; display: none;
+            z-index: 1100; animation: slideIn 0.3s ease; font-size: 13px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .footer { text-align: center; padding: 30px; color: #95a5a6; font-size: 11px; border-top: 1px solid #ecf0f1; margin-top: 30px; }
+        .content-viewer { line-height: 1.8; font-size: 15px; color: #2c3e50; }
+        .content-viewer img { max-width: 100%; border-radius: 16px; }
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 20px; }
+            .container { padding: 20px; }
+            .articles-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; }
+            .header-actions { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; }
+            .logo-text h2 { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let editor = null;
+        let currentEditId = null;
+        let currentFilter = 'all';
+        
+        function showToast(message, isError = false) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.style.backgroundColor = isError ? '#e74c3c' : '#2ecc71';
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function createSlug(title) {
+            return title.toLowerCase().replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        }
+        
+        async function checkSession() {
+            const session = localStorage.getItem('admin_session');
+            if (!session) return false;
+            try {
+                const sessionData = JSON.parse(session);
+                await supabaseClient.auth.setSession(sessionData);
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                if (error || !user) {
+                    localStorage.removeItem('admin_session');
+                    return false;
+                }
+                return true;
+            } catch (e) {
+                localStorage.removeItem('admin_session');
+                return false;
+            }
+        }
+        
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('admin_session');
+            showToast('Çıkış yapıldı!');
+            renderLoginPage();
+        }
+        
+        async function loadArticles(searchTerm = '') {
+            const container = document.getElementById('articlesContainer');
+            if (!container) return;
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Makaleler yükleniyor...</div>';
+            
+            let query = supabaseClient.from('articles').select('*').order('pubDate', { ascending: false });
+            if (currentFilter === 'published') query = query.eq('is_published', true);
+            else if (currentFilter === 'draft') query = query.eq('is_published', false);
+            if (searchTerm) query = query.ilike('title', `%${searchTerm}%`);
+            
+            const { data, error } = await query;
+            if (error) {
+                container.innerHTML = '<div class="loading">❌ Hata: ' + error.message + '</div>';
+                return;
+            }
+            if (!data || data.length === 0) {
+                let msg = '📝 Henüz makale yok. İlk makalenizi ekleyin!';
+                if (currentFilter === 'published') msg = '📝 Yayınlanmış makale bulunmuyor.';
+                if (currentFilter === 'draft') msg = '📝 Taslak makale bulunmuyor.';
+                container.innerHTML = `<div class="loading">${msg}</div>`;
+                return;
+            }
+            
+            container.innerHTML = data.map(article => `
+                <div class="article-card ${article.is_published ? 'published' : 'unpublished'}">
+                    <span class="status-badge ${article.is_published ? 'status-published' : 'status-draft'}">
+                        ${article.is_published ? '<i class="fas fa-check-circle"></i> YAYINDA' : '<i class="fas fa-pen-fancy"></i> TASLAK'}
+                    </span>
+                    <div class="article-title" onclick="viewArticle(${article.id})">${escapeHtml(article.title)}</div>
+                    <div class="article-summary">${escapeHtml(article.summary ? article.summary.substring(0, 100) : '')}${article.summary && article.summary.length > 100 ? '...' : ''}</div>
+                    <div class="article-meta">
+                        <span class="article-date"><i class="far fa-calendar-alt"></i> ${article.pubDate || 'Tarih yok'}</span>
+                        <div class="article-actions">
+                            <button class="btn-view" onclick="event.stopPropagation(); viewArticle(${article.id})"><i class="fas fa-eye"></i> Gör</button>
+                            <button class="btn-edit" onclick="event.stopPropagation(); editArticle(${article.id})"><i class="fas fa-edit"></i> Düzenle</button>
+                            ${!article.is_published ? 
+                                `<button class="btn-publish" onclick="event.stopPropagation(); togglePublish(${article.id}, true)"><i class="fas fa-rocket"></i> Yayınla</button>` :
+                                `<button class="btn-unpublish" onclick="event.stopPropagation(); togglePublish(${article.id}, false)"><i class="fas fa-archive"></i> Kaldır</button>`
+                            }
+                            <button class="btn-delete" onclick="event.stopPropagation(); deleteArticle(${article.id})"><i class="fas fa-trash"></i> Sil</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function togglePublish(id, publish) {
+            const { error } = await supabaseClient.from('articles').update({ is_published: publish }).eq('id', id);
+            if (error) showToast('Hata: ' + error.message, true);
+            else {
+                showToast(publish ? 'Makale yayınlandı!' : 'Makale yayından kaldırıldı!');
+                await loadArticles(document.getElementById('searchInput')?.value || '');
+            }
+        }
+        
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            loadArticles(document.getElementById('searchInput')?.value || '');
+        }
+        
+        async function viewArticle(id) {
+            const { data, error } = await supabaseClient.from('articles').select('*').eq('id', id).single();
+            if (error) { showToast('Makale bulunamadı!', true); return; }
+            document.getElementById('viewTitle').innerHTML = escapeHtml(data.title);
+            document.getElementById('viewAuthor').innerHTML = `<i class="fas fa-user-md"></i> ${escapeHtml(data.authorName || 'Uzm. Dr. Ayşe Demir')}`;
+            document.getElementById('viewDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${data.pubDate || 'Tarih yok'}`;
+            document.getElementById('viewStatus').innerHTML = data.is_published ? 
+                '<span style="background:#2ecc71; color:white; padding:5px 14px; border-radius:30px; font-size:11px;"><i class="fas fa-check-circle"></i> YAYINDA</span>' : 
+                '<span style="background:#e74c3c; color:white; padding:5px 14px; border-radius:30px; font-size:11px;"><i class="fas fa-pen-fancy"></i> TASLAK</span>';
+            document.getElementById('viewContent').innerHTML = data.fullContent || '<p>İçerik bulunmuyor.</p>';
+            document.getElementById('viewModal').style.display = 'flex';
+        }
+        
+        function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+        
+        async function editArticle(id) {
+            const { data, error } = await supabaseClient.from('articles').select('*').eq('id', id).single();
+            if (error) { showToast('Makale bulunamadı!', true); return; }
+            currentEditId = id;
+            document.getElementById('modalTitle').textContent = 'Makale Düzenle';
+            document.getElementById('title').value = data.title || '';
+            document.getElementById('summary').value = data.summary || '';
+            document.getElementById('authorName').value = data.authorName || 'Uzm. Dr. Ayşe Demir';
+            document.getElementById('authorAvatar').value = data.authorAvatar || 'img/author-ayse.jpg';
+            
+            if (editor && data.fullContent) {
+                editor.setContent(data.fullContent);
+            }
+            
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function openModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = 'Yeni Makale Ekle';
+            document.getElementById('title').value = '';
+            document.getElementById('summary').value = '';
+            document.getElementById('authorName').value = 'Uzm. Dr. Ayşe Demir';
+            document.getElementById('authorAvatar').value = 'img/author-ayse.jpg';
+            
+            if (editor) {
+                editor.setContent('');
+            }
+            
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            currentEditId = null;
+        }
+        
+        async function saveAsDraft() { await saveArticle(false); }
+        async function saveAndPublish() { await saveArticle(true); }
+        
+        async function saveArticle(publish = false) {
+            const title = document.getElementById('title').value;
+            const summary = document.getElementById('summary').value;
+            const fullContent = editor ? editor.getContent() : '';
+            const authorName = document.getElementById('authorName').value;
+            const authorAvatar = document.getElementById('authorAvatar').value;
+            const slug = createSlug(title);
+            const pubDate = new Date().toISOString().split('T')[0];
+            
+            if (!title || !summary || !fullContent) {
+                showToast('Lütfen tüm zorunlu alanları doldurun!', true);
+                return;
+            }
+            
+            const articleData = { slug, title, summary, fullContent, pubDate, authorName, authorAvatar, is_published: publish };
+            let result;
+            if (currentEditId) result = await supabaseClient.from('articles').update(articleData).eq('id', currentEditId);
+            else result = await supabaseClient.from('articles').insert([articleData]);
+            
+            if (result.error) showToast('Hata: ' + result.error.message, true);
+            else {
+                showToast(publish ? 'Makale yayınlandı!' : 'Makale taslak olarak kaydedildi!');
+                closeModal();
+                await loadArticles();
+            }
+        }
+        
+        async function deleteArticle(id) {
+            if (confirm('Bu makaleyi silmek istediğinize emin misiniz?')) {
+                const { error } = await supabaseClient.from('articles').delete().eq('id', id);
+                if (error) showToast('Silme hatası: ' + error.message, true);
+                else { showToast('Makale silindi!'); await loadArticles(); }
+            }
+        }
+        
+        let searchTimeout;
+        function onSearch(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadArticles(e.target.value), 300);
+        }
+        
+        function handleLogoError(imgElement, isLogin = false) {
+            const parent = imgElement.parentElement;
+            if (isLogin) {
+                const fallback = document.createElement('div');
+                fallback.className = 'logo-fallback';
+                fallback.innerHTML = 'KÇD';
+                parent.innerHTML = '';
+                parent.appendChild(fallback);
+            } else {
+                const fallback = document.createElement('div');
+                fallback.className = 'logo-fallback';
+                fallback.innerHTML = 'KÇ';
+                parent.innerHTML = '';
+                parent.appendChild(fallback);
+            }
+        }
+        
+        // TinyMCE Self-Hosted Başlatma (API anahtarı GEREKMEZ!)
+        function initTinyMCE() {
+            tinymce.init({
+                selector: '#editorTextarea',
+                height: 450,
+                language: 'tr',
+                menubar: false,
+                plugins: 'advlist lists link table',
+                toolbar: 'undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | link table | removeformat',
+                toolbar_mode: 'wrap',
+                skin: 'oxide',
+                content_css: 'default',
+                setup: function(ed) {
+                    editor = ed;
+                },
+                init_instance_callback: function(editor) {
+                    console.log('TinyMCE Self-Hosted başlatıldı! API anahtarı gerekmez.');
+                }
+            });
+        }
+        
+        function renderLoginPage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #2ecc71 0%, #1e8449 100%);">
+                    <div class="login-container">
+                        <div class="login-header">
+                            <div class="login-logo">
+                                <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği" onerror="handleLogoError(this, true)">
+                            </div>
+                            <h1>Kırıkkale Çölyak Derneği</h1>
+                            <p>Yazar Paneli</p>
+                        </div>
+                        <div class="login-body">
+                            <div class="error-message" id="errorMessage"></div>
+                            <form id="loginForm">
+                                <div class="input-group">
+                                    <label><i class="fas fa-envelope"></i> E-posta</label>
+                                    <input type="email" id="email" placeholder="E-posta adresiniz" required>
+                                </div>
+                                <div class="input-group">
+                                    <label><i class="fas fa-lock"></i> Şifre</label>
+                                    <input type="password" id="password" placeholder="Şifreniz" required>
+                                </div>
+                                <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Giriş Yap</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorDiv = document.getElementById('errorMessage');
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) { errorDiv.style.display = 'block'; errorDiv.textContent = 'Giriş başarısız: ' + error.message; }
+                else { localStorage.setItem('admin_session', JSON.stringify(data.session)); showToast('Giriş başarılı!'); renderDashboard(); }
+            });
+        }
+        
+        async function renderDashboard() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div>
+                    <div class="navbar">
+                        <div class="logo">
+                            <div class="logo-img">
+                                <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği" onerror="handleLogoError(this, false)">
+                            </div>
+                            <div class="logo-text">
+                                <h2>Kırıkkale Çölyak Derneği</h2>
+                                <p>YAZAR PANELİ</p>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="header-actions">
+                            <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus-circle"></i> Yeni Makale</button>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tümü</button>
+                                <button class="filter-btn" data-filter="published" onclick="setFilter('published')">Yayında</button>
+                                <button class="filter-btn" data-filter="draft" onclick="setFilter('draft')">Taslak</button>
+                            </div>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" placeholder="🔍 Makale ara..." onkeyup="onSearch(event)">
+                            </div>
+                        </div>
+                        <div id="articlesContainer" class="articles-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div></div>
+                    </div>
+                    
+                    <div id="modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 id="modalTitle">Yeni Makale Ekle</h2>
+                                <span class="close" onclick="closeModal()">&times;</span>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-heading"></i> Başlık *</label>
+                                <input type="text" id="title" placeholder="Makale başlığı...">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-align-left"></i> Özet *</label>
+                                <textarea id="summary" rows="3" placeholder="Makale özeti..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-edit"></i> İçerik *</label>
+                                <textarea id="editorTextarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-md"></i> Yazar Adı</label>
+                                <input type="text" id="authorName" value="Uzm. Dr. Ayşe Demir">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-image"></i> Yazar Avatar</label>
+                                <input type="text" id="authorAvatar" value="img/author-ayse.jpg">
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn-save-draft" onclick="saveAsDraft()"><i class="fas fa-save"></i> Taslak Kaydet</button>
+                                <button class="btn-save-publish" onclick="saveAndPublish()"><i class="fas fa-rocket"></i> Hemen Yayınla</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="viewModal" class="modal">
+                        <div class="modal-content" style="max-width: 900px;">
+                            <div class="modal-header">
+                                <h2 id="viewTitle">Makale Başlığı</h2>
+                                <span class="close" onclick="closeViewModal()">&times;</span>
+                            </div>
+                            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f2f5; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                                <span id="viewAuthor"><i class="fas fa-user-md"></i> Yazar</span>
+                                <span id="viewDate"><i class="far fa-calendar-alt"></i> Tarih</span>
+                                <span id="viewStatus"></span>
+                            </div>
+                            <div id="viewContent" class="content-viewer"></div>
+                        </div>
+                    </div>
+                    <div id="toast" class="toast"></div>
+                    <div class="footer">
+                        <p>© 2024 Kırıkkale Çölyak Derneği | Tüm hakları saklıdır.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Global fonksiyonları tanımla
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+            window.saveAsDraft = saveAsDraft;
+            window.saveAndPublish = saveAndPublish;
+            window.editArticle = editArticle;
+            window.deleteArticle = deleteArticle;
+            window.viewArticle = viewArticle;
+            window.closeViewModal = closeViewModal;
+            window.logout = logout;
+            window.onSearch = onSearch;
+            window.setFilter = setFilter;
+            window.togglePublish = togglePublish;
+            window.handleLogoError = handleLogoError;
+            
+            // TinyMCE'yi başlat (API anahtarı GEREKMEZ!)
+            initTinyMCE();
+            
+            await loadArticles();
+        }
+        
+        async function init() {
+            const isLoggedIn = await checkSession();
+            isLoggedIn ? renderDashboard() : renderLoginPage();
+        }
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
