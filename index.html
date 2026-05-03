@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0JW6387DD4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0JW6387DD4');
+</script>
+
+<title>Kırıkkale Çölyak Derneği | Glutensiz Yaşam Rehberi ve Güncel Haberler</title>
+<meta name="description" content="Kırıkkale Çölyak Derneği resmi web sitesi. Çölyak hastalığı nedir, belirtileri nelerdir? Glutensiz yaşam rehberi, güncel haberler, yerel rehber ve destek için tek adres.">
+<meta name="keywords" content="Kırıkkale çölyak derneği, çölyak hastalığı nedir, glutensiz yaşam, glutensiz diyet, Kırıkkale glutensiz ürünler, çölyak belirtileri, çölyak tedavisi">
+<meta name="author" content="Kırıkkale Çölyak Derneği">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="language" content="Turkish">
+<meta name="revisit-after" content="3 days">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.kirikkalecolyak.org.tr/">
+<meta property="og:title" content="Kırıkkale Çölyak Derneği | Glutensiz Yaşam Desteği">
+<meta property="og:description" content="Çölyak hastalarına özel glutensiz yaşam rehberi, güncel haberler ve topluluk desteği.">
+<meta property="og:image" content="https://www.kirikkalecolyak.org.tr/img/logo.png">
+<meta property="og:image:alt" content="Kırıkkale Çölyak Derneği logosu">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:site_name" content="Kırıkkale Çölyak Derneği">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kırıkkale Çölyak Derneği">
+<meta name="twitter:description" content="Çölyak hastalarına destek ve glutensiz yaşam rehberi.">
+<meta name="twitter:image" content="https://www.kirikkalecolyak.org.tr/img/logo.png">
+
+<meta name="theme-color" content="#059669">
+<link rel="canonical" href="https://www.kirikkalecolyak.org.tr/">
+<link rel="alternate" hreflang="tr" href="https://www.kirikkalecolyak.org.tr/">
+
+<link rel="preconnect" href="https://cdn.tailwindcss.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+    img { max-width: 100%; height: auto; display: block; }
+    .logo img, .footer-logo img { width: auto; max-width: 100%; height: auto; }
+    .hero-image img { max-width: 100%; width: auto; height: auto; }
+    .news-card img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+    video { max-width: 100%; height: auto; }
+    @media (max-width: 768px) {
+        .hero-content { flex-direction: column; text-align: center; }
+        .hero-image { margin-top: 1rem; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    .section-card { background: white; border-radius: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f0f2f5; overflow: hidden; transition: all 0.3s ease; height: auto; display: flex; flex-direction: column; }
+    .section-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+    .card-header { background-color: #059669; padding: 10px 15px; color: white; }
+    .card-header h3 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .card-header p { font-size: 0.75rem; opacity: 0.9; margin-top: 0.25rem; }
+    .card-body-custom { padding: 1.5rem; flex: 1; }
+    .video-wrapper { background: #000; border-radius: 12px; overflow: hidden; }
+    .video-wrapper video { width: 100%; height: auto; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-7 { display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .news-scroll { display: flex; gap: 1.5rem; overflow-x: auto; scroll-behavior: smooth; padding: 0.5rem 0.25rem; cursor: grab; scrollbar-width: thin; }
+    .news-scroll:active { cursor: grabbing; }
+    .news-scroll::-webkit-scrollbar { height: 6px; }
+    .news-scroll::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    .news-scroll::-webkit-scrollbar-thumb { background: #059669; border-radius: 10px; }
+    .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: white; border: 1px solid #e2e8f0; border-radius: 9999px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; z-index: 10; }
+    .slider-arrow.left { left: -20px; }
+    .slider-arrow.right { right: -20px; }
+    .slider-arrow:hover { background: #059669; color: white; border-color: #059669; }
+    .news-slider-container { position: relative; }
+
+
+
+// Her yenilemede göster (sessionStorage tamamen kaldırıldı, sadece sayfa içi yönlendirmeleri engellemek için)
+(function() {
+    // Sayfa içi yönlendirme mi kontrol et (document.referrer ile)
+    const oncekiSayfa = document.referrer;
+    const kendiSitem = oncekiSayfa.includes('kirikkalecolyak.org.tr');
+    
+    if (!kendiSitem) {
+        // Dışarıdan gelindi veya doğrudan girildi, modal göster
+        setTimeout(function() {
+            const modal = document.getElementById('reklamModal');
+            if (modal) modal.style.display = 'flex';
+        }, 500);
+    }
+    
+    function kapatModal() {
+        const modal = document.getElementById('reklamModal');
+        if (modal) modal.style.display = 'none';
+    }
+    
+    const kapatBtn = document.getElementById('closeReklamModalBtn');
+    if (kapatBtn) kapatBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        kapatModal();
+    });
+    
+    const modalBg = document.getElementById('reklamModal');
+    if (modalBg) {
+        modalBg.addEventListener('click', function(e) {
+            if (e.target === modalBg) kapatModal();
+        });
+    }
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    /* YAZARLAR KARTI - padding kaldırıldı, kartlar kenara yaslandı */
+    .order-authors .card-body-custom {
+        padding: 0 !important;
+    }
+    
+    .authors-container { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 1px;
+    }
+    
+    .author-card { 
+        background: #ffffff; 
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid #edf2f0;
+        transition: all 0.2s; 
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .author-card:last-child {
+        border-bottom: none;
+    }
+    
+    .author-card:hover { 
+        background: #fafef8;
+    }
+    
+    .author-content { 
+        display: flex; 
+        gap: 1rem; 
+        padding: 1rem; 
+        align-items: flex-start; 
+    }
+    
+    .author-avatar { 
+        flex-shrink: 0; 
+        width: 200px; 
+        text-align: center; 
+    }
+    
+    .author-avatar img { 
+        width: 150px; 
+        height: 150px; 
+        border-radius: 50%; 
+        object-fit: cover; 
+        border: 3px solid #e5f0ea; 
+        margin: 0 auto 0.5rem auto; 
+    }
+    
+    .author-info { 
+        max-width: 100%; 
+    }
+    
+    .author-name { 
+        font-weight: 700; 
+        font-size: 0.95rem; 
+        color: #1f3b2c; 
+        display: block; 
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 2px;
+    }
+    
+    .author-title { 
+        font-size: 0.65rem; 
+        color: #5a6e5e; 
+        display: block; 
+        line-height: 1.3; 
+        word-break: break-word;
+        margin-top: 4px;
+    }
+    
+    .author-articles { 
+        flex: 1; 
+        min-width: 0;
+    }
+    
+    .latest-article { 
+        background: #fafef8; 
+        border-radius: 0.75rem; 
+        padding: 0.75rem; 
+        margin-bottom: 0.5rem; 
+    }
+    
+    .latest-article .flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .latest-article h5 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        line-height: 1.35;
+        margin-bottom: 0.35rem;
+        color: #1f2937;
+    }
+    
+    .latest-article p {
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: #4b5563;
+    }
+    
+    .prev-article { 
+        padding-top: 0.5rem; 
+        border-top: 1px solid #e9f0e5; 
+    }
+    
+    .prev-article > span {
+        font-size: 0.7rem;
+    }
+    
+    .prev-article a {
+        font-size: 0.75rem;
+        display: block;
+        padding: 2px 0;
+        color: #059669;
+        text-decoration: none;
+    }
+    
+    .prev-article a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 640px) { 
+        .author-content { 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            gap: 0.75rem;
+            padding: 1rem;
+        } 
+        .author-avatar { 
+            width: 100%; 
+        }
+        .author-name {
+            white-space: normal;
+            text-align: center;
+        }
+        .author-articles { 
+            width: 100%; 
+            text-align: left;
+        }
+        .latest-article .flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    .celiac-video-wrapper { background: #f8fafc; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-top: 1rem; }
+    .celiac-video-wrapper video { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+    .celiac-video-caption { font-size: 0.7rem; color: #5b6e5e; padding: 0.5rem; text-align: center; background: #fefce8; border-top: 1px solid #e9f0e5; }
+    .two-column-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; align-items: start; }
+    .column { display: flex; flex-direction: column; gap: 1.5rem; }
+    .video-description { font-size: 0.875rem; line-height: 1.5; color: #4b5563; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+    @media (max-width: 768px) {
+        .two-column-layout { display: flex; flex-direction: column; gap: 1rem; }
+        .column { display: contents; }
+        .order-colyak { order: 1; }
+        .order-video { order: 2; }
+        .order-authors { order: 3; }
+        .order-pharmacy { order: 4; }
+    }
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": "Kırıkkale Çölyak Derneği Ana Sayfası",
+  "description": "Kırıkkale Çölyak Derneği'nin resmi web sitesi. Çölyak hastalığı, glutensiz yaşam, dernek haberleri ve yerel rehber bilgileri.",
+  "url": "https://www.kirikkalecolyak.org.tr/",
+  "inLanguage": "tr",
+  "isAccessibleForFree": true,
+  "publisher": {
+    "@type": "Organization",
+    "name": "Kırıkkale Çölyak Derneği",
+    "logo": "https://www.kirikkalecolyak.org.tr/img/logo.png"
+  },
+  "about": {
+    "@type": "MedicalCondition",
+    "name": "Çölyak Hastalığı",
+    "alternateName": "Gluten Enteropatisi",
+    "description": "Gluten tüketimiyle tetiklenen, ince bağırsakta hasara yol açan otoimmün bir hastalıktır.",
+    "symptom": "Karın ağrısı, şişkinlik, ishal, kabızlık, kilo kaybı, kansızlık, büyüme geriliği",
+    "possibleTreatment": "Ömür boyu süren katı glutensiz diyet"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Kırıkkale Çölyak Derneği",
+  "alternateName": "Kırıkkale Çölyak Hastalığı Derneği",
+  "url": "https://www.kirikkalecolyak.org.tr",
+  "logo": "https://www.kirikkalecolyak.org.tr/img/logo.png",
+  "description": "Kırıkkale'de çölyak hastalarına destek, glutensiz yaşam rehberi ve toplumsal farkındalık için çalışan sivil toplum kuruluşu.",
+  "foundingDate": "2025-04-24",
+  "founders": [{"@type": "Person", "name": "Fahri Türkoğlu"}],
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kırıkkale",
+    "addressRegion": "Kırıkkale",
+    "addressCountry": "TR"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+90-318-123-45-67",
+    "contactType": "customer service",
+    "language": "Turkish"
+  },
+  "sameAs": [
+    "https://www.facebook.com/kirikkalecolyak",
+    "https://www.instagram.com/kirikkalecolyak"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Çölyak hastalığı nedir ve belirtileri nelerdir?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Çölyak hastalığı, gluten adlı proteine karşı bağışıklık sisteminin verdiği tepki sonucu ince bağırsakta hasar oluşan otoimmün bir hastalıktır. Belirtileri arasında karın ağrısı, şişkinlik, ishal veya kabızlık, kilo kaybı, kansızlık, deri döküntüleri ve çocuklarda büyüme geriliği sayılabilir."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kırıkkale'de glutensiz ürünleri nerede bulabilirim?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kırıkkale merkezde Elit Ekmek, File Market, Kırıkkale Belediyesi Marketi, CarrefourSa, Gülenler Market ve Helal Market gibi işletmelerde çeşitli glutensiz ürünlere ulaşabilirsiniz. Detaylı liste ve harita için sitemizin 'Yerel Rehber' sayfasını ziyaret edebilirsiniz."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Çölyak hastalığının tedavisi var mı?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Çölyak hastalığının şu an için bilinen tek tedavisi, ömür boyu süren ve titizlikle uygulanması gereken glutensiz diyettir. Bu diyet sayesinde bağırsaklar iyileşir ve belirtiler ortadan kalkar."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-emerald-600 text-white px-4 py-2 rounded z-50">
+        Ana içeriğe atla
+    </a>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html" title="Kırıkkale Çölyak Derneği Ana Sayfa">
+                    <div class="logo-img">
+                        <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo - Glutensiz Yaşam" loading="eager" width="200" height="80" style="max-width:100%; height:auto;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart\'></i>';">
+                    </div>
+                    <div class="logo-text">
+                        <h1>Kırıkkale</h1>
+                        <p>Çölyak Derneği</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu" aria-label="Ana menü">
+                <ul>
+                    <li><a href="index.html" class="nav-link active" aria-current="page">Ana Sayfa</a></li>
+                    <li><a href="hakkimizda.html" class="nav-link">Derneğimiz</a></li>
+                    <li><a href="yerel-rehber.html" class="nav-link">Yerel Rehber</a></li>
+                    <li><a href="glutensiz-yasam.html" class="nav-link">Glutensiz Yaşam</a></li>
+                    <li><a href="bagis.html" class="nav-link">Bağış Yap</a></li>
+                    <li><a href="iletisim.html" class="nav-link">İletişim</a></li>
+                </ul>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menüyü aç/kapat" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="mobile-menu hidden" role="navigation" aria-label="Mobil menü">
+            <ul>
+                <li><a href="index.html" class="active">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                <li><a href="bagis.html">Bağış Yap</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main id="main-content" class="main-content">
+       
+        <section class="hero" style="background-image: linear-gradient(135deg, rgba(5, 150, 105, 0.6), rgba(0, 0, 0, 0.1)), url('img/arka.jpg'); background-size: cover; background-position: center;" aria-labelledby="hero-heading">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2 id="hero-heading" class="hero-title">Sağlıklı Bir Yaşam İçin Birlikteyiz</h2>
+                    <p class="hero-subtitle">Kırıkkale Çölyak Derneği olarak, çölyak hastalarının haklarını korumak ve glutensiz yaşamı kolaylaştırmak için çalışıyoruz.</p>
+                    <a href="hakkimizda.html" class="btn btn-primary" title="Derneğimiz Hakkında Detaylı Bilgi">Derneğimizi Tanıyın</a>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-image-circle">
+                        <div class="logo-wrapper">
+                            <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Resmi Logosu" width="200" height="200" style="max-width:100%; height:auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+       
+     
+
+
+
+
+
+<!-- YARIŞMA DUYURUSU BÖLÜMÜ BAŞLANGICI -->
+<section class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-8 transition-all duration-300 hover:shadow-lg">
+    <div class="grid md:grid-cols-3 gap-0">
+        <!-- Afiş Görseli -->
+        <div class="md:col-span-1 bg-emerald-50 flex items-center justify-center p-4">
+            <img src="img/yarisma.jpg" 
+                 alt="Buğday Tanesinden Farkındalığa: Çölyak Resim Yarışması Afişi" 
+                 class="w-full max-w-xs rounded-lg shadow-md object-cover"
+                 loading="lazy"
+                 onerror="this.src='https://via.placeholder.com/400x500/059669/ffffff?text=Resim+Yarismasi'">
+        </div>
+        
+        <!-- Duyuru İçeriği -->
+        <div class="md:col-span-2 p-5 md:p-6">
+            <div class="flex items-center gap-2 mb-3">
+                <i class="fas fa-palette text-emerald-600 text-xl"></i>
+                <h3 class="text-xl font-bold text-emerald-800">9 Mayıs Çölyak Günü Resim Yarışması</h3>
+                <span class="bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full animate-pulse ml-2">Duyuru</span>
+            </div>
+            
+            <p class="text-gray-700 font-semibold text-lg mb-2">"Buğday Tanesinden Farkındalığa: Çölyak Resim Yarışması"</p>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-gray-600 text-sm mb-2">
+                        Yahşihan İlçe Milli Eğitim Müdürlüğü ve Kırıkkale Üniversitesi Tıp Fakültesi iş birliğiyle düzenlenen 
+                        resim yarışması ile öğrencilerde çölyak hastalığına yönelik farkındalık oluşturulması hedeflenmektedir.
+                    </p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-users text-emerald-600 mt-0.5"></i> <span><strong>Katılımcılar:</strong> Resmi/Özel Tüm İlkokul ve Ortaokul Öğrencileri</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-calendar-alt text-emerald-600 mt-0.5"></i> <span><strong>Son Başvuru:</strong> <span class="font-semibold">6 Mayıs 2026 Çarşamba</span> (İlçe Milli Eğitim Müdürlüğü'ne teslim)</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-trophy text-emerald-600 mt-0.5"></i> <span><strong>Ödül Töreni:</strong> 9 Mayıs 2026 - </span></li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="font-semibold text-emerald-700 mb-2 text-sm"><i class="fas fa-chart-line mr-1"></i> Değerlendirme Ölçütleri:</p>
+                    <div class="space-y-1 text-xs">
+                        <div class="flex justify-between"><span>Çölyak Farkındalığını Yansıtma</span><span class="font-medium">30 Puan</span></div>
+                        <div class="flex justify-between"><span>Kompozisyon ve Anlatım Gücü</span><span class="font-medium">25 Puan</span></div>
+                        <div class="flex justify-between"><span>Tema ile Uyum</span><span class="font-medium">20 Puan</span></div>
+                        <div class="flex justify-between"><span>Yaratıcılık ve Özgünlük</span><span class="font-medium">15 Puan</span></div>
+                        <div class="flex justify-between"><span>Teknik Uygulama</span><span class="font-medium">10 Puan</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-3 mt-2">
+                <a href="Teknik%20%C5%9Eartname%20%C3%87%C3%96LYAK.docx" 
+                   class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition text-sm shadow-sm"
+                   download>
+                    <i class="fas fa-file-download"></i> Teknik Şartnameyi İndir
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- YARIŞMA DUYURUSU BÖLÜMÜ SONU -->
+
+
+
+
+
+
+
+
+
+
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 text-center">
+            <p class="text-gray-700 max-w-3xl mx-auto">
+                <strong class="text-emerald-700">Kırıkkale Çölyak Derneği</strong> olarak, <strong>çölyak hastalığı</strong> ile yaşayan bireylere ve ailelerine rehberlik etmek, 
+                doğru bilgiye erişimlerini sağlamak ve <strong>glutensiz yaşamı</strong> kolaylaştırmak için buradayız. 
+                Aşağıda hastalık, beslenme ve bölgemizdeki kaynaklar hakkında temel bilgilere ulaşabilirsiniz.
+                <a href="#clyak-nedir" class="text-emerald-600 font-semibold hover:underline">Çölyak Nedir?</a> •
+                <a href="#glutensiz-beslenme" class="text-emerald-600 font-semibold hover:underline">Glutensiz Beslenme</a> •
+                <a href="yerel-rehber.html" class="text-emerald-600 font-semibold hover:underline">Kırıkkale Rehberi</a>
+            </p>
+        </div>
+
+        <div class="two-column-layout">
+            <div class="column">
+                <div id="clyak-nedir" class="section-card order-colyak scroll-mt-20">
+                    <div class="card-header" style="background-color: #059669; padding: 10px 15px;">
+                        <h3 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Çölyak Nedir?</h3>
+                    </div>
+                    <div class="card-body-custom" style="padding: 1.5rem;">
+                        <p class="text-gray-600 leading-relaxed text-sm md:text-base">
+                            <strong class="text-emerald-700">Çölyak hastalığı</strong> (Gluten Enteropatisi), genetik yatkınlığı olan bireylerde 
+                            <strong>buğday, arpa, çavdar ve yulafta</strong> bulunan <strong>gluten</strong> proteininin tetiklediği, 
+                            ince bağırsağın emici yüzeyi olan <strong>villusların</strong> hasar görmesine yol açan bir <strong>otoimmün hastalıktır</strong>.
+                        </p>
+                        <p class="text-gray-600 leading-relaxed mt-3 text-sm md:text-base">
+                            Türkiye'de her <strong>100 kişiden 1'i</strong> çölyak hastasıdır, ancak çoğu henüz tanı almamıştır. 
+                            <strong>Kırıkkale</strong>'de de birçok birey bu hastalıkla yaşamaktadır. 
+                            <strong>Tek ve etkili tedavi</strong>, ömür boyu süren sıkı <strong>glutensiz diyettir</strong>.
+                        </p>
+                        <div class="celiac-video-wrapper mt-4">
+                            <video controls preload="metadata" poster="img/colyak-poster.jpg" aria-label="Çölyak hastalığı açıklayıcı video">
+                                <source src="colyaknedir.mp4" type="video/mp4">
+                                Tarayıcınız video etiketini desteklemiyor.
+                            </video>
+                            <div class="celiac-video-caption">
+                                <i class="fas fa-play-circle text-emerald-600 mr-1"></i>Çölyak Hastalığı Hakkında Kısa Bilgi
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card order-pharmacy">
+                    <div class="card-header" style="background-color: #059669; padding: 10px 15px;">
+                        <h3 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Kırıkkale Nöbetçi Eczaneler</h3>
+                    </div>
+                    <div class="card-body-custom pharmacy-widget" style="padding: 0;">
+                        <iframe src="https://widget.eczaneleri.org/api/widget/iframe.php?key=09b58f52c2914b56eb1b3f1fd81c2be0&theme=light-green" width="100%" height="820" frameborder="0" title="Kırıkkale Nöbetçi Eczaneler Widget"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="section-card order-video">
+                    <div class="card-header" style="background-color: #059669; padding: 10px 15px;">
+                        <div class="flex items-center justify-between flex-wrap gap-2 w-full">
+                            <h3 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Uzman Görüşleri: Glutensiz Yaşam</h3>
+                            <div class="flex gap-2">
+                                <button id="prev-video" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white transition" aria-label="Önceki video"><i class="fas fa-chevron-left"></i></button>
+                                <button id="next-video" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white transition" aria-label="Sonraki video"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body-custom" id="videoContainer" style="padding: 1.5rem;">
+                        <div class="animate-pulse">
+                            <div class="w-full bg-gray-200 rounded-xl mb-4 aspect-video"></div>
+                            <div class="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card order-authors">
+                    <div class="card-header" style="background-color: #059669; padding: 10px 15px;">
+                        <h3 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Dernek Yazarlarımızdan</h3>
+                    </div>
+                    <div class="card-body-custom" id="authorsContainer">
+                        <div class="animate-pulse flex flex-col gap-6">
+                            <div class="h-48 bg-gray-200 rounded-xl"></div>
+                            <div class="h-48 bg-gray-200 rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="glutensiz-beslenme" class="bg-emerald-50 rounded-2xl p-6 mb-8 scroll-mt-20">
+            <h2 class="text-2xl font-bold text-emerald-800 mb-4 text-center">Glutensiz Beslenme Rehberi</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-bold text-emerald-700 mb-2"><i class="fas fa-ban text-red-500 mr-2"></i> Kaçınılması Gerekenler</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700 text-sm">
+                        <li>Buğday (ekmek, makarna, kurabiye, kraker, un, irmik, bulgur, kuskus)</li>
+                        <li>Arpa (arpa unu, malt, malt özü, malt sirkesi, bira)</li>
+                        <li>Çavdar (çavdar ekmeği, çavdar unu)</li>
+                        <li>Yulaf (sadece <strong class="text-emerald-700">sertifikalı glutensiz yulaf</strong> güvenlidir)</li>
+                        <li>Çapraz bulaş riski taşıyan tüm gıdalar (ortak kızartma yağı, aynı bıçak/tahta kullanımı)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-emerald-700 mb-2"><i class="fas fa-check-circle text-green-600 mr-2"></i> Güvenle Tüketilebilecekler</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700 text-sm">
+                        <li>Doğal olarak glutensiz tahıllar: Pirinç, mısır, karabuğday, kinoa, amarant, darı, teff</li>
+                        <li>Tüm sebze ve meyveler</li>
+                        <li>Et, tavuk, balık, yumurta, baklagiller (nohut, mercimek, fasulye)</li>
+                        <li>Süt ve sade yoğurt, peynir (katkısız)</li>
+                        <li>Glutensiz sertifikalı ürünler (markalar: Schär, Dr. Schär, Migros Glutensiz, vb.)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl mt-4 text-center">
+                <p class="text-sm text-gray-600">📍 <strong>Kırıkkale'de glutensiz ürün bulabileceğiniz işletmelerin listesi ve haritası için <a href="yerel-rehber.html" class="text-emerald-600 font-semibold">Yerel Rehber sayfamızı</a> ziyaret edebilirsiniz.</strong></p>
+                <p class="text-xs text-gray-500 mt-2">Her zaman etiket okuyun ve "glutensiz" sertifikasına sahip ürünleri tercih edin.</p>
+            </div>
+        </div>
+
+        <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+            <div class="news-section-header" style="background-color: #059669; padding: 10px 15px;">
+                <h3 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Derneğimiz Hakkında Yerel Medya Haberleri</h3>
+            </div>
+            <div class="p-6">
+                <div class="news-slider-container group">
+                    <button onclick="scrollContainer('left')" class="slider-arrow left hidden md:flex" aria-label="Sola kaydır">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button onclick="scrollContainer('right')" class="slider-arrow right hidden md:flex" aria-label="Sağa kaydır">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div id="newsScrollContainer" class="news-scroll hide-scrollbar grab-cursor" role="region" aria-label="Haberler kaydırma alanı"></div>
+                    <div class="text-center mt-4 text-gray-400 text-sm">
+                        <i class="fas fa-arrows-alt-h mr-2"></i> Kaydırmak için sürükleyin veya okları kullanın
+                    </div>
+                </div>
+                <div id="emptyState" class="hidden text-center py-12">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                    <h4 class="text-lg font-semibold text-gray-600">Haber bulunamadı</h4>
+                    <p class="text-gray-500">Haber listesi boş veya erişilemez durumda.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-number">450+</div>
+                <div class="stat-label">İlimizdeki Çölyaklı</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-hand-holding-heart"></i>
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Desteklenen Aile</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-store"></i>
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Aktif Üye</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-check"></i>
+                <div class="stat-number">7/24</div>
+                <div class="stat-label">Destek</div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+            <div class="featured-section-header" style="background-color: #059669; padding: 10px 15px;">
+                <h2 style="font-size:1.2em; color:#FFF; margin: 0; font-weight: 500;">Öne Çıkan Sayfalar</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card group">
+                        <div class="h-44 overflow-hidden">
+                            <img src="img/hero-bg.jpg" alt="Glutensiz Yaşam Rehberi - Sağlıklı Beslenme" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" width="400" height="200" loading="lazy">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">Glutensiz Yaşam</h3>
+                            <p class="card-text">Glutensiz beslenme, teşhis, tedavi ve günlük yaşam ipuçları.</p>
+                            <a href="glutensiz-yasam.html" class="btn btn-primary w-full" title="Glutensiz Yaşam Rehberini Keşfet">Keşfet</a>
+                        </div>
+                    </div>
+                    <div class="card group">
+                        <div class="h-44 overflow-hidden">
+                            <img src="img/yrhero-bg.jpg" alt="Kırıkkale Yerel Rehber - Glutensiz Ürünler" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" width="400" height="200" loading="lazy">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">Yerel Rehber</h3>
+                            <p class="card-text">Kırıkkale'de glutensiz ürün bulabileceğiniz mekanlar.</p>
+                            <a href="yerel-rehber.html" class="btn btn-primary w-full" title="Yerel Rehberi Keşfet">Keşfet</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz" 
+           class="whatsapp-float" 
+           target="_blank" 
+           aria-label="WhatsApp grubuna katıl">
+           <i class="fab fa-whatsapp"></i>
+           <span class="whatsapp-text">Bize Katıl</span>
+        </a>
+
+        <style>
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border-radius: 50px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        .whatsapp-float i { font-size: 20px; }
+        .whatsapp-text { display: inline-block; }
+        .whatsapp-float:hover { transform: translateY(-3px) scale(1.05); background: #1ebe5d; }
+        @media (max-width: 600px) {
+            .whatsapp-text { display: none; }
+            .whatsapp-float { border-radius: 50%; padding: 14px; }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        </style>
+
+        <section class="rounded-xl overflow-hidden mb-8 max-w-3xl mx-auto" style="background: linear-gradient(135deg, #059669, #0d9488);">
+            <div class="text-center text-white py-6 px-4">
+                <h3 class="text-xl font-bold mb-2">Aramıza Katılın</h3>
+                <p class="text-emerald-50 mb-4 max-w-xl mx-auto text-sm">Çölyak hastalığı hakkında daha fazla bilgi edinmek ve topluluğumuzun bir parçası olmak için WhatsApp Grubumuza katılın, ayrıca bağışlarınızla bize destek olabilirsiniz.</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz?mode=gi_t" class="btn bg-white text-emerald-600 hover:bg-emerald-50 text-sm" rel="noopener noreferrer" target="_blank" title="WhatsApp grubumuza katıl">WhatsApp Grubuna Katılın</a>
+                    <a href="bagis.html" class="btn bg-emerald-700 text-white border border-emerald-500 hover:bg-emerald-600 text-sm" title="Bağış Yap">Bağış Yap</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo">
+                <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo - Footer" loading="lazy" width="150" height="60" style="max-width:100%; height:auto;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heart text-2xl text-gray-400\'></i>';">
+            </div>
+            <nav class="footer-nav" aria-label="Footer menü">
+                <ul>
+                    <li><a href="index.html">Ana Sayfa</a></li>
+                    <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                    <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                    <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                    <li><a href="bagis.html">Bağış Yap</a></li>
+                    <li><a href="iletisim.html">İletişim</a></li>
+                </ul>
+            </nav>
+            <p class="footer-copyright">&copy; 2026 Kırıkkale Çölyak Derneği. Tüm Hakları Saklıdır.</p>
+            <p class="footer-disclaimer">Bu web sitesi bilgilendirme amaçlıdır. Sakıncalı bir durum gördüğünüzde doktorunuza danışınız.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function formatDate(dateString) { if (!dateString) return 'Tarih yok'; try { const d = new Date(dateString); return d.toLocaleDateString('tr-TR'); } catch { return dateString; } }
+        
+        let videos = [];
+        let currentVideoIndex = 0;
+        
+        async function fetchVideos() { 
+            try { 
+                const res = await fetch('videos.json'); 
+                if(!res.ok) throw new Error(); 
+                videos = await res.json(); 
+                if(videos.length) { 
+                    currentVideoIndex = 0; 
+                    renderVideo(); 
+                } else { 
+                    showEmptyVideo(); 
+                }
+                updateVideoButtons();
+            } catch(e) { 
+                showEmptyVideo(); 
+            } 
+        }
+        
+        function showEmptyVideo() { 
+            const c = document.getElementById('videoContainer'); 
+            if(c) c.innerHTML = '<div class="text-center py-12 text-gray-500"><i class="fas fa-video-slash text-5xl mb-4"></i><p>Video içeriği yakında</p></div>'; 
+        }
+        
+        function renderVideo() { 
+            if(!videos.length) return; 
+            const v = videos[currentVideoIndex]; 
+            const c = document.getElementById('videoContainer'); 
+            const description = v.description || 'Kırıkkale Üniversitesi Tıp Fakültesi Hastanesi Çocuk Gastroenteroloji Ana Bilimdalı Prof.Dr. Hacer Fulya Gülermen ile bilgi dolu bu röportajı izleyerek çocukların sindirim sağlığı ile ilgili sorunlara nerede çözüm bulacağınız öğrenebilirsiniz.';
+            c.innerHTML = `
+                <div class="video-wrapper rounded-xl overflow-hidden bg-black mb-4">
+                    <video controls preload="metadata" style="width:100%; aspect-ratio:16/9;">
+                        <source src="${v.videoUrl}" type="video/mp4">
+                    </video>
+                </div>
+                <h4 class="text-lg font-bold">${escapeHtml(v.title)}</h4>
+                <div class="video-description">${escapeHtml(description)}</div>
+            `; 
+            updateVideoButtons();
+        }
+        
+        function updateVideoButtons() {
+            const prevBtn = document.getElementById('prev-video');
+            const nextBtn = document.getElementById('next-video');
+            if (prevBtn) prevBtn.disabled = currentVideoIndex === 0;
+            if (nextBtn) nextBtn.disabled = currentVideoIndex === videos.length - 1;
+        }
+        
+        function changeVideo(delta) { 
+            const ni = currentVideoIndex + delta; 
+            if(ni >= 0 && ni < videos.length) { 
+                currentVideoIndex = ni; 
+                renderVideo(); 
+            } 
+        }
+        
+        document.getElementById('prev-video')?.addEventListener('click', () => changeVideo(-1));
+        document.getElementById('next-video')?.addEventListener('click', () => changeVideo(1));
+        
+        async function loadAuthors() {
+            const container = document.getElementById('authorsContainer');
+            if(!container) return;
+            try {
+                const { data: articles, error } = await supabaseClient
+                    .from('articles')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('pubDate', { ascending: false });
+                    
+                if(error || !articles || articles.length === 0) throw new Error();
+                
+                const authorMap = new Map();
+                for(const a of articles) {
+                    const email = a.author_email;
+                    if(!email) continue;
+                    if(!authorMap.has(email)) {
+                        authorMap.set(email, { 
+                            name: a.author_name || email.split('@')[0], 
+                            title: a.author_title || '', 
+                            bio: a.author_bio || '',
+                            avatar: a.author_avatar || '', 
+                            email, 
+                            articles: [] 
+                        });
+                    }
+                    authorMap.get(email).articles.push(a);
+                }
+                
+                let sortedAuthors = Array.from(authorMap.values()).sort((a,b) => b.articles.length - a.articles.length);
+                let allAuthors = sortedAuthors;
+                if(allAuthors.length === 0) throw new Error();
+                
+                let authorsHtml = '<div class="authors-container">';
+                for(let author of allAuthors) {
+                    const latest = author.articles[0];
+                    const prevArticles = author.articles.slice(1, 3);
+                    const avatarUrl = author.avatar || 'img/yazar.jpg';
+                    const latestLink = `detay.html?id=${latest.id}&slug=${encodeURIComponent(latest.slug || '')}`;
+                    const titleText = author.title || (author.bio ? author.bio : 'Köşe yazarı');
+                    
+                    authorsHtml += `
+                        <div class="author-card">
+                            <div class="author-content">
+                                <div class="author-avatar">
+                                    <img src="${avatarUrl}" alt="${escapeHtml(author.name)}" onerror="this.src='img/yazar.jpg'" loading="lazy">
+                                    <div class="author-info">
+                                        <div class="author-name">${escapeHtml(author.name)}</div>
+                                        <div class="author-title">${escapeHtml(titleText)}</div>
+                                    </div>
+                                </div>
+                                <div class="author-articles">
+                                    <div class="latest-article">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-xs font-bold text-emerald-700"><i class="fas fa-star text-amber-500 text-xs mr-1"></i> Son Yazısı</span>
+                                            <a href="${latestLink}" class="text-xs text-emerald-600 font-medium" title="${escapeHtml(latest.title)}">Devamını Oku →</a>
+                                        </div>
+                                        <a href="${latestLink}">
+                                            <h5 class="font-bold text-md mb-1">${escapeHtml(latest.title)}</h5>
+                                            <p class="text-gray-600 text-xs line-clamp-2">${escapeHtml(latest.summary || '')}</p>
+                                            <div class="text-xs text-gray-400 mt-1"><i class="far fa-calendar-alt"></i> ${formatDate(latest.pubDate)}</div>
+                                        </a>
+                                    </div>
+                                    ${prevArticles.length > 0 ? `
+                                    <div class="prev-article">
+                                        <span class="text-xs font-semibold text-gray-500"><i class="fas fa-history text-emerald-600 text-xs mr-1"></i> Önceki Yazıları</span>
+                                        <div class="mt-1 space-y-1">
+                                            ${prevArticles.map(art => `
+                                                <div><a href="detay.html?id=${art.id}&slug=${encodeURIComponent(art.slug || '')}" class="text-sm font-medium hover:underline" title="${escapeHtml(art.title)}">${escapeHtml(art.title)}</a></div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    ` : '<div class="text-xs text-gray-400 italic mt-2">Önceki yazı bulunmuyor</div>'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                authorsHtml += '</div>';
+                container.innerHTML = authorsHtml;
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = '<div class="text-center py-12 text-red-500"><i class="fas fa-exclamation-circle text-5xl mb-4"></i><p>Yazar bölümü yüklenemedi.</p></div>';
+            }
+        }
+        
+        const newsContainer = document.getElementById('newsScrollContainer');
+        const emptyState = document.getElementById('emptyState');
+        function scrollContainer(direction) {
+            const container = document.getElementById('newsScrollContainer');
+            const scrollAmount = 350;
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+        function getRelativeTime(dateString) {
+            try {
+                const parts = dateString.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+                if (!parts) return '';
+                const date = new Date(parts[3], parts[2]-1, parts[1]);
+                const diff = new Date() - date;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                if (days === 0) return 'Bugün';
+                if (days === 1) return 'Dün';
+                if (days < 7) return `${days} gün önce`;
+                if (days < 30) return `${Math.floor(days / 7)} hafta önce`;
+                return `${Math.floor(days / 30)} ay önce`;
+            } catch { return ''; }
+        }
+        async function fetchNews() {
+            try {
+                const response = await fetch('news.json');
+                if (!response.ok) throw new Error('Haberler yüklenemedi');
+                const newsItems = await response.json();
+                renderNews(newsItems);
+            } catch (error) {
+                console.error('Haber hatası:', error);
+                if(newsContainer) newsContainer.innerHTML = '';
+                if(emptyState) emptyState.classList.remove('hidden');
+            }
+        }
+        function renderNews(items) {
+            if (!items || items.length === 0) {
+                if(newsContainer) newsContainer.innerHTML = '';
+                if(emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+            if(emptyState) emptyState.classList.add('hidden');
+            if(!newsContainer) return;
+            
+            newsContainer.innerHTML = items.map(item => {
+                const imageHtml = item.imageUrl ? 
+                    `<div class="relative h-40 md:h-48 overflow-hidden">
+                        <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-full object-cover" style="max-width:100%; height:auto;" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400/059669/ffffff?text=Haber'">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-emerald-600 text-white text-xs font-semibold rounded-full">${item.source || 'Haber'}</span>
+                        </div>
+                    </div>` : 
+                    `<div class="relative h-40 md:h-48 bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-4xl text-white/20"></i>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-white/20 text-white text-xs rounded-full">${item.source || 'Haber'}</span>
+                        </div>
+                    </div>`;
+                
+                return `
+                    <article class="news-card flex-shrink-0 w-72 md:w-80 bg-white rounded-2xl border border-gray-100 hover:border-emerald-200 snap-center flex flex-col h-[380px] md:h-[400px] shadow-sm">
+                        ${imageHtml}
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div class="flex items-center text-xs text-gray-500 mb-2 space-x-2">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>${formatDate(item.pubDate)}</span>
+                                <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span class="text-emerald-600 font-medium">${getRelativeTime(item.pubDate)}</span>
+                            </div>
+                            <h4 class="text-base font-bold text-gray-800 mb-2 line-clamp-2">${item.title}</h4>
+                            <p class="text-gray-600 text-xs line-clamp-3 mb-3 flex-1">${item.description}</p>
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn btn-outline w-full text-sm" title="Haberi Oku - ${item.title}">Haberi Oku</a>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+        function toggleAnnouncement() {
+            const content = document.getElementById('announcementContent');
+            const arrow = document.getElementById('announcementArrow');
+            const button = document.querySelector('[onclick="toggleAnnouncement()"]');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                button.setAttribute('aria-expanded', 'true');
+            } else {
+                content.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                button.setAttribute('aria-expanded', 'false');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNews();
+            fetchVideos();
+            loadAuthors();
+        });
+    </script>
+
+
+
+
+<!-- TEK SEferlik AÇILIR REKLAM MODALI -->
+<div id="reklamModal" class="modal-reklam">
+    <div class="modal-content-reklam">
+        <div class="modal-kapat-btn" id="closeReklamModalBtn">&times;</div>
+        <img src="img/afiş.jpg" alt="9 Mayıs Dünya Çölyak Günü Farkındalık Programı - Resim Yarışması, Yürüyüş ve Etkinlikler">
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Modal'ı kontrol et: daha önce gösterildi mi?
+        const modalGosterildi = localStorage.getItem('reklamGosterildi_v1');
+        
+        if (!modalGosterildi) {
+            // Daha önce gösterilmemiş, bekle 0.5 saniye sonra modalı göster (sayfa tam yüklensin)
+            setTimeout(function() {
+                const modal = document.getElementById('reklamModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    // Gösterildi bilgisini kaydet (bir daha asla gösterme)
+                    localStorage.setItem('reklamGosterildi_v1', 'true');
+                }
+            }, 500);
+        }
+        
+        // Kapatma işlevleri
+        function kapatModal() {
+            const modal = document.getElementById('reklamModal');
+            if (modal) modal.style.display = 'none';
+        }
+        
+        // Butona tıklanınca kapat
+        const kapatBtn = document.getElementById('closeReklamModalBtn');
+        if (kapatBtn) {
+            kapatBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                kapatModal();
+            });
+        }
+        
+        // Modal arka planına (boş alana) tıklanınca kapat
+        const modalBg = document.getElementById('reklamModal');
+        if (modalBg) {
+            modalBg.addEventListener('click', function(e) {
+                // Eğer tıklanan yer direkt arka plan (modal) ise kapat
+                if (e.target === modalBg) {
+                    kapatModal();
+                }
+            });
+        }
+        
+        // Görsele tıklanınca (isteğe bağlı: detay sayfasına yönlendirme yapılabilir)
+        // Şimdilik sadece kapatma yapıyoruz, yönlendirme isterseniz aşağıdaki satırı aktif edin:
+        /*
+        const modalImg = document.querySelector('#reklamModal img');
+        if (modalImg) {
+            modalImg.style.cursor = 'pointer';
+            modalImg.addEventListener('click', function() {
+                window.location.href = 'https://www.kirikkalecolyak.org.tr/yarisma-detay.html'; // istediğiniz link
+            });
+        }
+        */
+    })();
+</script>
+
+
+
+
+
+</body>
+</html>
