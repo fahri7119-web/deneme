@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0JW6387DD4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-0JW6387DD4');
+    </script>
+    
+    <title>İçerik Detayı - Kırıkkale Çölyak Derneği</title>
+    <meta name="description" content="Kırıkkale Çölyak Derneği içerik detay sayfası.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+    
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #f8fafc; }
+        
+        /* NAVBAR */
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 0.75rem 0;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        .logo-img img { width: 45px; height: 45px; object-fit: contain; }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 700; color: #1f2937; }
+        .logo-text p { font-size: 0.65rem; color: #6b7280; }
+        .nav-menu ul { display: flex; gap: 1.5rem; list-style: none; }
+        .nav-menu a { text-decoration: none; color: #4b5563; font-weight: 500; font-size: 0.85rem; padding: 0.5rem 0; }
+        .nav-menu a:hover, .nav-menu a.active { color: #059669; border-bottom: 2px solid #059669; }
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #374151; }
+        .mobile-menu { display: none; background: white; padding: 1rem; border-top: 1px solid #e5e7eb; }
+        .mobile-menu ul { list-style: none; padding: 0; }
+        .mobile-menu li a { display: block; padding: 0.75rem; text-decoration: none; color: #374151; border-bottom: 1px solid #f3f4f6; }
+        .mobile-menu.show { display: block; }
+        
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .mobile-menu-btn { display: block; }
+            .container { padding: 0 1rem; }
+        }
+        
+        /* İÇERİK STILLERI */
+        .content-body { font-size: 1rem; line-height: 1.7; color: #374151; }
+        .content-body p { margin-bottom: 1rem; }
+        .content-body h2 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: #1f2937; }
+        .content-body h3 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: #374151; }
+        .content-body ul, .content-body ol { margin: 0.75rem 0 0.75rem 1.5rem; }
+        
+        /* GALERI SLIDER */
+        .gallery-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .gallery-slider {
+            position: relative;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            display: flex;
+            gap: 0;
+            cursor: grab;
+        }
+        .gallery-slider:active { cursor: grabbing; }
+        .gallery-slide {
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        .gallery-slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        .gallery-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .gallery-dot.active {
+            background: #059669;
+            width: 24px;
+            border-radius: 10px;
+        }
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+        .gallery-arrow:hover { background: #059669; }
+        .gallery-arrow-left { left: 15px; }
+        .gallery-arrow-right { right: 15px; }
+        
+        /* VIDEO BÖLÜMÜ */
+        .video-section {
+            background: #1a1a2e;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+        .video-section video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        .video-caption {
+            padding: 0.75rem;
+            background: #1f2937;
+            color: #d1d5db;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery-slide img { height: 250px; }
+            .gallery-arrow { width: 30px; height: 30px; }
+        }
+        
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        .footer-nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .footer-nav a { color: #9ca3af; text-decoration: none; }
+        .footer-nav a:hover { color: #059669; }
+        
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border-radius: 50px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            z-index: 9999;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        
+        .hidden { display: none !important; }
+        .bg-emerald-50 { background-color: #ecfdf5; }
+        .text-emerald-600 { color: #059669; }
+    </style>
+ <!-- Ana stil dosyası -->
+    <link rel="stylesheet" href="css/style.css">
+
+
+
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container">
+        <div class="logo">
+            <a href="index.html">
+                <div class="logo-img">
+                    <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo" width="45" height="45">
+                </div>
+                <div class="logo-text">
+                    <h1>Kırıkkale</h1>
+                    <p>Çölyak Derneği</p>
+                </div>
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                <li><a href="bagis.html">Bağış Yap</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </nav>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div id="mobile-menu" class="mobile-menu">
+        <ul>
+            <li><a href="index.html">Ana Sayfa</a></li>
+            <li><a href="hakkimizda.html">Derneğimiz</a></li>
+            <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+            <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+            <li><a href="bagis.html">Bağış Yap</a></li>
+            <li><a href="iletisim.html">İletişim</a></li>
+        </ul>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8">
+    <div id="loadingSkeleton" class="bg-white rounded-xl shadow-sm p-6">
+        <div class="animate-pulse">
+            <div class="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+            <div class="h-64 bg-gray-200 rounded mb-6"></div>
+            <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        </div>
+    </div>
+    
+    <div id="detayContent" class="bg-white rounded-xl shadow-sm overflow-hidden hidden"></div>
+    
+    <div class="mt-6 text-center">
+        <a href="index.html" class="text-emerald-600 hover:text-emerald-700 font-medium">
+            <i class="fas fa-arrow-left mr-2"></i> Ana Sayfaya Dön
+        </a>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-logo">
+            <img src="img/logo.png" alt="Logo" width="150" height="60">
+        </div>
+        <nav class="footer-nav">
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                <li><a href="bagis.html">Bağış Yap</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </nav>
+        <p class="footer-copyright">&copy; 2026 Kırıkkale Çölyak Derneği. Tüm Hakları Saklıdır.</p>
+    </div>
+</footer>
+
+<a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    <span class="whatsapp-text">Bize Katıl</span>
+</a>
+
+<script>
+    // SUPABASE BAĞLANTI
+    const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'Tarih belirtilmemiş';
+        try {
+            const d = new Date(dateString);
+            return d.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+        } catch {
+            return dateString;
+        }
+    }
+    
+    // ========== GALERI SLIDER (RESİM SLIDE) ==========
+    let galleryScrollElem = null;
+    let galleryAutoInterval = null;
+    
+    function renderGallery(images, galleryTitle) {
+        if (!images || images.length === 0) return '';
+        
+        const containerId = 'gallery_' + Date.now();
+        const html = `
+            <div class="gallery-container mb-6">
+                <div id="${containerId}" class="gallery-slider">
+                    ${images.map(img => `
+                        <div class="gallery-slide">
+                            <img src="${escapeHtml(img)}" alt="Galeri görseli" loading="lazy" onerror="this.src='img/placeholder.jpg'">
+                        </div>
+                    `).join('')}
+                </div>
+                ${images.length > 1 ? `
+                    <div class="gallery-arrow gallery-arrow-left" onclick="scrollGallery('${containerId}', -1)"><i class="fas fa-chevron-left"></i></div>
+                    <div class="gallery-arrow gallery-arrow-right" onclick="scrollGallery('${containerId}', 1)"><i class="fas fa-chevron-right"></i></div>
+                    <div class="gallery-nav" id="dots_${containerId}">
+                        ${images.map((_, idx) => `<div class="gallery-dot ${idx === 0 ? 'active' : ''}" onclick="scrollGalleryTo('${containerId}', ${idx})"></div>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        // Script'i global olarak tanımla
+        window[`initGallery_${containerId}`] = function() {
+            const slider = document.getElementById(containerId);
+            if (!slider) return;
+            
+            slider.addEventListener('scroll', () => {
+                if (slider.clientWidth > 0) {
+                    const idx = Math.round(slider.scrollLeft / slider.clientWidth);
+                    const dots = document.querySelectorAll(`#dots_${containerId} .gallery-dot`);
+                    dots.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+                }
+            });
+        };
+        
+        return html;
+    }
+    
+    // Global gallery fonksiyonları
+    window.scrollGallery = function(containerId, direction) {
+        const slider = document.getElementById(containerId);
+        if (slider) {
+            const scrollAmount = slider.clientWidth;
+            slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+    };
+    
+    window.scrollGalleryTo = function(containerId, index) {
+        const slider = document.getElementById(containerId);
+        if (slider) {
+            slider.scrollTo({ left: slider.clientWidth * index, behavior: 'smooth' });
+        }
+    };
+    
+    // ========== VIDEO RENDER ==========
+    function renderVideo(videoUrl, videoTitle, posterImage) {
+        if (!videoUrl) return '';
+        
+        const isYouTube = videoUrl.includes('youtube.com/embed') || videoUrl.includes('youtu.be');
+        
+        if (isYouTube) {
+            let videoId = '';
+            if (videoUrl.includes('youtube.com/embed/')) {
+                videoId = videoUrl.split('/embed/')[1].split('?')[0];
+            } else if (videoUrl.includes('youtu.be/')) {
+                videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+            }
+            return `
+                <div class="video-section">
+                    <iframe src="https://www.youtube.com/embed/${videoId}" 
+                            class="w-full aspect-video" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                    ${videoTitle ? `<div class="video-caption">${escapeHtml(videoTitle)}</div>` : ''}
+                </div>
+            `;
+        } else {
+            return `
+                <div class="video-section">
+                    <video controls poster="${posterImage || ''}">
+                        <source src="${videoUrl}" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                    ${videoTitle ? `<div class="video-caption">${escapeHtml(videoTitle)}</div>` : ''}
+                </div>
+            `;
+        }
+    }
+    
+    // ========== İÇERİK YÜKLEME ==========
+    async function loadContent() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if (!id) {
+            showError('Geçersiz içerik ID\'si.');
+            return;
+        }
+        
+        // Önce hero tablosunda ara
+        const { data: heroData, error: heroError } = await supabaseClient
+            .from('hero')
+            .select('*')
+            .eq('id', id)
+            .eq('is_active', true)
+            .single();
+        
+        if (!heroError && heroData) {
+            // Medyaları da çek (hero_media tablosu varsa)
+            let galleryImages = heroData.gallery_images || [];
+            let mediaList = [];
+            
+            // hero_media tablosundan çek (varsa)
+            const { data: mediaData, error: mediaError } = await supabaseClient
+                .from('hero_media')
+                .select('*')
+                .eq('hero_id', id)
+                .order('order', { ascending: true });
+            
+            if (!mediaError && mediaData && mediaData.length > 0) {
+                mediaList = mediaData;
+                galleryImages = mediaData.filter(m => m.media_type === 'image').map(m => m.media_url);
+            }
+            
+            renderHeroContent(heroData, galleryImages, mediaList);
+            return;
+        }
+        
+        // Articles tablosunda ara
+        const { data: articleData, error: articleError } = await supabaseClient
+            .from('articles')
+            .select('*')
+            .eq('id', id)
+            .eq('is_published', true)
+            .single();
+        
+        if (!articleError && articleData) {
+            renderArticleContent(articleData);
+            return;
+        }
+        
+        showError('İçerik bulunamadı veya yayınlanmamış.');
+    }
+    
+    function renderHeroContent(hero, galleryImages, mediaList) {
+        document.title = `${hero.title} - Kırıkkale Çölyak Derneği`;
+        
+        // Video bul (hero_media'dan veya hero tablosundan)
+        let mainVideo = null;
+        let secondaryVideo = null;
+        
+        if (mediaList && mediaList.length > 0) {
+            const videos = mediaList.filter(m => m.media_type === 'video');
+            if (videos.length > 0) mainVideo = videos[0];
+            if (videos.length > 1) secondaryVideo = videos[1];
+        }
+        
+        if (!mainVideo && hero.video_url) {
+            mainVideo = { media_url: hero.video_url, media_title: hero.video_title };
+        }
+        
+        // Galeri HTML
+        const galleryHtml = galleryImages.length > 0 ? renderGallery(galleryImages, hero.gallery_title) : '';
+        
+        // Video HTML
+        const mainVideoHtml = mainVideo ? renderVideo(mainVideo.media_url, mainVideo.media_title || hero.video_title, hero.bg_image) : '';
+        const secondaryVideoHtml = secondaryVideo ? renderVideo(secondaryVideo.media_url, secondaryVideo.media_title, hero.bg_image) : '';
+        
+        const contentHtml = `
+            <div class="p-6 md:p-8">
+                <div class="mb-4">
+                    <span class="bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        <i class="fas fa-star mr-1"></i> ${hero.media_type === 'video' ? 'Video İçerik' : 'Manşet Haber'}
+                    </span>
+                </div>
+                
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">${escapeHtml(hero.title)}</h1>
+                
+                <div class="text-sm text-gray-500 mb-4 pb-2 border-b border-gray-100">
+                    <i class="far fa-calendar-alt mr-2"></i> ${formatDate(hero.created_at)}
+                    ${hero.location ? `<i class="fas fa-map-marker-alt ml-3 mr-1"></i> ${escapeHtml(hero.location)}` : ''}
+                </div>
+                
+                ${galleryHtml}
+                
+                ${mainVideoHtml}
+                
+                <div class="content-body text-gray-700 leading-relaxed">
+                    ${hero.full_description ? hero.full_description : `<p>${escapeHtml(hero.subtitle)}</p>`}
+                </div>
+                
+                ${secondaryVideoHtml}
+                
+                <div class="mt-8 pt-4 border-t border-gray-100 flex gap-3">
+                    <span class="text-xs text-gray-500">Paylaş:</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="text-blue-600"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(hero.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="text-sky-500"><i class="fab fa-twitter"></i></a>
+                    <a href="https://wa.me/?text=${encodeURIComponent(hero.title + ' ' + window.location.href)}" target="_blank" class="text-green-600"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('loadingSkeleton').classList.add('hidden');
+        const contentDiv = document.getElementById('detayContent');
+        contentDiv.innerHTML = contentHtml;
+        contentDiv.classList.remove('hidden');
+        
+        // Galeri slider'larını başlat
+        setTimeout(() => {
+            document.querySelectorAll('.gallery-slider').forEach(slider => {
+                const containerId = slider.id;
+                if (containerId && window[`initGallery_${containerId}`]) {
+                    window[`initGallery_${containerId}`]();
+                }
+            });
+        }, 100);
+    }
+    
+    function renderArticleContent(article) {
+        document.title = `${article.title} - Kırıkkale Çölyak Derneği`;
+        
+        // Article için galeri (varsa)
+        let galleryImages = article.gallery_images || [];
+        let mainVideo = article.video_url ? { media_url: article.video_url, media_title: article.video_title } : null;
+        
+        const galleryHtml = galleryImages.length > 0 ? renderGallery(galleryImages, article.gallery_title) : '';
+        const videoHtml = mainVideo ? renderVideo(mainVideo.media_url, mainVideo.media_title, article.bg_image) : '';
+        
+        const contentHtml = `
+            <div class="p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                    <img src="${article.author_avatar || 'img/yazar.jpg'}" 
+                         alt="${escapeHtml(article.author_name)}" 
+                         class="w-12 h-12 rounded-full object-cover border-2 border-emerald-200"
+                         onerror="this.src='img/yazar.jpg'">
+                    <div>
+                        <span class="font-semibold text-gray-800">${escapeHtml(article.author_name)}</span>
+                        <span class="text-xs text-gray-500 block">${article.author_title || 'Köşe Yazarı'}</span>
+                    </div>
+                    <div class="ml-auto text-right text-xs text-gray-400">
+                        <i class="far fa-calendar-alt mr-1"></i> ${formatDate(article.pubDate)}
+                    </div>
+                </div>
+                
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">${escapeHtml(article.title)}</h1>
+                
+                ${galleryHtml}
+                
+                ${videoHtml}
+                
+                ${article.summary ? `<div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-6 rounded-r-lg">
+                    <p class="text-emerald-800 italic">${escapeHtml(article.summary)}</p>
+                </div>` : ''}
+                
+                <div class="content-body">
+                    ${article.fullContent || '<p>İçerik bulunmamaktadır.</p>'}
+                </div>
+                
+                <div class="mt-8 pt-4 border-t border-gray-100 flex gap-3">
+                    <span class="text-xs text-gray-500">Paylaş:</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="text-blue-600"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="text-sky-500"><i class="fab fa-twitter"></i></a>
+                    <a href="https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}" target="_blank" class="text-green-600"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('loadingSkeleton').classList.add('hidden');
+        const contentDiv = document.getElementById('detayContent');
+        contentDiv.innerHTML = contentHtml;
+        contentDiv.classList.remove('hidden');
+        
+        setTimeout(() => {
+            document.querySelectorAll('.gallery-slider').forEach(slider => {
+                const containerId = slider.id;
+                if (containerId && window[`initGallery_${containerId}`]) {
+                    window[`initGallery_${containerId}`]();
+                }
+            });
+        }, 100);
+    }
+    
+    function showError(message) {
+        document.getElementById('loadingSkeleton').classList.add('hidden');
+        const contentDiv = document.getElementById('detayContent');
+        contentDiv.innerHTML = `
+            <div class="p-8 text-center">
+                <i class="fas fa-exclamation-triangle text-5xl text-amber-500 mb-4"></i>
+                <h2 class="text-xl font-bold text-gray-700 mb-2">İçerik Bulunamadı</h2>
+                <p class="text-gray-500">${escapeHtml(message)}</p>
+                <a href="index.html" class="inline-block mt-4 text-emerald-600 hover:underline">Ana Sayfaya Dön</a>
+            </div>
+        `;
+        contentDiv.classList.remove('hidden');
+    }
+    
+    // Mobil menü
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+        document.getElementById('mobile-menu')?.classList.toggle('show');
+    });
+    
+    // Sayfa yüklendiğinde
+    document.addEventListener('DOMContentLoaded', loadContent);
+</script>
+</body>
+</html>
