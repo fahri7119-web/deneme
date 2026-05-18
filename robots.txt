@@ -1,0 +1,16 @@
+# robots.txt for Kırıkkale Çölyak Derneği
+# https://www.kirikkalecolyak.org.tr/robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.kirikkalecolyak.org.tr/sitemap.xml
+
+# Crawl delay (optional - be polite to server)
+# Crawl-delay: 1
+
+# Disallow admin or private directories if any (none present currently)
+# Disallow: /admin/
+# Disallow: /private/
+# Disallow: /temp/
