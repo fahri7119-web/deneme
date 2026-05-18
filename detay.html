@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0JW6387DD4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0JW6387DD4');</script>
+
+<title>İçerik Detayı - Kırıkkale Çölyak Derneği</title>
+<meta name="description" content="Kırıkkale Çölyak Derneği içerik detay sayfası.">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+    /* ----- GLOBAL RESET & TYPOGRAPHY (glutensiz-yasam.html ile uyumlu) ----- */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f9fafb;
+        color: #1f2937;
+        overflow-x: hidden;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* ----- NAVBAR (glutensiz-yasam.html ile aynı) ----- */
+    .navbar {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .navbar .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 4rem;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+    .logo-img {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .logo-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    .logo-text h1 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #059669;
+        margin: 0;
+        line-height: 1.2;
+    }
+    .logo-text p {
+        font-size: 0.625rem;
+        color: #6b7280;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .nav-menu {
+        display: none;
+    }
+    @media (min-width: 768px) {
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #059669;
+            font-weight: 600;
+        }
+        .mobile-menu-btn {
+            display: none;
+        }
+    }
+    .mobile-menu-btn {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        color: #059669;
+        cursor: pointer;
+        padding: 0.5rem;
+        width: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .mobile-menu {
+        display: none;
+        position: absolute;
+        top: 4rem;
+        left: 0;
+        right: 0;
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.5rem;
+        z-index: 40;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .mobile-menu.hidden {
+        display: none;
+    }
+    .mobile-menu:not(.hidden) {
+        display: flex;
+    }
+    .mobile-menu a {
+        padding: 0.75rem 1rem;
+        text-decoration: none;
+        color: #4b5563;
+        border-radius: 0.5rem;
+        transition: background 0.2s;
+        font-weight: 500;
+    }
+    .mobile-menu a:hover,
+    .mobile-menu a.active {
+        background: #ecfdf5;
+        color: #059669;
+        font-weight: 600;
+    }
+
+    /* ----- FOOTER (glutensiz-yasam.html ile aynı) ----- */
+    .footer {
+        background: #111827;
+        color: #9ca3af;
+        padding: 3rem 1rem;
+        margin-top: 4rem;
+    }
+    .footer-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    .footer-nav a {
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: block;
+        padding: 0.5rem 0;
+        transition: color 0.2s;
+    }
+    .footer-nav a:hover {
+        color: #059669;
+    }
+    .footer-copyright {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid #374151;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+    }
+    .footer-social {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .footer-social a {
+        color: #9ca3af;
+        font-size: 1.25rem;
+        transition: color 0.2s;
+    }
+    .footer-social a:hover {
+        color: #059669;
+    }
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    .text-center {
+        text-align: center;
+    }
+
+    /* ----- DETAY SAYFASINA ÖZGÜ GALERİ, VİDEO, İÇERİK STİLLERİ (korundu) ----- */
+    .gallery-container { 
+        position: relative; 
+        margin-bottom: 1.5rem; 
+        border-radius: 0.75rem; 
+        overflow: hidden; 
+        background: #000;
+    }
+    .gallery-slider { 
+        overflow-x: auto; 
+        scroll-snap-type: x mandatory; 
+        display: flex; 
+        cursor: grab; 
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+    }
+    .gallery-slider::-webkit-scrollbar { display: none; }
+    .gallery-slider:active { cursor: grabbing; }
+
+    .gallery-slide {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        width: 100%;
+        background: #1a1a2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 350px;
+    }
+
+    .gallery-slide img {
+        width: 100%;
+        height: auto;
+        max-height: 450px;
+        object-fit: contain;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .gallery-slide {
+            min-height: 250px;
+        }
+        .gallery-slide img {
+            max-height: 350px;
+        }
+    }
+
+    .gallery-dots { 
+        position: absolute; 
+        bottom: 16px; 
+        left: 0; 
+        right: 0; 
+        display: flex; 
+        justify-content: center; 
+        gap: 8px; 
+        z-index: 10; 
+    }
+    .gallery-dot { 
+        width: 8px; 
+        height: 8px; 
+        border-radius: 50%; 
+        background: rgba(255,255,255,0.5); 
+        cursor: pointer; 
+        transition: all 0.2s;
+    }
+    .gallery-dot.active { 
+        background: #059669; 
+        width: 20px; 
+        border-radius: 10px; 
+    }
+    .gallery-arrow { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        background: rgba(0,0,0,0.5); 
+        color: white; 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        z-index: 10;
+        transition: all 0.2s;
+    }
+    .gallery-arrow:hover { background: rgba(0,0,0,0.8); }
+    .gallery-arrow.left { left: 12px; }
+    .gallery-arrow.right { right: 12px; }
+    
+    .video-section { background: #1a1a2e; border-radius: 0.75rem; overflow: hidden; margin: 1rem 0; }
+    .video-section video, .video-section iframe { width: 100%; aspect-ratio: 16/9; }
+    .author-avatar-large img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+    .content-body { font-size: 0.95rem; line-height: 1.6; color: #374151; }
+    .content-body p { margin-bottom: 0.75rem; }
+    
+    @media (max-width:768px) { 
+        .author-avatar-large img { width: 50px; height: 50px; }
+        .gallery-arrow { width: 28px; height: 28px; }
+    }
+
+    /* Ana içerik alanı düzeni (mevcut yapı korundu) */
+    main {
+        max-width: 960px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+    .bg-white {
+        background: white;
+    }
+    .rounded-xl {
+        border-radius: 0.75rem;
+    }
+    .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    .hidden {
+        display: none;
+    }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+    .sr-only:focus-visible {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        background: #059669;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        z-index: 100;
+        width: auto;
+        height: auto;
+        clip: auto;
+    }
+</style>
+</head>
+<body>
+
+<!-- Skip to main content (erişilebilirlik, glutensiz-yasam.html ile uyum) -->
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-emerald-600 text-white px-4 py-2 rounded z-50">Ana içeriğe atla</a>
+
+<!-- NAVBAR - birebir glutensiz-yasam.html ile aynı -->
+<header class="navbar">
+    <div class="container">
+        <a href="index.html" class="logo">
+            <div class="logo-img"><img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat text-emerald-600 text-2xl\'></i>'"></div>
+            <div class="logo-text"><h1>Kırıkkale</h1><p>Çölyak Derneği</p></div>
+        </a>
+        <nav class="nav-menu" id="nav-menu">
+            <ul style="display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0;">
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Derneğimiz</a></li>
+                <li><a href="yerel-rehber.html">Yerel Rehber</a></li>
+                <li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li>
+                <li><a href="bagis.html">Bağış Yap</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </nav>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menü"><i class="fas fa-bars"></i></button>
+    </div>
+    <div id="mobile-menu" class="mobile-menu hidden">
+        <a href="index.html">Ana Sayfa</a>
+        <a href="hakkimizda.html">Derneğimiz</a>
+        <a href="yerel-rehber.html">Yerel Rehber</a>
+        <a href="glutensiz-yasam.html">Glutensiz Yaşam</a>
+        <a href="bagis.html">Bağış Yap</a>
+        <a href="iletisim.html">İletişim</a>
+    </div>
+</header>
+
+<!-- Ana içerik alanı (detay.html'in orijinal yapısı korundu) -->
+<main id="main-content">
+    <div id="loadingSkeleton" class="bg-white rounded-xl shadow-sm p-5">
+        <div class="animate-pulse">
+            <div class="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+            <div class="h-48 bg-gray-200 rounded mb-4"></div>
+            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+        </div>
+    </div>
+    <div id="detayContent" class="bg-white rounded-xl shadow-sm overflow-hidden hidden"></div>
+    <div class="mt-5 text-center">
+        <a href="index.html" class="text-emerald-600 text-sm"><i class="fas fa-arrow-left mr-1"></i> Ana Sayfaya Dön</a>
+    </div>
+</main>
+
+<!-- FOOTER - birebir glutensiz-yasam.html ile aynı -->
+<footer class="footer">
+    <div class="footer-container container">
+        <div class="footer-grid text-center">
+            <div>
+                <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat text-emerald-500 text-4xl mb-2 block\'></i>'" style="height: 3.5rem; width: auto; opacity: 0.85; margin-bottom: 0.75rem; display: inline-block;">
+                <h3 class="text-emerald-500 font-bold text-lg">Kırıkkale Çölyak Derneği</h3>
+                <p class="text-xs text-gray-400 mt-1">Sağlıklı bir gelecek için</p>
+            </div>
+            <div class="footer-nav">
+                <h4 class="text-white font-semibold mb-3">Sayfalar</h4>
+                <a href="index.html">Ana Sayfa</a>
+                <a href="hakkimizda.html">Derneğimiz</a>
+                <a href="yerel-rehber.html">Yerel Rehber</a>
+                <a href="glutensiz-yasam.html">Glutensiz Yaşam</a>
+                <a href="bagis.html">Bağış Yap</a>
+                <a href="iletisim.html">İletişim</a>
+            </div>
+            <div class="footer-nav">
+                <h4 class="text-white font-semibold mb-3">Sosyal Medya</h4>
+                <div class="footer-social justify-center">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2026 Kırıkkale Çölyak Derneği | Tüm hakları saklıdır.
+        </div>
+    </div>
+</footer>
+
+<!-- main.js (mevcut menü ve copyIBAN fonksiyonları, navbar ID'leri uyumlu) -->
+<script src="js/main.js"></script>
+
+<!-- Sayfa özel script (içerik yükleme, galeri, menü çakışması olmadan çalışır) -->
+<script>
+const SUPABASE_URL='https://tmtdpykzmdvxszxwyege.supabase.co',SUPABASE_ANON_KEY='sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F',supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+let currentGalleryId = null;
+
+function escapeHtml(s){if(!s)return'';const d=document.createElement('div');return d.textContent=s,d.innerHTML}
+function formatDate(d){if(!d)return'Belirtilmemiş';try{return new Date(d).toLocaleDateString('tr-TR')}catch{return d}}
+
+function renderGallery(imgs){
+    if(!imgs?.length) return '';
+    const id = 'gallery_' + Date.now();
+    currentGalleryId = id;
+    
+    let html = `<div class="gallery-container" id="container_${id}">
+        <div id="${id}" class="gallery-slider">`;
+    
+    imgs.forEach(img => {
+        html += `<div class="gallery-slide"><img src="${escapeHtml(img)}" loading="lazy" onerror="this.src='img/placeholder.jpg'"></div>`;
+    });
+    
+    html += `</div>`;
+    
+    if(imgs.length > 1){
+        html += `<div class="gallery-arrow left" onclick="scrollGallery('${id}', -1)"><i class="fas fa-chevron-left"></i></div>
+                 <div class="gallery-arrow right" onclick="scrollGallery('${id}', 1)"><i class="fas fa-chevron-right"></i></div>
+                 <div class="gallery-dots" id="dots_${id}">`;
+        
+        imgs.forEach((_, i) => {
+            html += `<div class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="scrollToSlide('${id}', ${i})"></div>`;
+        });
+        
+        html += `</div>`;
+    }
+    
+    html += `</div>`;
+    
+    setTimeout(() => {
+        const slider = document.getElementById(id);
+        if(slider){
+            slider.addEventListener('scroll', function() {
+                updateActiveDot(id);
+            });
+        }
+    }, 100);
+    
+    return html;
+}
+
+function updateActiveDot(galleryId){
+    const slider = document.getElementById(galleryId);
+    if(!slider || slider.clientWidth === 0) return;
+    const scrollPos = slider.scrollLeft;
+    const slideWidth = slider.clientWidth;
+    const activeIndex = Math.round(scrollPos / slideWidth);
+    const dots = document.querySelectorAll(`#dots_${galleryId} .gallery-dot`);
+    dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === activeIndex);
+    });
+}
+
+function scrollGallery(galleryId, direction){
+    const slider = document.getElementById(galleryId);
+    if(slider && slider.clientWidth > 0){
+        slider.scrollBy({ left: slider.clientWidth * direction, behavior: 'smooth' });
+    }
+}
+
+function scrollToSlide(galleryId, index){
+    const slider = document.getElementById(galleryId);
+    if(slider && slider.clientWidth > 0){
+        slider.scrollTo({ left: slider.clientWidth * index, behavior: 'smooth' });
+    }
+}
+
+function renderVideo(url, title){
+    if(!url) return '';
+    if(url.includes('youtube.com/embed')){
+        const id = url.split('/embed/')[1]?.split('?')[0];
+        return `<div class="video-section"><iframe src="https://www.youtube.com/embed/${id}" class="w-full aspect-video" allowfullscreen></iframe>${title ? `<div class="p-2 bg-gray-800 text-gray-300 text-xs text-center">${escapeHtml(title)}</div>` : ''}</div>`;
+    }
+    return `<div class="video-section"><video controls><source src="${escapeHtml(url)}" type="video/mp4"></video>${title ? `<div class="p-2 bg-gray-800 text-gray-300 text-xs text-center">${escapeHtml(title)}</div>` : ''}</div>`;
+}
+
+async function loadContent(){
+    const id = new URLSearchParams(location.search).get('id');
+    if(!id) return showError('Geçersiz ID');
+    
+    const { data: hero } = await supabaseClient.from('hero').select('*').eq('id', id).eq('is_active', true).single();
+    if(hero){
+        let gi = hero.gallery_images || [];
+        const { data: media } = await supabaseClient.from('hero_media').select('*').eq('hero_id', id);
+        if(media?.length) gi = media.filter(m => m.media_type === 'image').map(m => m.media_url);
+        renderHero(hero, gi);
+        return;
+    }
+    
+    const { data: article } = await supabaseClient.from('articles').select('*').eq('id', id).eq('is_published', true).single();
+    if(article) renderArticle(article);
+    else showError('İçerik bulunamadı');
+}
+
+function renderHero(h, gi){
+    document.title = `${h.title} - Kırıkkale Çölyak Derneği`;
+    const mv = h.video_url ? { url: h.video_url, title: h.video_title } : null;
+    document.getElementById('loadingSkeleton').classList.add('hidden');
+    const c = document.getElementById('detayContent');
+    c.innerHTML = `<div class="p-5">
+        <div class="mb-3"><span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded">${h.media_type === 'video' ? 'Video İçerik' : 'Manşet Haber'}</span></div>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">${escapeHtml(h.title)}</h1>
+        <div class="text-xs text-gray-400 mb-3 pb-2 border-b"><i class="far fa-calendar-alt mr-1"></i> ${formatDate(h.created_at)}${h.location ? ` <i class="fas fa-map-marker-alt ml-2 mr-1"></i> ${escapeHtml(h.location)}` : ''}</div>
+        ${renderGallery(gi)}
+        ${mv ? renderVideo(mv.url, mv.title) : ''}
+        <div class="content-body">${h.full_description || `<p>${escapeHtml(h.subtitle)}</p>`}</div>
+        <div class="mt-5 pt-3 border-t flex gap-2 text-xs flex-wrap"><span>Paylaş:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank" class="text-blue-600">Facebook</a>
+            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(h.title)}&url=${encodeURIComponent(location.href)}" target="_blank" class="text-sky-500">Twitter</a>
+            <a href="https://wa.me/?text=${encodeURIComponent(h.title+' '+location.href)}" target="_blank" class="text-green-600">WhatsApp</a>
+        </div>
+    </div>`;
+    c.classList.remove('hidden');
+}
+
+function renderArticle(a){
+    document.title = `${a.title} - Kırıkkale Çölyak Derneği`;
+    const gi = a.gallery_images || [];
+    const mv = a.video_url ? { url: a.video_url, title: a.video_title } : null;
+    document.getElementById('loadingSkeleton').classList.add('hidden');
+    const c = document.getElementById('detayContent');
+    c.innerHTML = `<div class="p-5">
+        <div class="flex items-center gap-3 mb-4 pb-3 border-b flex-wrap">
+            <div class="author-avatar-large"><img src="${a.author_avatar || 'img/yazar.jpg'}" onerror="this.src='img/yazar.jpg'"></div>
+            <div><div class="font-semibold">${escapeHtml(a.author_name)}</div><div class="text-gray-500 text-xs">${a.author_title || 'Köşe Yazarı'}</div></div>
+            <div class="ml-auto text-right text-xs text-gray-400"><i class="far fa-calendar-alt"></i> ${formatDate(a.pubDate)}</div>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${escapeHtml(a.title)}</h1>
+        ${renderGallery(gi)}
+        ${mv ? renderVideo(mv.url, mv.title) : ''}
+        ${a.summary ? `<div class="bg-emerald-50 border-l-4 border-emerald-500 p-3 mb-4 text-emerald-800 text-sm italic">${escapeHtml(a.summary)}</div>` : ''}
+        <div class="content-body">${a.fullContent || '<p>İçerik bulunmuyor.</p>'}</div>
+        <div class="mt-5 pt-3 border-t flex gap-2 text-xs flex-wrap"><span>Paylaş:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank" class="text-blue-600">Facebook</a>
+            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(location.href)}" target="_blank" class="text-sky-500">Twitter</a>
+            <a href="https://wa.me/?text=${encodeURIComponent(a.title+' '+location.href)}" target="_blank" class="text-green-600">WhatsApp</a>
+        </div>
+    </div>`;
+    c.classList.remove('hidden');
+}
+
+function showError(m){
+    document.getElementById('loadingSkeleton').classList.add('hidden');
+    const c = document.getElementById('detayContent');
+    c.innerHTML = `<div class="p-8 text-center"><i class="fas fa-exclamation-triangle text-4xl text-amber-500 mb-3"></i><h2 class="font-bold text-gray-700">İçerik Bulunamadı</h2><p class="text-gray-500 text-sm">${escapeHtml(m)}</p><a href="index.html" class="inline-block mt-3 text-emerald-600 text-sm">Ana Sayfaya Dön</a></div>`;
+    c.classList.remove('hidden');
+}
+
+// Sayfa yüklendiğinde içeriği getir (menü işlemleri main.js'e bırakıldı)
+document.addEventListener('DOMContentLoaded', function() {
+    loadContent();
+});
+</script>
+</body>
+</html>
