@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geçtiğimiz Ayın Ardından - Çölyak Farkındalığı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #000000; /* Genel metin rengi siyah yapıldı */
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(76, 175, 80, 0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 3rem 2rem;
+        }
+        
+        .content p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            color: #000000; /* Paragraf metin rengi siyah yapıldı */
+            font-size: 1rem;
+        }
+        
+        .content p:first-letter {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        
+        .resim-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .resim-container.left {
+            float: left;
+            margin-right: 1.5rem;
+            margin-bottom: 1rem;
+            width: 45%;
+        }
+        
+        .resim-container.right {
+            float: right;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            width: 45%;
+        }
+        
+        .resim-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.2);
+            border: 3px solid #a5d6a7;
+            transition: transform 0.3s ease;
+        }
+        
+        .resim-container img:hover {
+            transform: scale(1.02);
+        }
+        
+        .resim-alt-yazi {
+            font-size: 0.85rem;
+            color: #2e7d32; /* Alt yazı rengi daha koyu bir yeşil yapıldı */
+            text-align: center;
+            margin-top: 0.8rem;
+            font-style: italic;
+            background: #f1f8e9;
+            padding: 0.6rem;
+            border-radius: 8px;
+            border-left: 3px solid #7cb342;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #2e7d32 0%, #1b5e20 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        
+        .quote-box {
+            background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+            border-left: 5px solid #2e7d32;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+            font-style: italic;
+            color: #000000; /* Alıntı metni siyah yapıldı */
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+        }
+        
+        .section-title {
+            color: #2e7d32;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 3px solid #81c784;
+        }
+        
+        .author-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #81c784;
+            clear: both;
+        }
+        
+        .author-section h3 {
+            color: #2e7d32;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .author-name {
+            font-weight: 600;
+            color: #000000; /* Yazar ismi siyah yapıldı */
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .author-title {
+            color: #2e7d32; /* Yazar ünvanı koyu yeşil bırakıldı */
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        @media (max-width: 768px) {
+            .resim-container.left,
+            .resim-container.right {
+                float: none;
+                width: 100%;
+                margin: 1.5rem 0;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .content p {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+        
+        <div class="content">
+            <p>Mayıs ayı, bizim için Çölyak hastalığını hatırlamak, anlamak ve çevremizdeki herkesi bu konuda bilinçlendirmek adına çok özel bir zaman dilimiydi. Özellikle 9-15 Mayıs tarihlerini, "Dünya Çölyak Günü ve Çölyak Farkındalık Haftası" olarak dolu dolu geçirdik.</p>
+            
+            <div class="resim-container left">
+                <div>
+                    <img src="img/etkinlik.jpg" alt="Çölyak farkındalık etkinliği - görsel 1">
+                    <div class="resim-alt-yazi">Çölyak Farkındalık Etkinliği</div>
+                </div>
+            </div>
+            
+            <p>Kırıkkale'mizde, yeni kurulan Kırıkkale Çölyak Derneği olarak, Kırıkkale Üniversitesi Tıp Fakültesi Çocuk Gastroenteroloji bölümümüzle el ele verdik. Birlikte öyle güzel etkinliklere imza attık ki, Kırıkkale halkıyla üniversitemiz arasında sıcacık bir bağ kurduk. Bu, şehrimiz için bir ilkti ve hepimizi çok mutlu etti.</p>
+            
+            <div class="section-title">Çölyak Hastalığı ve Tedavisi</div>
+            
+            <p>Çölyak hastalığının şimdilik tek çaresi, ömür boyu sürecek glutensiz bir beslenme şekli. Burada önemli olan şu: Glutensiz beslenme, öyle moda bir diyet değil, Çölyaklılar için hayat memat meselesi. <span class="highlight">"Azıcık yesem ne olur ki?" düşüncesi, maalesef bağırsaklara zarar vermeye devam ediyor.</span> Bu yüzden, bu diyette sıfır tolerans, yani hiç taviz vermemek çok önemli.</p>
+            
+            <div class="quote-box">
+                Glutensiz diyet bir "seçim" değil, bir "tedavi"dir. Bu tedavinin doğru uygulanması ise ancak bilgi, farkındalık ve kararlılıkla mümkün.
+            </div>
+            
+            <p>Bu konuda hepimize büyük görevler düşüyor. Restoranların glutensiz menüler hazırlaması, gıda üreticilerinin etiketleri açıkça belirtmesi ve çevremizdeki insanların bu konuda duyarlı olması, Çölyaklı dostlarımızın hayatını çok kolaylaştırıyor. Çünkü glutensiz yaşamak, sadece mutfakta değil, sosyal hayatta da anlayış ve özen gerektiriyor.</p>
+            
+            <div class="resim-container right">
+                <div>
+                    <img src="img/etkinlik2.jpg" alt="Çölyak farkındalık yürüyüşü veya sergi">
+                    <div class="resim-alt-yazi">Farkındalık Etkinlikleri</div>
+                </div>
+            </div>
+            
+            <p>Her yıl 9 Mayıs'ta, tüm dünyada Çölyak hastalığına dikkat çekmek ve farkındalık yaratmak için çeşitli etkinlikler düzenleniyor. 9 Mayıs Çölyak Günü ve ardından gelen Farkındalık Haftası, sadece bir hatırlatma değil; milyonlarca insanın yaşam kalitesini doğrudan etkileyen bu sağlık gerçeğini daha görünür kılmak için harika bir fırsat.</p>
+            
+            <p>Sağlıklı bir toplum olabilmek için, farklı beslenme ihtiyaçlarına saygı duymak ve bu konuda bilinçli olmak hepimizin sorumluluğu.</p>
+            
+            <div class="section-title">Bu Yılki Etkinliklerimiz</div>
+            
+            <p>Bu seneki etkinliklerimizde, Kırıkkale halkını üniversite, okul ve toplum üçgeninde birleştirmeyi ve kaynaştırmayı amaçladık. Etkinliklerimizin ana teması, <span class="highlight">"Çölyaklılar için Glutensiz Yaşam Bir Tercih Değil, Zorunluluktur"</span> mottosu etrafında şekillendi.</p>
+            
+            <p>Tıp Fakültemiz Çocuk Gastroenteroloji bölümünün değerli girişimleri ve Kırıkkale Çölyak Derneği Başkanı Sayın Fahri Türkoğlu'nun karşılıksız ve özverili destekleriyle, Yahşihan İlçe Milli Eğitim Müdürlüğü, Kırıkkale İl Gençlik ve Spor Müdürlüğü, Gençlik Kültür Merkezi ve şehrimizin önemli sivil toplum kuruluşlarından Bozkır Dağcılık ve Doğa Sporları Kulübü ile harika ortak etkinlikler düzenledik.</p>
+            
+            <div class="resim-container left">
+                <div>
+                    <img src="img/galeri/sergi/tiyatro2.jpg" alt="Tiyatro etkinliği">
+                    <div class="resim-alt-yazi">Tiyatro Oyunu: Glutensiz Hayatlar</div>
+                </div>
+            </div>
+            
+            <p>Bu etkinlikler arasında, İlk ve Ortaokullar arası "Çölyak: Bir Tanenin Hikayesi" konulu resim yarışması, minik oyuncuların sahnelediği "Glutensiz Hayatlar" adlı tiyatro oyunu, İl Kapalı Spor Merkezi ve Kırıkkale Üniversitesi Tıp Fakültesi Hastanesi'nde açılan "Çölyak ve Gluten Etkisi" konulu resim sergileri ve Hacıbalı Köyü Kızılırmak kenarında 12 kilometrelik keyifli bir parkurda düzenlenen geniş katılımlı "Çölyak Farkındalık Yürüyüşü" vardı.</p>
+            
+            <div class="resim-container right">
+                <div>
+                    <img src="img/galeri/yuruyus/2.jpg" alt="Farkındalık Yürüyüşü">
+                    <div class="resim-alt-yazi">Çölyak Farkındalık Yürüyüşü</div>
+                </div>
+            </div>
+            
+            <p>Tıp Fakültesi Hastanesi'nde açılan resim sergisi, üniversitemizin "Bestival 2026" programı kapsamında bir hafta boyunca ziyaretçilere açık kaldı. Bu serginin, Çölyak farkındalığının en güzel şekilde anlatılabileceği yerlerden biri olan hastanede yer alması, toplumsal bilinçlenme açısından gerçekten çok değerliydi.</p>
+            
+            <div class="clearfix"></div>
+            
+            <div class="author-section">
+                
+                <div class="author-name">Prof. Dr. Hacer Fulya Gülerman</div>
+                <div class="author-title">
+                    KÜ Tıp Fak. Çocuk Gastroenteroloji BD Bşk.<br>
+                    Kırıkkale Çölyak Derneği Onursal Başkanı
+                </div>
+            </div>
+        
+    </div>
+</body>
+</html>
