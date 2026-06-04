@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0JW6387DD4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0JW6387DD4');</script>
+<script type="text/javascript"> (function(c,l,a,r,i,t,y){ c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)}; t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i; y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y); })(window, document, "clarity", "script", "wthzc9odvw"); </script>
+<title>İçerik Detayı - Kırıkkale Çölyak Derneği</title>
+<meta name="description" content="Kırıkkale Çölyak Derneği içerik detay sayfası.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;}body{background:#f9fafb;color:#1f2937;font-family:'Inter',sans-serif;}
+    .navbar{background:white;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:50;}
+    .navbar .container{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;height:4rem;}
+    .logo{display:flex;align-items:center;gap:0.75rem;text-decoration:none;}
+    .logo-img{width:2.5rem;height:2.5rem;}
+    .logo-img img{width:100%;height:100%;object-fit:contain;}
+    .logo-text h1{font-size:1.125rem;font-weight:700;color:#059669;}
+    .logo-text p{font-size:0.625rem;color:#6b7280;}
+    .nav-menu ul{display:flex;gap:1rem;list-style:none;}
+    .nav-menu a{text-decoration:none;color:#4b5563;font-weight:500;}
+    .nav-menu a:hover,.nav-menu a.active{color:#059669;}
+    .mobile-menu-btn{display:none;background:none;border:none;font-size:1.8rem;color:#059669;cursor:pointer;}
+    .mobile-menu{display:none;position:absolute;top:4rem;left:0;right:0;background:white;border-bottom:1px solid #e5e7eb;flex-direction:column;padding:1rem;gap:0.5rem;z-index:40;}
+    .mobile-menu:not(.hidden){display:flex;}
+    .mobile-menu a{padding:0.75rem 1rem;text-decoration:none;color:#4b5563;border-radius:0.5rem;}
+    .mobile-menu a:hover{background:#ecfdf5;color:#059669;}
+    @media (max-width:768px){.nav-menu{display:none;}.mobile-menu-btn{display:block;}.navbar .container{height:auto;padding:0.75rem 1rem;}}
+    
+    /* FOOTER - index.html ile aynı */
+    .footer{background:#111827;color:#9ca3af;padding:3rem 1rem;margin-top:4rem;}
+    .footer-container{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;}
+    .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;text-align:center;}
+    .footer-nav a{color:#9ca3af;text-decoration:none;font-size:0.875rem;display:block;padding:0.5rem 0;transition:color 0.2s;}
+    .footer-nav a:hover{color:#059669;}
+    .footer-copyright{text-align:center;padding-top:2rem;border-top:1px solid #374151;font-size:0.875rem;margin-top:1rem;}
+    .footer-social{display:flex;justify-content:center;gap:1rem;margin-top:1rem;}
+    .footer-social a{color:#9ca3af;font-size:1.25rem;transition:color 0.2s;}
+    .footer-social a:hover{color:#059669;}
+    
+    .gallery-container{position:relative;margin-bottom:1.5rem;border-radius:0.75rem;overflow:hidden;background:#000;}
+    .gallery-slider{overflow-x:auto;scroll-snap-type:x mandatory;display:flex;cursor:grab;scroll-behavior:smooth;scrollbar-width:none;}
+    .gallery-slider::-webkit-scrollbar{display:none;}
+    .gallery-slide{scroll-snap-align:start;flex-shrink:0;width:100%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:350px;}
+    .gallery-slide img{width:100%;height:auto;max-height:450px;object-fit:contain;}
+    .gallery-dots{position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:10;}
+    .gallery-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer;}
+    .gallery-dot.active{background:#059669;width:20px;border-radius:10px;}
+    .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;}
+    .gallery-arrow.left{left:12px;}.gallery-arrow.right{right:12px;}
+    .video-section{background:#1a1a2e;border-radius:0.75rem;overflow:hidden;margin:1rem 0;}
+    .video-section video,.video-section iframe{width:100%;aspect-ratio:16/9;}
+    .content-body{font-size:0.95rem;line-height:1.6;color:#374151;}
+    main{max-width:960px;margin:0 auto;padding:1.5rem 1rem;}
+    .bg-white{background:white;}
+    .rounded-xl{border-radius:0.75rem;}
+    .shadow-sm{box-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);}
+    .hidden{display:none;}
+    @media (max-width:768px){main{padding-left:0;padding-right:0;}#detayContent .p-5{padding:1rem!important;}.gallery-container,.video-section{border-radius:0;margin-left:-1rem;margin-right:-1rem;width:calc(100% + 2rem);}}
+    /* Yazar resmi mobilde ortalanmış ve büyütülmüş */
+    .author-avatar-large{text-align:center;}
+    .author-avatar-large img{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto;display:block;}
+    .author-info-mobile{text-align:center;}
+    @media (max-width:768px){.author-avatar-large img{width:120px;height:120px;}.author-info-mobile{margin-top:0.5rem;}.flex.items-center.gap-3{flex-direction:column;text-align:center;}.ml-auto{text-align:center;margin-left:0!important;}}
+</style>
+</head>
+<body>
+<a href="#main-content" class="sr-only">Ana içeriğe atla</a>
+<header class="navbar"><div class="container"><a href="index.html" class="logo"><div class="logo-img"><img src="img/logo.png" alt="Logo"></div><div class="logo-text"><h1>Kırıkkale</h1><p>Çölyak Derneği</p></div></a><nav class="nav-menu"><ul><li><a href="index.html">Ana Sayfa</a></li><li><a href="hakkimizda.html">Derneğimiz</a></li><li><a href="haberler.html">Basında Biz</a></li><li><a href="yerel-rehber.html">Yerel Rehber</a></li><li><a href="glutensiz-yasam.html">Glutensiz Yaşam</a></li><li><a href="bagis.html">Stok Durumu</a></li><li><a href="iletisim.html">İletişim</a></li></ul></nav><button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button></div><div id="mobile-menu" class="mobile-menu hidden"><a href="index.html">Ana Sayfa</a><a href="hakkimizda.html">Derneğimiz</a><a href="haberler.html">Basında Biz</a><a href="yerel-rehber.html">Yerel Rehber</a><a href="glutensiz-yasam.html">Glutensiz Yaşam</a><a href="bagis.html">Stok Durumu</a><a href="iletisim.html">İletişim</a></div></header>
+<main id="main-content"><div id="loadingSkeleton" class="bg-white rounded-xl shadow-sm p-5"><div class="animate-pulse">Yükleniyor...</div></div><div id="detayContent" class="bg-white rounded-xl shadow-sm overflow-hidden hidden"></div><div class="mt-5 text-center"><a href="index.html" class="text-emerald-600">← Ana Sayfaya Dön</a></div></main>
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-grid text-center">
+            <div>
+                <img src="img/logo.png" alt="Logo" style="height:4rem;width:auto;opacity:0.85;margin-bottom:0.75rem;display:inline-block;">
+                <h3 class="text-emerald-500 font-bold">Kırıkkale Çölyak Derneği</h3>
+                <p class="text-xs text-gray-400 mt-1">Sağlıklı bir gelecek için</p>
+            </div>
+            <div class="footer-nav">
+                <h4 class="text-white font-semibold mb-3">Sayfalar</h4>
+                <a href="index.html">Ana Sayfa</a>
+                <a href="hakkimizda.html">Derneğimiz</a>
+                <a href="yerel-rehber.html">Yerel Rehber</a>
+                <a href="bagis.html">Bağış Yap</a>
+                <a href="iletisim.html">İletişim</a>
+            </div>
+            <div class="footer-nav">
+                <h4 class="text-white font-semibold mb-3">Sosyal Medya</h4>
+                <div class="footer-social justify-center">
+                    <a href="https://www.facebook.com/share/1Xp3XcfJwX/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/kirikkalecolyak" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">© 2026 Kırıkkale Çölyak Derneği | Tüm hakları saklıdır.</div>
+    </div>
+</footer>
+<script>
+const SUPABASE_URL='https://tmtdpykzmdvxszxwyege.supabase.co',SUPABASE_ANON_KEY='sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F',supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function escapeHtml(s){if(!s)return'';const d=document.createElement('div');return d.textContent=s,d.innerHTML}
+function formatDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('tr-TR')}catch{return d}}
+let currentGalleryId=null;
+function renderGallery(imgs){if(!imgs?.length)return'';const id='gallery_'+Date.now();let html=`<div class="gallery-container" id="container_${id}"><div id="${id}" class="gallery-slider">`;imgs.forEach(img=>{html+=`<div class="gallery-slide"><img src="${escapeHtml(img)}" onerror="this.src='img/placeholder.jpg'"></div>`;});html+=`</div>`;if(imgs.length>1){html+=`<div class="gallery-arrow left" onclick="scrollGallery('${id}',-1)">‹</div><div class="gallery-arrow right" onclick="scrollGallery('${id}',1)">›</div><div class="gallery-dots" id="dots_${id}">`;imgs.forEach((_,i)=>{html+=`<div class="gallery-dot ${i===0?'active':''}" onclick="scrollToSlide('${id}',${i})"></div>`;});html+=`</div>`;}html+=`</div>`;setTimeout(()=>{const s=document.getElementById(id);if(s)s.addEventListener('scroll',()=>updateActiveDot(id));},100);return html;}
+function updateActiveDot(gid){const s=document.getElementById(gid);if(!s||s.clientWidth===0)return;const idx=Math.round(s.scrollLeft/s.clientWidth);document.querySelectorAll(`#dots_${gid} .gallery-dot`).forEach((d,i)=>d.classList.toggle('active',i===idx));}
+function scrollGallery(gid,dir){const s=document.getElementById(gid);if(s&&s.clientWidth>0)s.scrollBy({left:s.clientWidth*dir,behavior:'smooth'});}
+function scrollToSlide(gid,idx){const s=document.getElementById(gid);if(s&&s.clientWidth>0)s.scrollTo({left:s.clientWidth*idx,behavior:'smooth'});}
+function renderVideo(url,title){if(!url)return'';if(url.includes('youtube.com/embed')){const vid=url.split('/embed/')[1]?.split('?')[0];return`<div class="video-section"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe></div>`;}return`<div class="video-section"><video controls><source src="${escapeHtml(url)}" type="video/mp4"></video></div>`;}
+async function loadContent(){const params=new URLSearchParams(location.search);const slug=params.get('slug');const id=params.get('id');if(slug){const{data:art}=await supabaseClient.from('articles').select('*').eq('slug',slug).eq('is_published',true).single();if(art){renderArticle(art);return;}}if(id){const{data:hero}=await supabaseClient.from('hero').select('*').eq('id',id).eq('is_active',true).single();if(hero){let gi=hero.gallery_images||[];const{data:media}=await supabaseClient.from('hero_media').select('*').eq('hero_id',id);if(media?.length)gi=media.filter(m=>m.media_type==='image').map(m=>m.media_url);renderHero(hero,gi);return;}const{data:art}=await supabaseClient.from('articles').select('*').eq('id',id).eq('is_published',true).single();if(art){renderArticle(art);return;}}showError('İçerik bulunamadı');}
+function renderHero(h,gi){document.title=`${h.title} - Kırıkkale Çölyak Derneği`;const mv=h.video_url?{url:h.video_url,title:h.video_title}:null;document.getElementById('loadingSkeleton').classList.add('hidden');const c=document.getElementById('detayContent');c.innerHTML=`<div class="p-5"><span class="bg-emerald-600 text-white px-2 py-0.5 rounded text-xs">${h.media_type==='video'?'Video':'Manşet'}</span><h1 class="text-xl md:text-2xl font-bold mt-2">${escapeHtml(h.title)}</h1><div class="text-xs text-gray-400 my-2">${formatDate(h.created_at)}</div>${renderGallery(gi)}${mv?renderVideo(mv.url,mv.title):''}<div class="content-body">${h.full_description||h.subtitle||''}</div><div class="mt-5 flex gap-2"><a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank">Facebook</a> <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(h.title)}&url=${encodeURIComponent(location.href)}" target="_blank">Twitter</a></div></div>`;c.classList.remove('hidden');}
+function renderArticle(a){document.title=`${a.title} - Kırıkkale Çölyak Derneği`;const gi=a.gallery_images||[];const mv=a.video_url?{url:a.video_url,title:a.video_title}:null;document.getElementById('loadingSkeleton').classList.add('hidden');const c=document.getElementById('detayContent');c.innerHTML=`<div class="p-5"><div class="flex items-center gap-3 mb-4 pb-3 border-b flex-wrap author-info-mobile"><div class="author-avatar-large"><img src="${a.author_avatar||'img/yazar.jpg'}" onerror="this.src='img/yazar.jpg'"></div><div><div class="font-semibold">${escapeHtml(a.author_name)}</div><div class="text-gray-500 text-xs">${escapeHtml(a.author_title)||'Köşe Yazarı'}</div></div><div class="ml-auto text-right text-xs text-gray-400">${formatDate(a.pubDate)}</div></div><h1 class="text-xl md:text-2xl font-bold mb-3">${escapeHtml(a.title)}</h1>${renderGallery(gi)}${mv?renderVideo(mv.url,mv.title):''}${a.summary?`<div class="bg-emerald-50 border-l-4 border-emerald-500 p-3 mb-4 text-sm italic">${escapeHtml(a.summary)}</div>`:''}<div class="content-body">${a.fullContent||'<p>İçerik yok.</p>'}</div><div class="mt-5 flex gap-2"><a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank">Facebook</a> <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(location.href)}" target="_blank">Twitter</a> <a href="https://wa.me/?text=${encodeURIComponent(a.title+' '+location.href)}" target="_blank">WhatsApp</a></div></div>`;c.classList.remove('hidden');}
+function showError(m){document.getElementById('loadingSkeleton').classList.add('hidden');const c=document.getElementById('detayContent');c.innerHTML=`<div class="p-8 text-center"><i class="fas fa-exclamation-triangle text-4xl text-amber-500 mb-3"></i><h2>İçerik Bulunamadı</h2><p>${escapeHtml(m)}</p><a href="index.html">Ana Sayfaya Dön</a></div>`;c.classList.remove('hidden');}
+document.addEventListener('DOMContentLoaded',()=>{loadContent();const mb=document.getElementById('mobile-menu-btn');const mm=document.getElementById('mobile-menu');if(mb&&mm)mb.addEventListener('click',()=>mm.classList.toggle('hidden'));});
+</script>
+</body>
+</html>
