@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Süper Admin Panel | Kırıkkale Çölyak Derneği</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/skins/ui/oxide/skin.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --secondary-color: #34495e;
+            --bg-light: #f1f5f9;
+            --bg-dark: #0f172a;
+            --card-light: #ffffff;
+            --card-dark: #1e293b;
+            --text-light: #334155;
+            --text-dark: #cbd5e1;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-light);
+            transition: background 0.3s, color 0.2s;
+            line-height: 1.6;
+        }
+
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: var(--card-light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        body.dark .navbar {
+            background: var(--card-dark);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: inherit;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: inherit;
+            font-weight: 500;
+            background: transparent;
+        }
+
+        .nav-item i {
+            font-size: 1rem;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 10px rgba(46,204,113,0.3);
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: rgba(0,0,0,0.05);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            color: inherit;
+        }
+
+        body.dark .icon-btn {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .page-title span {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46,204,113,0.3);
+        }
+
+        /* TABLE CARD */
+        .data-card {
+            background: var(--card-light);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        body.dark .data-card {
+            background: var(--card-dark);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(0,0,0,0.02);
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            white-space: nowrap;
+        }
+
+        body.dark th {
+            background: rgba(255,255,255,0.02);
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            vertical-align: middle;
+        }
+
+        body.dark td {
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-light);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+        }
+
+        body.dark .modal-content {
+            background: var(--card-dark);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .close-modal {
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        /* FORM ELEMENTS */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .form-row.full-width {
+            grid-column: span 2;
+        }
+
+        .form-row label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-row input[type="text"],
+        .form-row input[type="email"],
+        .form-row input[type="date"],
+        .form-row select,
+        .form-row textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.02);
+            color: inherit;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        body.dark .form-row input,
+        body.dark .form-row select,
+        body.dark .form-row textarea {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-row input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* LOGIN */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-light);
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        body.dark .login-card {
+            background: var(--card-dark);
+        }
+
+        .login-card h2 { margin-bottom: 10px; }
+        .login-card p { margin-bottom: 30px; opacity: 0.7; }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--card-light);
+                padding: 20px;
+                flex-direction: column;
+                align-items: stretch;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            body.dark .nav-links { background: var(--card-dark); }
+            .nav-links.open { display: flex; }
+            .hamburger { display: block; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-row.full-width { grid-column: span 1; }
+        }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 16px; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+            .logo-text { font-size: 1rem; }
+            .modal-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        (function() {
+            // CONFIG
+            const SB_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+            const SB_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+            const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
+            // TRANSLATIONS
+            const translations = {
+                tables: {
+                    articles: "Makaleler",
+                    authors: "Yazarlar",
+                    businesses: "İşletmeler",
+                    hero: "Kapak (Hero)",
+                    videos: "Videolar"
+                },
+                columns: {
+                    id: "ID",
+                    title: "Başlık",
+                    summary: "Özet",
+                    fullContent: "Tam İçerik",
+                    slug: "URL Uzantısı",
+                    pubDate: "Yayın Tarihi",
+                    is_published: "Yayınlandı mı?",
+                    author_email: "Yazar E-postası",
+                    author_name: "Yazar Adı",
+                    author_title: "Yazar Unvanı",
+                    author_avatar: "Yazar Resmi (Avatar)",
+                    featured: "Öne Çıkan",
+                    video_url: "Video URL",
+                    gallery: "Galeri (Resimler)",
+                    meta_description: "Meta Açıklama (SEO)",
+                    meta_keywords: "Anahtar Kelimeler (SEO)",
+                    tags: "Etiketler",
+                    created_at: "Oluşturulma",
+                    updated_at: "Güncellenme",
+                    name: "Ad / İsim",
+                    avatar: "Profil Resmi",
+                    bio: "Biyografi",
+                    email: "E-posta",
+                    address: "Adres",
+                    description: "Açıklama",
+                    logo: "Logo",
+                    website: "Web Sitesi",
+                    is_active: "Aktif mi?",
+                    subtitle: "Alt Başlık",
+                    button_text: "Buton Metni",
+                    bg_image: "Arka Plan Resmi",
+                    link: "Bağlantı",
+                    media_type: "Medya Türü",
+                    video_poster: "Video Kapak Resmi",
+                    full_description: "Detaylı Açıklama",
+                    order: "Sıralama",
+                    poster: "Kapak Resmi"
+                }
+            };
+
+            // STATE
+            let currentUser = null;
+            let activeTable = 'articles';
+            const allTables = ['articles', 'authors', 'businesses', 'hero', 'videos'];
+            let currentData = [];
+            let authorsData = []; 
+            let editId = null;
+            let darkMode = localStorage.getItem('darkMode') === 'true';
+
+            const tableSchemas = {
+                articles: ['id', 'title', 'summary', 'slug', 'pubDate', 'is_published', 'author_name', 'created_at'],
+                authors: ['id', 'name', 'title', 'avatar', 'email', 'created_at'],
+                businesses: ['id', 'name', 'address', 'logo', 'website', 'is_active'],
+                hero: ['id', 'title', 'subtitle', 'bg_image', 'order', 'is_active'],
+                videos: ['id', 'title', 'video_url', 'poster', 'created_at']
+            };
+
+            const fullSchemas = {
+                articles: ['title', 'slug', 'summary', 'fullContent', 'pubDate', 'is_published', 'author_select', 'author_email', 'author_name', 'author_title', 'author_avatar', 'featured', 'video_url', 'gallery', 'meta_description', 'meta_keywords', 'tags'],
+                authors: ['name', 'title', 'avatar', 'bio', 'email'],
+                businesses: ['name', 'address', 'description', 'logo', 'website', 'is_active'],
+                hero: ['title', 'subtitle', 'button_text', 'bg_image', 'link', 'media_type', 'video_url', 'video_poster', 'full_description', 'order', 'is_active'],
+                videos: ['title', 'description', 'video_url', 'poster']
+            };
+
+            // UTILS
+            function t(key) { return translations.columns[key] || key; }
+            function tt(key) { return translations.tables[key] || key; }
+
+            function getColumnType(col) {
+                if (['is_published', 'featured', 'is_active'].includes(col)) return 'boolean';
+                if (['pubDate', 'created_at', 'updated_at'].includes(col)) return 'timestamp';
+                if (['fullContent', 'bio', 'full_description', 'description'].includes(col)) return 'richtext';
+                if (col === 'summary') return 'textarea';
+                return 'text';
+            }
+
+            function stripHtml(html) {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                return doc.body.textContent || "";
+            }
+
+            function slugify(text) {
+                const trMap = {'ç':'c','Ç':'C','ğ':'g','Ğ':'G','ş':'s','Ş':'S','ü':'u','Ü':'U','ı':'i','İ':'I','ö':'o','Ö':'O'};
+                for (let key in trMap) text = text.replace(new RegExp(key, 'g'), trMap[key]);
+                return text.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_-]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+            }
+
+            function showToast(msg, isErr=false) {
+                let toast = document.getElementById('globalToast');
+                if(!toast){ 
+                    toast = document.createElement('div'); 
+                    toast.id='globalToast'; 
+                    toast.className='toast'; 
+                    document.body.appendChild(toast); 
+                }
+                toast.style.backgroundColor = isErr ? '#e74c3c' : '#2ecc71';
+                toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+                toast.style.display = 'block';
+                setTimeout(()=> toast.style.display='none', 3000);
+            }
+
+            // AUTH
+            async function login(email, password) {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) { showToast('Giriş hatası: ' + error.message, true); return false; }
+                currentUser = data.user;
+                if (currentUser.email !== 'fahri7119@gmail.com') {
+                    await supabaseClient.auth.signOut();
+                    showToast('Bu panel sadece Süper Admin içindir.', true);
+                    return false;
+                }
+                localStorage.setItem('admin_session', JSON.stringify(data.session));
+                return true;
+            }
+
+            async function checkSession() {
+                const session = localStorage.getItem('admin_session');
+                if (!session) return false;
+                try {
+                    const sessionData = JSON.parse(session);
+                    await supabaseClient.auth.setSession(sessionData);
+                    const { data: { user }, error } = await supabaseClient.auth.getUser();
+                    if (error || !user || user.email !== 'fahri7119@gmail.com') return false;
+                    currentUser = user;
+                    return true;
+                } catch(e) { return false; }
+            }
+
+            // DATA
+            async function fetchAuthors() {
+                const { data, error } = await supabaseClient.from('authors').select('*');
+                if(!error) authorsData = data || [];
+            }
+
+            async function loadTableData() {
+                const container = document.getElementById('dataContainer');
+                container.innerHTML = '<div style="padding:40px; text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Veriler yükleniyor...</p></div>';
+                
+                await fetchAuthors();
+                const { data, error } = await supabaseClient.from(activeTable).select('*').order('id', { ascending: false });
+                if(error) { showToast('Hata: '+error.message, true); return; }
+                currentData = data || [];
+                renderTable();
+            }
+
+            function renderTable() {
+                const container = document.getElementById('dataContainer');
+                if(!currentData.length) {
+                    container.innerHTML = '<div style="padding:60px; text-align:center; opacity:0.5;"><i class="fas fa-folder-open fa-3x"></i><p>Burada henüz bir şey yok. Yeni bir tane eklemeye ne dersin?</p></div>';
+                    return;
+                }
+
+                const cols = tableSchemas[activeTable];
+                let html = `<div class="table-responsive"><table><thead><tr>`;
+                cols.forEach(c => html += `<th>${t(c)}</th>`);
+                html += `<th>İşlemler</th></tr></thead><tbody>`;
+
+                currentData.forEach(row => {
+                    html += `<tr>`;
+                    cols.forEach(c => {
+                        let val = row[c];
+                        if(val === null || val === undefined) val = '-';
+                        if(typeof val === 'boolean') val = val ? '<span style="color:#2ecc71">Evet</span>' : '<span style="color:#e74c3c">Hayır</span>';
+                        if(typeof val === 'string' && val.startsWith('http')) val = `<a href="${val}" target="_blank" style="color:#3498db"><i class="fas fa-link"></i> Link</a>`;
+                        if(val && typeof val === 'string' && val.length > 50) val = stripHtml(val).substring(0, 50) + '...';
+                        html += `<td>${val}</td>`;
+                    });
+                    html += `<td>
+                        <div class="actions-cell">
+                            <button class="btn-sm btn-edit" onclick="window.editRow(${row.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm btn-delete" onclick="window.deleteRow(${row.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+                container.innerHTML = html;
+            }
+
+            window.deleteRow = async (id) => {
+                if(!confirm('Bu kaydı silmek istediğine emin misin? Geri dönüşü yok bak!')) return;
+                const { error } = await supabaseClient.from(activeTable).delete().eq('id', id);
+                if(error) showToast('Silinemedi: '+error.message, true);
+                else { showToast('Uçuruldu! (Silindi)'); loadTableData(); }
+            };
+
+            // FORM & MODAL
+            window.openAddModal = () => {
+                editId = null;
+                renderForm({});
+                document.getElementById('modalTitle').innerText = `${tt(activeTable)} - Yeni Kayıt`;
+                document.getElementById('dataModal').style.display = 'flex';
+            };
+
+            window.editRow = (id) => {
+                const row = currentData.find(r => r.id === id);
+                if(!row) return;
+                editId = id;
+                renderForm(row);
+                document.getElementById('modalTitle').innerText = `${tt(activeTable)} - Düzenle (#${id})`;
+                document.getElementById('dataModal').style.display = 'flex';
+            };
+
+            function renderForm(data) {
+                const body = document.getElementById('modalFormBody');
+                const cols = fullSchemas[activeTable];
+                let html = '<div class="form-grid">';
+                
+                cols.forEach(col => {
+                    if(col === 'author_select' && activeTable === 'articles') {
+                        html += `<div class="form-row full-width">
+                            <label><i class="fas fa-user-pen"></i> Hazır Yazar Seç (Bilgileri otomatik doldurur)</label>
+                            <select id="author_selector" onchange="window.handleAuthorSelect(this.value)">
+                                <option value="">--- Bir yazar seçin ---</option>
+                                ${authorsData.map(a => `<option value="${a.id}">${a.name} (${a.title})</option>`).join('')}
+                            </select>
+                        </div>`;
+                        return;
+                    }
+
+                    const type = getColumnType(col);
+                    let val = data[col] || '';
+                    const isFull = type === 'richtext' || type === 'textarea' || col === 'address' || col === 'gallery' || col === 'tags';
+                    
+                    html += `<div class="form-row ${isFull ? 'full-width' : ''}">
+                        <label>${t(col)}</label>`;
+                    
+                    if(type === 'boolean') {
+                        html += `<div class="checkbox-row" onclick="this.querySelector('input').click()">
+                            <input type="checkbox" id="f_${col}" ${val ? 'checked' : ''}>
+                            <span>Aktif / Evet</span>
+                        </div>`;
+                    } else if(type === 'richtext') {
+                        html += `<textarea id="f_${col}" class="editor-trigger"></textarea>`;
+                    } else if(type === 'textarea' || col === 'gallery' || col === 'tags') {
+                        if(col === 'summary') val = stripHtml(val);
+                        const listStr = Array.isArray(val) ? val.join('\n') : val;
+                        const placeholder = col === 'gallery' ? "Her satıra bir URL" : (col === 'tags' ? "Her satıra bir etiket" : "");
+                        html += `<textarea id="f_${col}" rows="4" placeholder="${placeholder}">${listStr}</textarea>`;
+                    } else if(type === 'timestamp') {
+                        const dateVal = val ? val.split('T')[0] : '';
+                        html += `<input type="date" id="f_${col}" value="${dateVal}">`;
+                    } else if(col === 'title' && activeTable === 'articles') {
+                        html += `<input type="text" id="f_${col}" value="${val}" oninput="window.handleTitleInput(this.value)">`;
+                    } else {
+                        html += `<input type="text" id="f_${col}" value="${val}">`;
+                    }
+                    html += `</div>`;
+                });
+                html += '</div>';
+                body.innerHTML = html;
+
+                // Init TinyMCE
+                setTimeout(() => {
+                    const triggers = document.querySelectorAll('.editor-trigger');
+                    if(triggers.length) {
+                        tinymce.remove();
+                        tinymce.init({
+                            selector: '.editor-trigger',
+                            height: 300,
+                            plugins: 'link image table code lists',
+                            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+                            menubar: false,
+                            skin: darkMode ? 'oxide-dark' : 'oxide',
+                            content_css: darkMode ? 'dark' : 'default',
+                            entity_encoding: "raw",
+                            verify_html: false,
+                            setup: function(editor) {
+                                editor.on('init', function() {
+                                    const colId = editor.id.replace('f_', '');
+                                    const content = data[colId] || '';
+                                    editor.setContent(content);
+                                });
+                            }
+                        });
+                    }
+                }, 100);
+            }
+
+            // AUTOMATION HANDLERS
+            window.handleTitleInput = (val) => {
+                if(activeTable === 'articles') {
+                    const slugField = document.getElementById('f_slug');
+                    if(slugField) slugField.value = slugify(val);
+                }
+            };
+
+            window.handleAuthorSelect = (authorId) => {
+                const author = authorsData.find(a => a.id == authorId);
+                if(author) {
+                    if(document.getElementById('f_author_name')) document.getElementById('f_author_name').value = author.name;
+                    if(document.getElementById('f_author_email')) document.getElementById('f_author_email').value = author.email;
+                    if(document.getElementById('f_author_title')) document.getElementById('f_author_title').value = author.title;
+                    if(document.getElementById('f_author_avatar')) document.getElementById('f_author_avatar').value = author.avatar;
+                    showToast(`${author.name} bilgileri getirildi.`);
+                }
+            };
+
+            window.submitForm = async () => {
+                const cols = fullSchemas[activeTable].filter(c => c !== 'author_select');
+                const formData = {};
+                
+                cols.forEach(col => {
+                    const el = document.getElementById(`f_${col}`);
+                    const editor = tinymce.get(`f_${col}`);
+                    
+                    let val;
+                    if(editor) val = editor.getContent();
+                    else if(el && el.type === 'checkbox') val = el.checked;
+                    else if(el) val = el.value;
+
+                    // Handle arrays (Gallery and Tags)
+                    if((col === 'gallery' || col === 'tags') && typeof val === 'string') {
+                        val = val.split('\n').map(v => v.trim()).filter(v => v);
+                    }
+                    formData[col] = val;
+                });
+
+                let res;
+                if(editId) res = await supabaseClient.from(activeTable).update(formData).eq('id', editId);
+                else res = await supabaseClient.from(activeTable).insert([formData]);
+
+                if(res.error) showToast('Hata: '+res.error.message, true);
+                else {
+                    showToast(editId ? 'Başarıyla güncellendi!' : 'Yeni kayıt eklendi, hayırlı olsun!');
+                    window.closeModal();
+                    loadTableData();
+                }
+            };
+
+            window.closeModal = () => {
+                document.getElementById('dataModal').style.display = 'none';
+                tinymce.remove();
+            };
+
+            // UI ACTIONS
+            window.setActiveTable = (table) => {
+                activeTable = table;
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.getElementById(`nav_${table}`).classList.add('active');
+                document.getElementById('currentTableTitle').innerText = tt(table) + ' Yönetimi';
+                document.getElementById('navLinks').classList.remove('open');
+                loadTableData();
+            };
+
+            window.toggleDarkMode = () => {
+                darkMode = !darkMode;
+                localStorage.setItem('darkMode', darkMode);
+                document.body.classList.toggle('dark', darkMode);
+                document.getElementById('darkIcon').className = darkMode ? 'fas fa-sun' : 'fas fa-moon';
+            };
+
+            window.toggleMenu = () => {
+                document.getElementById('navLinks').classList.toggle('open');
+            };
+
+            window.logout = async () => {
+                await supabaseClient.auth.signOut();
+                localStorage.removeItem('admin_session');
+                location.reload();
+            };
+
+            // RENDERING
+            function renderAdmin() {
+                const app = document.getElementById('app');
+                app.innerHTML = `
+                    <nav class="navbar">
+                        <div class="logo-area">
+                            <div class="logo-icon">KÇ</div>
+                            <div class="logo-text">Kırıkkale Çölyak</div>
+                        </div>
+                        <button class="hamburger" onclick="window.toggleMenu()"><i class="fas fa-bars"></i></button>
+                        <div class="nav-links" id="navLinks">
+                            ${allTables.map(t => `
+                                <div class="nav-item ${t === activeTable ? 'active' : ''}" id="nav_${t}" onclick="window.setActiveTable('${t}')">
+                                    <i class="fas ${getIcon(t)}"></i> ${tt(t)}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="user-area">
+                            <button class="icon-btn" onclick="window.toggleDarkMode()"><i id="darkIcon" class="fas ${darkMode ? 'fa-sun' : 'fa-moon'}"></i></button>
+                            <button class="logout-btn" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
+                        </div>
+                    </nav>
+                    <div class="main-container">
+                        <div class="top-bar">
+                            <div class="page-title">
+                                <h1 id="currentTableTitle">${tt(activeTable)} Yönetimi</h1>
+                                <span>Hoş geldin, ${currentUser.email}</span>
+                            </div>
+                            <button class="btn-primary" onclick="window.openAddModal()"><i class="fas fa-plus"></i> Yeni Ekle</button>
+                        </div>
+                        <div class="data-card">
+                            <div id="dataContainer"></div>
+                        </div>
+                    </div>
+                    <div id="dataModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 id="modalTitle">Form</h2>
+                                <span class="close-modal" onclick="window.closeModal()">&times;</span>
+                            </div>
+                            <div id="modalFormBody"></div>
+                            <div style="margin-top:30px; display:flex; gap:12px; justify-content:flex-end;">
+                                <button class="btn-primary" onclick="window.submitForm()">Kaydet</button>
+                                <button style="background:#95a5a6; color:white; border:none; padding:12px 24px; border-radius:12px; cursor:pointer;" onclick="window.closeModal()">Vazgeç</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                if(darkMode) document.body.classList.add('dark');
+                loadTableData();
+            }
+
+            function getIcon(t) {
+                const icons = { articles: 'fa-newspaper', authors: 'fa-users', businesses: 'fa-store', hero: 'fa-image', videos: 'fa-video' };
+                return icons[t] || 'fa-table';
+            }
+
+            function renderLogin() {
+                const app = document.getElementById('app');
+                app.innerHTML = `
+                    <div class="login-container">
+                        <div class="login-card">
+                            <div class="logo-icon" style="margin:0 auto 20px; width:60px; height:60px; font-size:28px;">KÇ</div>
+                            <h2>Süper Admin Girişi</h2>
+                            <p>Kırıkkale Çölyak Derneği Yönetim Paneli</p>
+                            <div class="form-row">
+                                <input type="email" id="l_email" placeholder="E-posta" value="fahri7119@gmail.com">
+                            </div>
+                            <div class="form-row">
+                                <input type="password" id="l_pass" placeholder="Şifre">
+                            </div>
+                            <button class="btn-primary" style="width:100%; justify-content:center; padding:14px;" id="l_btn">Giriş Yap</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('l_btn').onclick = async () => {
+                    const email = document.getElementById('l_email').value;
+                    const pass = document.getElementById('l_pass').value;
+                    if(await login(email, pass)) renderAdmin();
+                };
+            }
+
+            // INIT
+            async function init() {
+                if(await checkSession()) renderAdmin();
+                else renderLogin();
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>
