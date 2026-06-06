@@ -1,0 +1,99 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-store"></i> İşletmeler Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openBusinessModal()"><i class="fas fa-plus"></i> Yeni İşletme</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr style="background: var(--primary-bg);"><th>#</th><th>İşletme Adı</th><th>Adres</th><th>Web Sitesi</th><th>Durum</th><th>İşlemler</th></tr></thead>
+                <tbody id="businessesTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="businessModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header"><div class="modal-title" id="businessModalTitle">Yeni İşletme</div><button class="modal-close" onclick="closeBusinessModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body" id="businessModalBody"></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeBusinessModal()">İptal</button><button class="btn btn-primary" onclick="saveBusiness()">Kaydet</button></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let businessesData = [];
+    let editingBusinessId = null;
+
+    function initBusinesses() { loadBusinesses(); }
+
+    async function loadBusinesses() {
+        const { data, error } = await window.supabaseClient.from('businesses').select('*').order('created_at', { ascending: false });
+        if (error) { window.showToast('İşletmeler yüklenemedi', 'error'); return; }
+        businessesData = data || [];
+        renderBusinesses();
+    }
+
+    function renderBusinesses() {
+        const tbody = document.getElementById('businessesTableBody');
+        if (!businessesData.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">İşletme yok</td></tr>'; return; }
+        tbody.innerHTML = businessesData.map((b, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><strong>${window.escapeHtml(b.name)}</strong></td>
+                <td>${window.escapeHtml(b.address) || '-'}</td>
+                <td>${b.website ? `<a href="${b.website}" target="_blank">${b.website}</a>` : '-'}</td>
+                <td>${b.is_active ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-red">Pasif</span>'}</td>
+                <td class="admin-only"><button class="btn btn-secondary btn-small" onclick="editBusiness('${b.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-small" onclick="deleteBusiness('${b.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function openBusinessModal() { editingBusinessId = null; renderBusinessForm({}); document.getElementById('businessModal').classList.add('active'); }
+    function editBusiness(id) { const b = businessesData.find(x => x.id === id); if (b) { editingBusinessId = id; renderBusinessForm(b); document.getElementById('businessModal').classList.add('active'); } }
+    
+    function renderBusinessForm(data) {
+        document.getElementById('businessModalBody').innerHTML = `
+            <div class="form-group"><label>İşletme Adı *</label><input type="text" id="business_name" value="${window.escapeHtml(data.name || '')}" required></div>
+            <div class="form-group"><label>Adres</label><textarea id="business_address" rows="2">${window.escapeHtml(data.address || '')}</textarea></div>
+            <div class="form-group"><label>Açıklama</label><textarea id="business_description" rows="3">${window.escapeHtml(data.description || '')}</textarea></div>
+            <div class="form-group"><label>Logo (URL)</label><input type="url" id="business_logo" value="${window.escapeHtml(data.logo || '')}"></div>
+            <div class="form-group"><label>Web Sitesi</label><input type="url" id="business_website" value="${window.escapeHtml(data.website || '')}"></div>
+            <div class="form-group checkbox-row"><label><input type="checkbox" id="business_is_active" ${data.is_active ? 'checked' : ''}> Aktif</label></div>
+        `;
+    }
+
+    async function saveBusiness() {
+        const businessData = {
+            name: document.getElementById('business_name').value.trim(),
+            address: document.getElementById('business_address').value.trim() || null,
+            description: document.getElementById('business_description').value.trim() || null,
+            logo: document.getElementById('business_logo').value.trim() || null,
+            website: document.getElementById('business_website').value.trim() || null,
+            is_active: document.getElementById('business_is_active').checked,
+            updated_at: new Date().toISOString()
+        };
+        if (!businessData.name) { window.showToast('İşletme adı zorunludur', 'warning'); return; }
+        
+        let result;
+        if (editingBusinessId) result = await window.supabaseClient.from('businesses').update(businessData).eq('id', editingBusinessId);
+        else { businessData.created_at = new Date().toISOString(); result = await window.supabaseClient.from('businesses').insert([businessData]); }
+        
+        if (result.error) { window.showToast('Hata: ' + result.error.message, 'error'); return; }
+        window.showToast(editingBusinessId ? 'İşletme güncellendi' : 'İşletme eklendi', 'success');
+        closeBusinessModal();
+        loadBusinesses();
+    }
+
+    async function deleteBusiness(id) {
+        window.showDeleteConfirm('Bu işletmeyi silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('businesses').delete().eq('id', id);
+            if (error) { window.showToast('Hata: ' + error.message, 'error'); return; }
+            window.showToast('İşletme silindi', 'success');
+            loadBusinesses();
+        });
+    }
+
+    function closeBusinessModal() { document.getElementById('businessModal').classList.remove('active'); }
+</script>

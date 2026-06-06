@@ -1,0 +1,415 @@
+<div class="page-content">
+    <div class="form-card admin-only">
+        <div class="form-header"><i class="fas fa-hand-holding-heart"></i> Yeni Dağıtım (FIFO)</div>
+        <div class="form-body">
+            <form id="distributionForm" onsubmit="addDistribution(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Makbuz No *</label><input type="text" id="receipt_number" required></div>
+                    <div class="form-group"><label>Dağıtım Tarihi *</label><input type="date" id="distribution_date" required></div>
+                </div>
+                <div class="form-group"><label>Üye Seçimi *</label><select id="member_id" required><option value="">Üye seçiniz...</option></select></div>
+                <div class="form-group"><label>Çölyaklı Seçimi (Birden fazla seçilebilir)</label><select id="celiac_index" multiple style="min-height:70px"></select></div>
+                <div class="form-group"><label>Ürünler</label><div id="distributionItems"></div><button type="button" class="btn btn-secondary btn-small" onclick="addDistributionItem()"><i class="fas fa-plus"></i> Ürün Ekle</button></div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-check-circle"></i> Dağıtımı Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div style="background:white; border-radius:var(--radius-lg); border:1px solid var(--gray-200); padding:1rem 1.25rem; margin-bottom:1rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
+        <div class="form-group" style="margin:0; min-width:200px; flex:1;">
+            <label style="font-size:0.8rem;"><i class="fas fa-user"></i> Üye Adına Göre Süz</label>
+            <select id="distFilterMember" onchange="applyDistributionFilters()" style="padding:0.5rem 0.75rem; font-size:0.85rem;">
+                <option value="">Tüm Üyeler</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin:0; min-width:200px; flex:1;">
+            <label style="font-size:0.8rem;"><i class="fas fa-box"></i> Ürüne Göre Süz</label>
+            <select id="distFilterProduct" onchange="applyDistributionFilters()" style="padding:0.5rem 0.75rem; font-size:0.85rem;">
+                <option value="">Tüm Ürünler</option>
+            </select>
+        </div>
+        <div style="flex-shrink:0;">
+            <button class="btn btn-secondary btn-small" onclick="clearDistributionFilters()"><i class="fas fa-times"></i> Filtreyi Temizle</button>
+        </div>
+    </div>
+
+    <!-- Dağıtım Listesi -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Makbuz No</th>
+                    <th>Üye / Çölyaklı / TC / Tel</th>
+                    <th>Tarih</th>
+                    <th class="products-header">Ürünler</th>
+                    <th class="admin-only">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="distributionTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function initDistribution() {
+        updateMemberSelect();
+        if (document.getElementById('distributionItems').children.length === 0) addDistributionItem();
+        document.getElementById('distribution_date').valueAsDate = new Date();
+        renderDistributions();
+    }
+
+    function updateMemberSelect() {
+        const select = document.getElementById('member_id');
+        const activeMembers = window.data.members.filter(m => !(m.is_passive === true || m.is_passive === 1 || m.is_passive === 'true'));
+        const sortedMembers = [...activeMembers].sort((a, b) => (a.first_name + ' ' + a.last_name).localeCompare(b.first_name + ' ' + b.last_name, 'tr'));
+        select.innerHTML = '<option value="">Üye seçiniz...</option>' + sortedMembers.map(m => `<option value="${m.id}">${window.escapeHtml(m.first_name)} ${window.escapeHtml(m.last_name)}</option>`).join('');
+        select.onchange = function() {
+            const member = window.data.members.find(m => m.id === this.value);
+            const celiacSelect = document.getElementById('celiac_index');
+            celiacSelect.innerHTML = '';
+            if (member?.celiacs?.length) {
+                member.celiacs.forEach((c, idx) => celiacSelect.innerHTML += `<option value="${idx}">${window.escapeHtml(c.name)} ${window.escapeHtml(c.surname)} (${c.relation})</option>`);
+            }
+        };
+    }
+
+    function addDistributionItem() {
+        const container = document.getElementById('distributionItems');
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        const div = document.createElement('div');
+        div.className = 'distribution-item';
+        div.innerHTML = `
+            <div class="form-row" style="flex:1;align-items:center;gap:0.5rem;">
+                <select class="dist-product" required onchange="updateDistItemUnit(this)">
+                    <option value="">Ürün seçiniz...</option>
+                    ${products.map(p => `<option value="${window.escapeHtml(p)}">${window.escapeHtml(p)}</option>`).join('')}
+                </select>
+                <input type="number" class="dist-qty" step="0.01" placeholder="Miktar" required>
+                <span class="dist-unit-label" style="min-width:45px;font-size:0.8rem;color:var(--gray-500);">-</span>
+            </div>
+            <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function updateDistItemUnit(sel) {
+        const si = window.data.stock.find(s => s.product_name === sel.value);
+        const lbl = sel.closest('.distribution-item').querySelector('.dist-unit-label');
+        if (lbl) lbl.textContent = si ? si.unit : '-';
+    }
+
+    async function addDistribution(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+        
+        const memberId = document.getElementById('member_id').value;
+        if (!memberId) { window.showToast('Üye seçin', 'warning'); return; }
+        
+        const celiacSelect = document.getElementById('celiac_index');
+        const selectedCeliacs = Array.from(celiacSelect.selectedOptions).map(opt => opt.value);
+        const member = window.data.members.find(m => m.id === memberId);
+        let celiacName = 'Belirtilmemiş';
+        if (member && selectedCeliacs.length > 0 && member.celiacs) {
+            celiacName = selectedCeliacs.map(idx => { const c = member.celiacs[idx]; return c ? `${c.name} ${c.surname}` : ''; }).filter(n => n).join(', ');
+        }
+        
+        const items = [];
+        document.querySelectorAll('.distribution-item').forEach(it => {
+            const p = it.querySelector('.dist-product')?.value;
+            const q = parseFloat(it.querySelector('.dist-qty')?.value);
+            if (p && q > 0) {
+                const se = window.data.stock.find(s => s.product_name === p);
+                items.push({ productName: p, quantity: q, unit: se ? se.unit : 'Adet' });
+            }
+        });
+        
+        if (items.length === 0) { window.showToast('Ürün ekleyin', 'warning'); return; }
+        
+        // FIFO stok kontrolü
+        const fifoMap = window.computeFifoRemaining();
+        const productTotals = {};
+        Object.values(fifoMap).forEach(s => {
+            productTotals[s.product_name] = (productTotals[s.product_name] || 0) + s._computed_remaining;
+        });
+        
+        for (const item of items) {
+            if ((productTotals[item.productName] || 0) < item.quantity) {
+                window.showToast(`${item.productName} stok yetersiz! (Mevcut: ${productTotals[item.productName] || 0})`, 'error');
+                return;
+            }
+        }
+        
+        // Stok düşümü yap
+        for (const item of items) {
+            let rem = item.quantity;
+            const stockItems = window.data.stock.filter(s => s.product_name === item.productName && s.remaining_quantity > 0).sort((a,b) => new Date(a.entry_date) - new Date(b.entry_date));
+            for (const st of stockItems) {
+                if (rem <= 0) break;
+                const d = Math.min(rem, st.remaining_quantity);
+                st.remaining_quantity = parseFloat((st.remaining_quantity - d).toFixed(2));
+                rem = parseFloat((rem - d).toFixed(2));
+                await window.supabaseClient.from('stock').update({ remaining_quantity: st.remaining_quantity }).eq('id', st.id);
+            }
+        }
+        
+        const dist = {
+            id: crypto.randomUUID(),
+            receipt_number: document.getElementById('receipt_number').value.trim(),
+            member_id: memberId,
+            celiac_name: celiacName,
+            distribution_date: document.getElementById('distribution_date').value,
+            items,
+            created_at: new Date().toISOString()
+        };
+        
+        const { error } = await window.supabaseClient.from('distributions').insert(dist);
+        if (!error) {
+            window.data.distributions.unshift(dist);
+            renderDistributions();
+            renderStock();
+            document.getElementById('distributionForm').reset();
+            document.getElementById('distributionItems').innerHTML = '';
+            addDistributionItem();
+            document.getElementById('distribution_date').valueAsDate = new Date();
+            window.showToast('Dağıtım kaydedildi', 'success');
+        } else {
+            window.showToast('Hata: ' + error.message, 'error');
+        }
+    }
+
+    // Makbuz No sıralama fonksiyonu (PLAN- prefix'li olanları doğru sıralar)
+    function sortByReceiptNumber(a, b) {
+        const rA = a.receipt_number || '', rB = b.receipt_number || '';
+        const isPlanA = rA.startsWith('PLAN-'), isPlanB = rB.startsWith('PLAN-');
+        if (isPlanA && !isPlanB) return 1;
+        if (!isPlanA && isPlanB) return -1;
+        const mA = rA.match(/\d+/), mB = rB.match(/\d+/);
+        const nA = mA ? parseInt(mA[0], 10) : null, nB = mB ? parseInt(mB[0], 10) : null;
+        if (nA === null && nB === null) return rA.localeCompare(rB);
+        if (nA === null) return 1;
+        if (nB === null) return -1;
+        if (nA !== nB) return nA - nB;
+        return rA.localeCompare(rB);
+    }
+
+    function updateDistributionFilters() {
+        const memberSelect = document.getElementById('distFilterMember');
+        const productSelect = document.getElementById('distFilterProduct');
+        if (!memberSelect || !productSelect) return;
+        
+        const prevMember = memberSelect.value;
+        const prevProduct = productSelect.value;
+        
+        const memberIds = [...new Set(window.data.distributions.map(d => d.member_id))];
+        memberSelect.innerHTML = '<option value="">Tüm Üyeler</option>';
+        memberIds.forEach(id => {
+            const m = window.data.members.find(x => x.id === id);
+            if (m) {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = `${m.first_name} ${m.last_name}`;
+                memberSelect.appendChild(opt);
+            }
+        });
+        if (prevMember && memberSelect.querySelector(`option[value="${prevMember}"]`)) memberSelect.value = prevMember;
+        
+        const allProducts = new Set();
+        window.data.distributions.forEach(d => (d.items || []).forEach(i => allProducts.add(i.productName)));
+        window.data.stock.forEach(s => allProducts.add(s.product_name));
+        productSelect.innerHTML = '<option value="">Tüm Ürünler</option>';
+        [...allProducts].sort().forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            productSelect.appendChild(opt);
+        });
+        if (prevProduct && productSelect.querySelector(`option[value="${prevProduct}"]`)) productSelect.value = prevProduct;
+    }
+
+    function applyDistributionFilters() {
+        const memberFilter = (document.getElementById('distFilterMember') || {}).value || '';
+        const productFilter = (document.getElementById('distFilterProduct') || {}).value || '';
+        const tbody = document.getElementById('distributionTableBody');
+        
+        let filtered = [...window.data.distributions];
+        if (memberFilter) filtered = filtered.filter(d => d.member_id === memberFilter);
+        if (productFilter) filtered = filtered.filter(d => (d.items || []).some(i => i.productName === productFilter));
+        
+        if (!filtered.length) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-state">${window.data.distributions.length ? 'Filtreye uyan dağıtım yok' : 'Dağıtım yok'}</td></tr>`;
+            return;
+        }
+        
+        const sorted = [...filtered].sort(sortByReceiptNumber);
+        tbody.innerHTML = sorted.map(d => {
+            const member = window.data.members.find(m => m.id === d.member_id);
+            const itemsList = d.items.map((i, idx) => `<div style="${idx > 0 ? 'margin-top:0.5rem;' : ''}">${window.escapeHtml(i.productName)} (${i.quantity})</div>`).join('');
+            return `
+                <tr>
+                    <td><span class="badge badge-green">${window.escapeHtml(d.receipt_number)}</span></td>
+                    <td>
+                        <strong>${member ? window.escapeHtml(member.first_name+' '+member.last_name) : '?'}</strong><br>
+                        <small>${window.escapeHtml(d.celiac_name)}</small><br>
+                        <small>${member ? window.escapeHtml(member.tc_id || '-') : '-'}</small><br>
+                        <small>${member ? window.escapeHtml(member.phone || '-') : '-'}</small>
+                    </td>
+                    <td>${window.formatDateTR(d.distribution_date)}</td>
+                    <td class="products-cell"><small>${itemsList}</small></td>
+                    <td class="admin-only">
+                        <button class="btn btn-info btn-small" onclick="editDistribution('${d.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-small" onclick="confirmDeleteDistribution('${d.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function clearDistributionFilters() {
+        const ms = document.getElementById('distFilterMember'); if (ms) ms.value = '';
+        const ps = document.getElementById('distFilterProduct'); if (ps) ps.value = '';
+        applyDistributionFilters();
+    }
+
+    function renderDistributions() {
+        updateDistributionFilters();
+        applyDistributionFilters();
+    }
+
+    // DAĞITIM DÜZENLEME FONKSİYONU
+    function editDistribution(id) {
+        if (!window.checkAdmin()) return;
+        const dist = window.data.distributions.find(d => d.id === id);
+        if (!dist) return;
+        window.editingData = { type: 'distribution', id };
+        
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        let itemsHtml = '';
+        dist.items.forEach((item, idx) => {
+            itemsHtml += `
+                <div class="distribution-item edit-dist-item" data-index="${idx}">
+                    <div class="form-row" style="flex:1">
+                        <select class="edit-dist-product" required>
+                            <option value="">Ürün seçiniz...</option>
+                            ${products.map(p => `<option value="${window.escapeHtml(p)}" ${p === item.productName ? 'selected' : ''}>${window.escapeHtml(p)}</option>`).join('')}
+                        </select>
+                        <input type="number" class="edit-dist-qty" step="0.01" placeholder="Miktar" value="${item.quantity}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+                </div>
+            `;
+        });
+        
+        const _dm = window.data.members.find(m => m.id === dist.member_id);
+        const _curC = (dist.celiac_name || '').split(',').map(n => n.trim());
+        let _cOpts = '';
+        if (_dm && _dm.celiacs && _dm.celiacs.length) {
+            _dm.celiacs.forEach((c, i) => {
+                const fn = `${c.name} ${c.surname}`;
+                _cOpts += `<option value="${i}" ${_curC.includes(fn)?'selected':''}>${window.escapeHtml(fn)} (${c.relation})</option>`;
+            });
+        }
+        
+        const _cf = _cOpts
+            ? `<div class="form-group"><label>Çölyaklı Seçimi</label><select id="edit_celiac_select" multiple style="min-height:70px">${_cOpts}</select></div>`
+            : `<div class="form-group"><label>Çölyaklı Adı</label><input id="edit_celiac_name" value="${window.escapeHtml(dist.celiac_name)}"></div>`;
+        
+        const content = `
+            <div class="form-group"><label>Makbuz No</label><input id="edit_receipt" value="${window.escapeHtml(dist.receipt_number)}"></div>
+            <div class="form-group"><label>Dağıtım Tarihi</label><input type="date" id="edit_dist_date" value="${dist.distribution_date}"></div>
+            <div class="form-group"><label>Üye</label><input value="${window.escapeHtml(_dm ? _dm.first_name+' '+_dm.last_name : '?')}" disabled style="background:var(--gray-100)"></div>
+            ${_cf}
+            <div class="form-group"><label>Ürünler</label>
+                <div id="editDistItems">${itemsHtml}</div>
+                <button type="button" class="btn btn-secondary btn-small" onclick="addEditDistItem()" style="margin-top:0.5rem;"><i class="fas fa-plus"></i> Ürün Ekle</button>
+            </div>
+        `;
+        
+        document.getElementById('editModalTitle').innerHTML = 'Dağıtım Düzenle';
+        document.getElementById('editModalBody').innerHTML = content;
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = saveDistributionEdit;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function addEditDistItem() {
+        const container = document.getElementById('editDistItems');
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        const div = document.createElement('div');
+        div.className = 'distribution-item edit-dist-item';
+        div.innerHTML = `
+            <div class="form-row" style="flex:1">
+                <select class="edit-dist-product" required>
+                    <option value="">Ürün seçiniz...</option>
+                    ${products.map(p => `<option value="${window.escapeHtml(p)}">${window.escapeHtml(p)}</option>`).join('')}
+                </select>
+                <input type="number" class="edit-dist-qty" step="0.01" placeholder="Miktar" required>
+            </div>
+            <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+        `;
+        container.appendChild(div);
+    }
+
+    async function saveDistributionEdit() {
+        if (!window.checkAdmin()) return;
+        
+        const newItems = [];
+        document.querySelectorAll('#editDistItems .edit-dist-item').forEach(item => {
+            const product = item.querySelector('.edit-dist-product')?.value;
+            const qty = parseFloat(item.querySelector('.edit-dist-qty')?.value);
+            if (product && qty > 0) {
+                const se = window.data.stock.find(s => s.product_name === product);
+                newItems.push({ productName: product, quantity: qty, unit: se ? se.unit : 'Adet' });
+            }
+        });
+        
+        if (newItems.length === 0) { window.showToast('En az bir ürün ekleyin', 'warning'); return; }
+        
+        let _cn = 'Belirtilmemiş';
+        const _cs = document.getElementById('edit_celiac_select');
+        const _ci = document.getElementById('edit_celiac_name');
+        if (_cs) {
+            const _d2 = window.data.distributions.find(d => d.id === window.editingData.id);
+            const _m2 = _d2 ? window.data.members.find(m => m.id === _d2.member_id) : null;
+            _cn = Array.from(_cs.selectedOptions).map(o => {
+                const c = _m2 && _m2.celiacs ? _m2.celiacs[+o.value] : null;
+                return c ? `${c.name} ${c.surname}` : '';
+            }).filter(Boolean).join(', ') || 'Belirtilmemiş';
+        } else if (_ci) { _cn = _ci.value.trim() || 'Belirtilmemiş'; }
+        
+        const updates = {
+            receipt_number: document.getElementById('edit_receipt').value.trim(),
+            distribution_date: document.getElementById('edit_dist_date').value,
+            celiac_name: _cn,
+            items: newItems
+        };
+        
+        const { error } = await window.supabaseClient.from('distributions').update(updates).eq('id', window.editingData.id);
+        if (!error) {
+            const idx = window.data.distributions.findIndex(d => d.id === window.editingData.id);
+            if (idx !== -1) Object.assign(window.data.distributions[idx], updates);
+            await window.rebuildAndSyncStockFromFifo();
+            renderDistributions();
+            window.closeEditModal();
+            window.showToast('Dağıtım güncellendi', 'success');
+        } else {
+            window.showToast('Hata: ' + error.message, 'error');
+        }
+    }
+
+    function confirmDeleteDistribution(id) {
+        if (!window.checkAdmin()) return;
+        const dist = window.data.distributions.find(d => d.id === id);
+        const label = dist ? `Makbuz No: ${dist.receipt_number}` : 'bu dağıtım kaydını';
+        window.showDeleteConfirm(`"${label}" dağıtım kaydını silmek istediğinizden emin misiniz?`, async () => {
+            const { error } = await window.supabaseClient.from('distributions').delete().eq('id', id);
+            if (!error) {
+                window.data.distributions = window.data.distributions.filter(d => d.id !== id);
+                await window.rebuildAndSyncStockFromFifo();
+                renderDistributions();
+                window.showToast('Dağıtım silindi', 'success');
+            }
+        });
+    }
+</script>

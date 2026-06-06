@@ -1,0 +1,302 @@
+<div class="page-content">
+    <!-- Ürün Bazlı Renkli Stok Kartları -->
+    <div id="stockSummaryCards" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1.5rem; margin-bottom:2rem;"></div>
+
+    <!-- Stok Giriş Formu -->
+    <div class="form-card admin-only">
+        <div class="form-header"><i class="fas fa-plus-circle"></i> Stok Girişi (Aynı Tarihte Birden Fazla Ürün)</div>
+        <div class="form-body">
+            <form id="stockForm" onsubmit="addMultipleStock(event)">
+                <div class="form-group"><label>Giriş Tarihi *</label><input type="date" id="stock_entry_date" required></div>
+                <div id="stockItemsContainer"></div>
+                <button type="button" class="btn btn-secondary btn-small add-stock-item-btn" onclick="addStockItemRow()"><i class="fas fa-plus"></i> Ürün Ekle</button>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:1rem;"><i class="fas fa-arrow-down"></i> Tüm Stokları Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stok Listesi Tablosu -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th><th>Ürün</th><th>Giriş Tarihi</th><th>Alınan</th><th>Kalan</th><th>Birim</th>
+                    <th>Sipariş Linki</th><th>Alış Fiyatı</th><th>Durum</th><th class="admin-only">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Renk paleti (her ürün için farklı)
+    const colorPairs = [
+        { bg: '#ecfdf5', border: '#10b981', icon: '#059669' },
+        { bg: '#eff6ff', border: '#3b82f6', icon: '#2563eb' },
+        { bg: '#fef3c7', border: '#f59e0b', icon: '#d97706' },
+        { bg: '#fce7f3', border: '#ec4899', icon: '#db2777' },
+        { bg: '#f5f3ff', border: '#8b5cf6', icon: '#7c3aed' },
+        { bg: '#fff7ed', border: '#f97316', icon: '#ea580c' },
+        { bg: '#ecfeff', border: '#06b6d4', icon: '#0891b2' },
+        { bg: '#fef2f2', border: '#ef4444', icon: '#dc2626' }
+    ];
+
+    function initStock() {
+        document.getElementById('stock_entry_date').valueAsDate = new Date();
+        if (document.getElementById('stockItemsContainer').children.length === 0) addStockItemRow();
+        renderStock();
+    }
+
+    function addStockItemRow(productName = '', quantity = '', unit = 'Adet', orderLink = '', purchasePrice = '') {
+        const container = document.getElementById('stockItemsContainer');
+        const div = document.createElement('div');
+        div.className = 'stock-item-row';
+        div.innerHTML = `
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+                <div style="flex:2; min-width:150px;"><input type="text" class="stock-product-name" placeholder="Ürün Adı *" value="${window.escapeHtml(productName)}" required></div>
+                <div style="flex:1; min-width:100px;"><input type="number" class="stock-quantity" step="0.01" placeholder="Miktar *" value="${quantity}" required></div>
+                <div style="flex:1; min-width:100px;">
+                    <select class="stock-unit">
+                        <option ${unit==='Adet'?'selected':''}>Adet</option>
+                        <option ${unit==='Kg'?'selected':''}>Kg</option>
+                        <option ${unit==='Litre'?'selected':''}>Litre</option>
+                        <option ${unit==='Paket'?'selected':''}>Paket</option>
+                    </select>
+                </div>
+                <div style="flex:2; min-width:200px;"><input type="url" class="stock-order-link" placeholder="Sipariş Linki (opsiyonel)" value="${window.escapeHtml(orderLink)}"></div>
+                <div style="flex:1; min-width:100px;"><input type="number" class="stock-price" step="0.01" placeholder="Alış Fiyatı (₺)" value="${purchasePrice}"></div>
+                <button type="button" class="remove-stock-item" onclick="this.closest('.stock-item-row').remove()"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    async function addMultipleStock(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+        const entryDate = document.getElementById('stock_entry_date').value;
+        if (!entryDate) { window.showToast('Giriş tarihi gerekli', 'warning'); return; }
+        
+        const rows = document.querySelectorAll('#stockItemsContainer .stock-item-row');
+        if (rows.length === 0) { window.showToast('En az bir ürün ekleyin', 'warning'); return; }
+        
+        let successCount = 0, errorCount = 0;
+        
+        for (const row of rows) {
+            const productName = row.querySelector('.stock-product-name')?.value.trim();
+            const quantity = parseFloat(row.querySelector('.stock-quantity')?.value);
+            const unit = row.querySelector('.stock-unit')?.value || 'Adet';
+            const orderLink = row.querySelector('.stock-order-link')?.value.trim() || null;
+            const purchasePrice = parseFloat(row.querySelector('.stock-price')?.value) || null;
+            
+            if (!productName) { window.showToast('Ürün adı boş bırakılamaz', 'warning'); continue; }
+            if (isNaN(quantity) || quantity <= 0) { window.showToast(`${productName} için geçerli miktar girin`, 'warning'); continue; }
+            
+            const stockItem = {
+                id: crypto.randomUUID(),
+                product_name: productName,
+                entry_date: entryDate,
+                received_quantity: quantity,
+                remaining_quantity: quantity,
+                unit: unit,
+                order_link: orderLink,
+                purchase_price: purchasePrice,
+                created_at: new Date().toISOString()
+            };
+            
+            const { error } = await window.supabaseClient.from('stock').insert(stockItem);
+            if (!error) {
+                window.data.stock.unshift(stockItem);
+                successCount++;
+            } else {
+                errorCount++;
+            }
+        }
+        
+        if (successCount > 0) {
+            document.getElementById('stockForm').reset();
+            document.getElementById('stockItemsContainer').innerHTML = '';
+            addStockItemRow();
+            document.getElementById('stock_entry_date').valueAsDate = new Date();
+            renderStock();
+            window.showToast(`${successCount} ürün stok başarıyla eklendi${errorCount > 0 ? `, ${errorCount} hata oluştu` : ''}`, 'success');
+        } else {
+            window.showToast('Stok eklenemedi', 'error');
+        }
+    }
+
+    function renderStock() {
+        const tbody = document.getElementById('stockTableBody');
+        if (!window.data.stock.length) { 
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Stok yok</td></tr>'; 
+            renderStockSummaryCards(); 
+            return; 
+        }
+        
+        const fifoMap = window.computeFifoRemaining();
+        const sorted = [...window.data.stock].sort((a,b) => new Date(b.entry_date) - new Date(a.entry_date));
+        
+        tbody.innerHTML = sorted.map((s, idx) => {
+            const computed = fifoMap[s.id];
+            const remaining = computed ? computed._computed_remaining : s.remaining_quantity;
+            const isFinished = remaining <= 0;
+            const statusBadge = isFinished ? '<span class="badge badge-red">❌ BİTTİ</span>' : `<span class="badge ${remaining/s.received_quantity > 0.5 ? 'badge-green' : 'badge-yellow'}">${remaining/s.received_quantity > 0.5 ? 'Yeterli' : 'Azalıyor'}</span>`;
+            const orderLinkHtml = s.order_link ? `<a href="${window.escapeHtml(s.order_link)}" target="_blank" style="font-size:0.7rem;"><i class="fas fa-external-link-alt"></i> Link</a>` : '-';
+            const priceHtml = s.purchase_price ? `${s.purchase_price.toLocaleString('tr-TR')} ₺` : '-';
+            return `
+                <tr>
+                    <td>${idx+1}</td>
+                    <td><strong>${window.escapeHtml(s.product_name)}</strong></td>
+                    <td>${window.formatDateTR(s.entry_date)}</td>
+                    <td>${s.received_quantity} ${s.unit}</td>
+                    <td><strong>${remaining} ${s.unit}</strong></td>
+                    <td>${s.unit}</td>
+                    <td>${orderLinkHtml}</td>
+                    <td>${priceHtml}</td>
+                    <td>${statusBadge}</td>
+                    <td class="admin-only">
+                        <button class="btn btn-info btn-small" onclick="editStockItem('${s.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-small" onclick="confirmDeleteStock('${s.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        renderStockSummaryCards();
+    }
+
+    function renderStockSummaryCards() {
+        const container = document.getElementById('stockSummaryCards');
+        if (!container) return;
+        if (!window.data.stock.length) { container.innerHTML = ''; return; }
+
+        // Toplam alınan miktarlar
+        const receivedMap = new Map();
+        const unitMap = new Map();
+        window.data.stock.forEach(s => {
+            receivedMap.set(s.product_name, (receivedMap.get(s.product_name) || 0) + s.received_quantity);
+            unitMap.set(s.product_name, s.unit);
+        });
+
+        // Dağıtılan miktarlar
+        const distributedMap = new Map();
+        window.data.distributions.forEach(d => {
+            (d.items || []).forEach(item => {
+                distributedMap.set(item.productName, (distributedMap.get(item.productName) || 0) + item.quantity);
+            });
+        });
+
+        // Kalan miktarlar (FIFO ile)
+        const fifoMap = window.computeFifoRemaining();
+        const remainingMap = new Map();
+        Object.values(fifoMap).forEach(s => {
+            remainingMap.set(s.product_name, (remainingMap.get(s.product_name) || 0) + s._computed_remaining);
+        });
+
+        const products = [...receivedMap.keys()].sort();
+
+        container.innerHTML = products.map((name, idx) => {
+            const color = colorPairs[idx % colorPairs.length];
+            const received = receivedMap.get(name) || 0;
+            const distributed = distributedMap.get(name) || 0;
+            const remaining = remainingMap.get(name) || 0;
+            const unit = unitMap.get(name) || 'Adet';
+            const remainingPct = received > 0 ? Math.max(0, Math.round((remaining / received) * 100)) : 0;
+            const statusColor = remaining <= 0 ? '#ef4444' : remaining / received > 0.5 ? '#10b981' : '#f59e0b';
+            
+            return `
+                <div style="background:${color.bg}; border:1px solid ${color.border}; border-radius:var(--radius-lg); padding:1.25rem; box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.8rem; font-weight:700; color:${color.icon}; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.4rem; text-transform:uppercase; letter-spacing:0.03em;">
+                        <i class="fas fa-box"></i> ${window.escapeHtml(name)}
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; text-align:center;">
+                        <div style="background:white; border-radius:var(--radius-sm); padding:0.6rem 0.25rem; border:1px solid ${color.border}20;">
+                            <div style="font-size:1.1rem; font-weight:700; color:#1f2937;">${received}</div>
+                            <div style="font-size:0.65rem; color:#6b7280; margin-top:0.15rem;">Toplam Alınan</div>
+                        </div>
+                        <div style="background:white; border-radius:var(--radius-sm); padding:0.6rem 0.25rem; border:1px solid ${color.border}20;">
+                            <div style="font-size:1.1rem; font-weight:700; color:#ef4444;">${distributed}</div>
+                            <div style="font-size:0.65rem; color:#6b7280; margin-top:0.15rem;">Dağıtılan</div>
+                        </div>
+                        <div style="background:white; border-radius:var(--radius-sm); padding:0.6rem 0.25rem; border:1px solid ${color.border}20;">
+                            <div style="font-size:1.1rem; font-weight:700; color:${statusColor};">${remaining}</div>
+                            <div style="font-size:0.65rem; color:#6b7280; margin-top:0.15rem;">Kalan</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:0.6rem; background:#e5e7eb; border-radius:99px; height:5px; overflow:hidden;">
+                        <div style="height:100%; width:${remainingPct}%; background:${statusColor}; border-radius:99px; transition:width 0.3s;"></div>
+                    </div>
+                    <div style="font-size:0.7rem; color:#6b7280; margin-top:0.3rem; text-align:right;">Kalan: %${remainingPct} &bull; Birim: ${unit}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function confirmDeleteStock(id) {
+        if (!window.checkAdmin()) return;
+        const item = window.data.stock.find(s => s.id === id);
+        const name = item ? item.product_name : 'bu stok kaydını';
+        window.showDeleteConfirm(`"${name}" stok kaydını silmek istediğinizden emin misiniz?`, async () => {
+            const { error } = await window.supabaseClient.from('stock').delete().eq('id', id);
+            if (!error) {
+                window.data.stock = window.data.stock.filter(s => s.id !== id);
+                await window.rebuildAndSyncStockFromFifo();
+                renderStock();
+                window.showToast('Stok silindi', 'success');
+            }
+        });
+    }
+
+    function editStockItem(id) {
+        if (!window.checkAdmin()) return;
+        const item = window.data.stock.find(s => s.id === id);
+        if(!item) return;
+        window.editingData = { type: 'stock', id: item.id };
+        
+        const content = `
+            <div class="form-group"><label>Ürün Adı</label><input id="edit_product_name" value="${window.escapeHtml(item.product_name)}"></div>
+            <div class="form-group"><label>Giriş Tarihi</label><input type="date" id="edit_entry_date" value="${item.entry_date}"></div>
+            <div class="form-group"><label>Alınan Miktar</label><input type="number" id="edit_received_qty" step="0.01" value="${item.received_quantity}"></div>
+            <div class="form-group"><label>Kalan Miktar</label><input type="number" id="edit_remaining_qty" step="0.01" value="${item.remaining_quantity}"></div>
+            <div class="form-group"><label>Birim</label><select id="edit_unit">
+                <option ${item.unit==='Adet'?'selected':''}>Adet</option>
+                <option ${item.unit==='Kg'?'selected':''}>Kg</option>
+                <option ${item.unit==='Litre'?'selected':''}>Litre</option>
+                <option ${item.unit==='Paket'?'selected':''}>Paket</option>
+            </select></div>
+            <div class="form-group"><label>Sipariş Linki</label><input type="url" id="edit_order_link" value="${window.escapeHtml(item.order_link || '')}" placeholder="https://..."></div>
+            <div class="form-group"><label>Alış Fiyatı (₺)</label><input type="number" id="edit_purchase_price" step="0.01" value="${item.purchase_price || ''}" placeholder="0.00"></div>
+        `;
+        document.getElementById('editModalTitle').innerHTML = 'Stok Düzenle';
+        document.getElementById('editModalBody').innerHTML = content;
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = saveStockEdit;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    async function saveStockEdit() {
+        if (!window.checkAdmin()) return;
+        const updates = { 
+            product_name: document.getElementById('edit_product_name').value, 
+            entry_date: document.getElementById('edit_entry_date').value, 
+            received_quantity: parseFloat(document.getElementById('edit_received_qty').value), 
+            remaining_quantity: parseFloat(document.getElementById('edit_remaining_qty').value), 
+            unit: document.getElementById('edit_unit').value,
+            order_link: document.getElementById('edit_order_link').value || null,
+            purchase_price: parseFloat(document.getElementById('edit_purchase_price').value) || null
+        };
+        const { error } = await window.supabaseClient.from('stock').update(updates).eq('id', window.editingData.id);
+        if (!error) {
+            const idx = window.data.stock.findIndex(s => s.id === window.editingData.id);
+            if(idx !== -1) Object.assign(window.data.stock[idx], updates);
+            await window.rebuildAndSyncStockFromFifo();
+            renderStock();
+            window.closeEditModal();
+            window.showToast('Stok güncellendi', 'success');
+        } else {
+            window.showToast('Stok güncellenemedi', 'error');
+        }
+    }
+</script>

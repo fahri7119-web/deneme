@@ -1,0 +1,336 @@
+<div class="page-content">
+    <div class="form-card admin-only">
+        <div class="form-header"><i class="fas fa-clipboard-list"></i> Yeni Dağıtım Planı</div>
+        <div class="form-body">
+            <form id="distributionPlanForm" onsubmit="addDistributionPlan(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Plan Tarihi *</label><input type="date" id="plan_date" required></div>
+                    <div class="form-group"><label>Notlar</label><input type="text" id="plan_notes" placeholder="Plan açıklaması..."></div>
+                </div>
+                <div class="form-group"><label>Üye Seçimi *</label><select id="plan_member_id" required><option value="">Üye seçiniz...</option></select></div>
+                <div class="form-group"><label>Çölyaklı Seçimi (Birden fazla seçilebilir)</label><select id="plan_celiac_index" multiple style="min-height:70px"></select></div>
+                <div class="form-group"><label>Ürünler</label>
+                    <div id="planDistributionItems"></div>
+                    <button type="button" class="btn btn-secondary btn-small" onclick="addPlanDistributionItem()"><i class="fas fa-plus"></i> Ürün Ekle</button>
+                </div>
+                <button type="submit" class="btn btn-warning btn-block"><i class="fas fa-clipboard-check"></i> Planı Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Üye / Çölyaklı / TC / Tel</th>
+                    <th>Plan Tarihi</th>
+                    <th class="products-header">Ürünler</th>
+                    <th>Notlar</th>
+                    <th>Durum</th>
+                    <th class="admin-only">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="distributionPlanTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function initDistribution_plan() {
+        updatePlanMemberSelect();
+        if (document.getElementById('planDistributionItems').children.length === 0) addPlanDistributionItem();
+        document.getElementById('plan_date').valueAsDate = new Date();
+        renderDistributionPlans();
+    }
+
+    function updatePlanMemberSelect() {
+        const select = document.getElementById('plan_member_id');
+        const activeMembers = window.data.members.filter(m => !(m.is_passive === true || m.is_passive === 1 || m.is_passive === 'true'));
+        const sortedMembers = [...activeMembers].sort((a, b) => (a.first_name + ' ' + a.last_name).localeCompare(b.first_name + ' ' + b.last_name, 'tr'));
+        select.innerHTML = '<option value="">Üye seçiniz...</option>' + sortedMembers.map(m => `<option value="${m.id}">${window.escapeHtml(m.first_name)} ${window.escapeHtml(m.last_name)}</option>`).join('');
+        select.onchange = function() {
+            const member = window.data.members.find(m => m.id === this.value);
+            const celiacSelect = document.getElementById('plan_celiac_index');
+            celiacSelect.innerHTML = '';
+            if (member?.celiacs?.length) {
+                member.celiacs.forEach((c, idx) => celiacSelect.innerHTML += `<option value="${idx}">${window.escapeHtml(c.name)} ${window.escapeHtml(c.surname)} (${c.relation})</option>`);
+            }
+        };
+    }
+
+    function addPlanDistributionItem() {
+        const container = document.getElementById('planDistributionItems');
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        const div = document.createElement('div');
+        div.className = 'distribution-item';
+        div.innerHTML = `
+            <div class="form-row" style="flex:1;align-items:center;gap:0.5rem;">
+                <select class="plan-dist-product" required onchange="updatePlanDistItemUnit(this)">
+                    <option value="">Ürün seçiniz...</option>
+                    ${products.map(p => `<option value="${window.escapeHtml(p)}">${window.escapeHtml(p)}</option>`).join('')}
+                </select>
+                <input type="number" class="plan-dist-qty" step="0.01" placeholder="Miktar" required>
+                <span class="plan-dist-unit-label" style="min-width:45px;font-size:0.8rem;color:var(--gray-500);">-</span>
+            </div>
+            <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function updatePlanDistItemUnit(sel) {
+        const si = window.data.stock.find(s => s.product_name === sel.value);
+        const lbl = sel.closest('.distribution-item').querySelector('.plan-dist-unit-label');
+        if (lbl) lbl.textContent = si ? si.unit : '-';
+    }
+
+    async function addDistributionPlan(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+        
+        const memberId = document.getElementById('plan_member_id').value;
+        if (!memberId) { window.showToast('Üye seçin', 'warning'); return; }
+        
+        const celiacSelect = document.getElementById('plan_celiac_index');
+        const selectedCeliacs = Array.from(celiacSelect.selectedOptions).map(opt => opt.value);
+        const member = window.data.members.find(m => m.id === memberId);
+        let celiacName = 'Belirtilmemiş';
+        if (member && selectedCeliacs.length > 0 && member.celiacs) {
+            celiacName = selectedCeliacs.map(idx => { const c = member.celiacs[idx]; return c ? `${c.name} ${c.surname}` : ''; }).filter(n => n).join(', ');
+        }
+        
+        const items = [];
+        document.querySelectorAll('#planDistributionItems .distribution-item').forEach(it => {
+            const p = it.querySelector('.plan-dist-product')?.value;
+            const q = parseFloat(it.querySelector('.plan-dist-qty')?.value);
+            if (p && q > 0) {
+                const se = window.data.stock.find(s => s.product_name === p);
+                items.push({ productName: p, quantity: q, unit: se ? se.unit : 'Adet' });
+            }
+        });
+        
+        if (items.length === 0) { window.showToast('Ürün ekleyin', 'warning'); return; }
+        
+        // Stok uyarısı
+        const _sw = [];
+        items.forEach(item => {
+            const av = window.data.stock.filter(s => s.product_name === item.productName && s.remaining_quantity > 0).reduce((s, st) => s + st.remaining_quantity, 0);
+            if (av < item.quantity) {
+                const u = (window.data.stock.find(s => s.product_name === item.productName)||{}).unit||'Adet';
+                _sw.push(`• ${item.productName}: ${av} ${u} mevcut, ${item.quantity} ${u} isteniyor`);
+            }
+        });
+        
+        if (_sw.length && !confirm('⚠️ Stok Uyarısı\n\n' + _sw.join('\n') + '\n\nYine de planı kaydetmek istiyor musunuz?')) return;
+        
+        const plan = {
+            id: crypto.randomUUID(),
+            member_id: memberId,
+            celiac_name: celiacName,
+            items,
+            planned_date: document.getElementById('plan_date').value,
+            notes: document.getElementById('plan_notes').value.trim() || null,
+            status: 'planned',
+            created_at: new Date().toISOString()
+        };
+        
+        const { error } = await window.supabaseClient.from('distribution_plans').insert(plan);
+        if (error) { window.showToast('Plan kaydedildi (yerel)', 'warning'); } 
+        else { window.showToast('Plan kaydedildi', 'success'); }
+        
+        window.data.distributionPlans.unshift(plan);
+        document.getElementById('distributionPlanForm').reset();
+        document.getElementById('planDistributionItems').innerHTML = '';
+        addPlanDistributionItem();
+        document.getElementById('plan_date').valueAsDate = new Date();
+        renderDistributionPlans();
+    }
+
+    function renderDistributionPlans() {
+        const tbody = document.getElementById('distributionPlanTableBody');
+        const plans = window.data.distributionPlans.filter(p => p.status === 'planned');
+        if (!plans.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Planlanan dağıtım yok</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = plans.map((p, idx) => {
+            const member = window.data.members.find(m => m.id === p.member_id);
+            const planItemsList = p.items.map((i, idx2) => `<div style="${idx2 > 0 ? 'margin-top:0.5rem;' : ''}">${window.escapeHtml(i.productName)} (${i.quantity})</div>`).join('');
+            return `
+                <tr>
+                    <td>${idx+1}</td>
+                    <td>
+                        <strong>${member ? window.escapeHtml(member.first_name+' '+member.last_name) : '?'}</strong><br>
+                        <small>${window.escapeHtml(p.celiac_name)}</small><br>
+                        <small>${member ? window.escapeHtml(member.tc_id || '-') : '-'}</small><br>
+                        <small>${member ? window.escapeHtml(member.phone || '-') : '-'}</small>
+                    </td>
+                    <td>${window.formatDateTR(p.planned_date)}</td>
+                    <td class="products-cell"><small>${planItemsList}</small></td>
+                    <td>${p.notes ? window.escapeHtml(p.notes) : '-'}</td>
+                    <td><span class="badge badge-yellow">Planlandı</span></td>
+                    <td class="admin-only">
+                        <button class="btn btn-success btn-small" onclick="deliverPlan('${p.id}')"><i class="fas fa-check"></i> Teslim Et</button>
+                        <button class="btn btn-secondary btn-small" onclick="editDistributionPlan('${p.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-small" onclick="confirmDeleteDistributionPlan('${p.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function deliverPlan(planId) {
+        if (!window.checkAdmin()) return;
+        const plan = window.data.distributionPlans.find(p => p.id === planId);
+        if (!plan) return;
+        
+        if (!confirm('Bu planı teslim edildi olarak işaretlemek istiyor musunuz? Stoktan düşülecektir.')) return;
+        
+        // FIFO stok düşümü
+        for (const item of plan.items) {
+            let rem = item.quantity;
+            const stockItems = window.data.stock.filter(s => s.product_name === item.productName && s.remaining_quantity > 0).sort((a,b) => new Date(a.entry_date) - new Date(b.entry_date));
+            const totalAvail = stockItems.reduce((s,st) => s + st.remaining_quantity, 0);
+            if (totalAvail < rem) {
+                window.showToast(`${item.productName} stok yetersiz! (Mevcut: ${totalAvail})`, 'error');
+                return;
+            }
+            for (const st of stockItems) {
+                if (rem <= 0) break;
+                const d = Math.min(rem, st.remaining_quantity);
+                st.remaining_quantity = parseFloat((st.remaining_quantity - d).toFixed(2));
+                rem = parseFloat((rem - d).toFixed(2));
+                await window.supabaseClient.from('stock').update({ remaining_quantity: st.remaining_quantity }).eq('id', st.id);
+            }
+        }
+        
+        const dist = {
+            id: crypto.randomUUID(),
+            receipt_number: 'PLAN-' + plan.id.slice(0,8).toUpperCase(),
+            member_id: plan.member_id,
+            celiac_name: plan.celiac_name,
+            distribution_date: new Date().toISOString().split('T')[0],
+            items: plan.items,
+            created_at: new Date().toISOString()
+        };
+        
+        await window.supabaseClient.from('distributions').insert(dist);
+        window.data.distributions.unshift(dist);
+        plan.status = 'delivered';
+        await window.supabaseClient.from('distribution_plans').update({ status: 'delivered' }).eq('id', planId);
+        
+        renderDistributionPlans();
+        if (typeof renderDistributions === 'function') renderDistributions();
+        window.showToast('Dağıtım teslim edildi ve stoktan düşüldü!', 'success');
+    }
+
+    // PLAN DÜZENLEME
+    function editDistributionPlan(id) {
+        if (!window.checkAdmin()) return;
+        const plan = window.data.distributionPlans.find(p => p.id === id);
+        if (!plan) return;
+        window.editingData = { type: 'distributionPlan', id };
+        
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        let itemsHtml = '';
+        plan.items.forEach((item, idx) => {
+            itemsHtml += `
+                <div class="distribution-item edit-plan-item" data-index="${idx}">
+                    <div class="form-row" style="flex:1">
+                        <select class="edit-plan-product" required>
+                            <option value="">Ürün seçiniz...</option>
+                            ${products.map(p => `<option value="${window.escapeHtml(p)}" ${p === item.productName ? 'selected' : ''}>${window.escapeHtml(p)}</option>`).join('')}
+                        </select>
+                        <input type="number" class="edit-plan-qty" step="0.01" placeholder="Miktar" value="${item.quantity}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+                </div>
+            `;
+        });
+        
+        const content = `
+            <div class="form-group"><label>Plan Tarihi</label><input type="date" id="edit_plan_date" value="${plan.planned_date}"></div>
+            <div class="form-group"><label>Notlar</label><input id="edit_plan_notes" value="${window.escapeHtml(plan.notes) || ''}"></div>
+            <div class="form-group"><label>Çölyaklı Adı</label><input id="edit_plan_celiac" value="${window.escapeHtml(plan.celiac_name)}"></div>
+            <div class="form-group"><label>Ürünler</label>
+                <div id="editPlanItems">${itemsHtml}</div>
+                <button type="button" class="btn btn-secondary btn-small" onclick="addEditPlanItem()" style="margin-top:0.5rem;"><i class="fas fa-plus"></i> Ürün Ekle</button>
+            </div>
+        `;
+        
+        document.getElementById('editModalTitle').innerHTML = 'Plan Düzenle';
+        document.getElementById('editModalBody').innerHTML = content;
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = savePlanEdit;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function addEditPlanItem() {
+        const container = document.getElementById('editPlanItems');
+        const products = [...new Set(window.data.stock.map(s => s.product_name))];
+        const div = document.createElement('div');
+        div.className = 'distribution-item edit-plan-item';
+        div.innerHTML = `
+            <div class="form-row" style="flex:1">
+                <select class="edit-plan-product" required>
+                    <option value="">Ürün seçiniz...</option>
+                    ${products.map(p => `<option value="${window.escapeHtml(p)}">${window.escapeHtml(p)}</option>`).join('')}
+                </select>
+                <input type="number" class="edit-plan-qty" step="0.01" placeholder="Miktar" required>
+            </div>
+            <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i> Sil</button>
+        `;
+        container.appendChild(div);
+    }
+
+    async function savePlanEdit() {
+        if (!window.checkAdmin()) return;
+        
+        const newItems = [];
+        document.querySelectorAll('#editPlanItems .edit-plan-item').forEach(item => {
+            const product = item.querySelector('.edit-plan-product')?.value;
+            const qty = parseFloat(item.querySelector('.edit-plan-qty')?.value);
+            if (product && qty > 0) {
+                const se = window.data.stock.find(s => s.product_name === product);
+                newItems.push({ productName: product, quantity: qty, unit: se ? se.unit : 'Adet' });
+            }
+        });
+        
+        if (newItems.length === 0) { window.showToast('En az bir ürün ekleyin', 'warning'); return; }
+        
+        const updates = {
+            planned_date: document.getElementById('edit_plan_date').value,
+            notes: document.getElementById('edit_plan_notes').value.trim() || null,
+            celiac_name: document.getElementById('edit_plan_celiac').value.trim(),
+            items: newItems
+        };
+        
+        const { error } = await window.supabaseClient.from('distribution_plans').update(updates).eq('id', window.editingData.id);
+        if (!error) {
+            const idx = window.data.distributionPlans.findIndex(p => p.id === window.editingData.id);
+            if (idx !== -1) Object.assign(window.data.distributionPlans[idx], updates);
+            renderDistributionPlans();
+            window.closeEditModal();
+            window.showToast('Plan güncellendi', 'success');
+        } else {
+            window.showToast('Plan güncellenemedi', 'error');
+        }
+    }
+
+    function confirmDeleteDistributionPlan(id) {
+        if (!window.checkAdmin()) return;
+        const plan = window.data.distributionPlans.find(p => p.id === id);
+        const member = plan ? window.data.members.find(m => m.id === plan.member_id) : null;
+        const label = member ? `${member.first_name} ${member.last_name} - ${plan.celiac_name}` : 'bu dağıtım planını';
+        window.showDeleteConfirm(`"${label}" dağıtım planını silmek istediğinizden emin misiniz?`, async () => {
+            const { error } = await window.supabaseClient.from('distribution_plans').delete().eq('id', id);
+            if (!error) {
+                window.data.distributionPlans = window.data.distributionPlans.filter(p => p.id !== id);
+                renderDistributionPlans();
+                window.showToast('Plan silindi', 'success');
+            }
+        });
+    }
+</script>

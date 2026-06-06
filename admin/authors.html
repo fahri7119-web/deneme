@@ -1,0 +1,119 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-users"></i> Yazarlar Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openAuthorModal()"><i class="fas fa-plus"></i> Yeni Yazar</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr style="background: var(--primary-bg);">
+                        <th>#</th><th>Ad Soyad</th><th>Unvan</th><th>E-posta</th><th>Makale Sayısı</th><th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="authorsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Yazar Modal -->
+    <div id="authorModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" id="authorModalTitle">Yeni Yazar</div>
+                <button class="modal-close" onclick="closeAuthorModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="authorModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAuthorModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveAuthor()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let authorsData = [];
+    let editingAuthorId = null;
+
+    function initAuthors() { loadAuthors(); }
+
+    async function loadAuthors() {
+        const { data, error } = await window.supabaseClient.from('authors').select('*').order('created_at', { ascending: false });
+        if (error) { window.showToast('Yazarlar yüklenemedi', 'error'); return; }
+        authorsData = data || [];
+        renderAuthors();
+    }
+
+    function renderAuthors() {
+        const tbody = document.getElementById('authorsTableBody');
+        if (!authorsData.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Yazar yok</td></tr>'; return; }
+        
+        // Makale sayılarını hesapla
+        const articleCounts = {};
+        if (window.data.articles) {
+            window.data.articles.forEach(a => { if (a.author_email) articleCounts[a.author_email] = (articleCounts[a.author_email] || 0) + 1; });
+        }
+        
+        tbody.innerHTML = authorsData.map((author, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><strong>${window.escapeHtml(author.name)}</strong></td>
+                <td>${window.escapeHtml(author.title) || '-'}</td>
+                <td>${window.escapeHtml(author.email) || '-'}</td>
+                <td>${articleCounts[author.email] || 0}</td>
+                <td class="admin-only">
+                    <button class="btn btn-secondary btn-small" onclick="editAuthor('${author.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-small" onclick="deleteAuthor('${author.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openAuthorModal() { editingAuthorId = null; renderAuthorForm({}); document.getElementById('authorModal').classList.add('active'); }
+    function editAuthor(id) { const author = authorsData.find(a => a.id === id); if (author) { editingAuthorId = id; renderAuthorForm(author); document.getElementById('authorModal').classList.add('active'); } }
+    
+    function renderAuthorForm(data) {
+        document.getElementById('authorModalBody').innerHTML = `
+            <div class="form-group"><label>Ad Soyad *</label><input type="text" id="author_name" class="form-control" value="${window.escapeHtml(data.name || '')}" required></div>
+            <div class="form-group"><label>Unvan</label><input type="text" id="author_title" class="form-control" value="${window.escapeHtml(data.title || '')}"></div>
+            <div class="form-group"><label>E-posta *</label><input type="email" id="author_email" class="form-control" value="${window.escapeHtml(data.email || '')}" required></div>
+            <div class="form-group"><label>Avatar (URL)</label><input type="url" id="author_avatar" class="form-control" value="${window.escapeHtml(data.avatar || '')}"></div>
+            <div class="form-group"><label>Biyografi</label><textarea id="author_bio" rows="4" class="form-control">${window.escapeHtml(data.bio || '')}</textarea></div>
+        `;
+    }
+
+    async function saveAuthor() {
+        const authorData = {
+            name: document.getElementById('author_name').value.trim(),
+            title: document.getElementById('author_title').value.trim() || null,
+            email: document.getElementById('author_email').value.trim(),
+            avatar: document.getElementById('author_avatar').value.trim() || null,
+            bio: document.getElementById('author_bio').value.trim() || null,
+            updated_at: new Date().toISOString()
+        };
+        if (!authorData.name) { window.showToast('Ad Soyad zorunludur', 'warning'); return; }
+        if (!authorData.email) { window.showToast('E-posta zorunludur', 'warning'); return; }
+        
+        let result;
+        if (editingAuthorId) result = await window.supabaseClient.from('authors').update(authorData).eq('id', editingAuthorId);
+        else { authorData.created_at = new Date().toISOString(); result = await window.supabaseClient.from('authors').insert([authorData]); }
+        
+        if (result.error) { window.showToast('Hata: ' + result.error.message, 'error'); return; }
+        window.showToast(editingAuthorId ? 'Yazar güncellendi' : 'Yazar eklendi', 'success');
+        closeAuthorModal();
+        loadAuthors();
+    }
+
+    async function deleteAuthor(id) {
+        window.showDeleteConfirm('Bu yazarı silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('authors').delete().eq('id', id);
+            if (error) { window.showToast('Hata: ' + error.message, 'error'); return; }
+            window.showToast('Yazar silindi', 'success');
+            loadAuthors();
+        });
+    }
+
+    function closeAuthorModal() { document.getElementById('authorModal').classList.remove('active'); }
+</script>

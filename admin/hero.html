@@ -1,0 +1,109 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-image"></i> Kapak (Hero) Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openHeroModal()"><i class="fas fa-plus"></i> Yeni Hero</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr style="background: var(--primary-bg);"><th>#</th><th>Başlık</th><th>Alt Başlık</th><th>Sıra</th><th>Durum</th><th>İşlemler</th></tr></thead>
+                <tbody id="heroTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="heroModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header"><div class="modal-title" id="heroModalTitle">Yeni Hero</div><button class="modal-close" onclick="closeHeroModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body" id="heroModalBody"></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeHeroModal()">İptal</button><button class="btn btn-primary" onclick="saveHero()">Kaydet</button></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let heroData = [];
+    let editingHeroId = null;
+
+    function initHero() { loadHero(); }
+
+    async function loadHero() {
+        const { data, error } = await window.supabaseClient.from('hero').select('*').order('order', { ascending: true });
+        if (error) { window.showToast('Hero yüklenemedi', 'error'); return; }
+        heroData = data || [];
+        renderHero();
+    }
+
+    function renderHero() {
+        const tbody = document.getElementById('heroTableBody');
+        if (!heroData.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Hero kaydı yok</td></tr>'; return; }
+        tbody.innerHTML = heroData.map((h, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><strong>${window.escapeHtml(h.title) || '-'}</strong></td>
+                <td>${window.escapeHtml(h.subtitle) || '-'}</td>
+                <td>${h.order || 0}</td>
+                <td>${h.is_active ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-red">Pasif</span>'}</td>
+                <td class="admin-only"><button class="btn btn-secondary btn-small" onclick="editHero('${h.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-small" onclick="deleteHero('${h.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function openHeroModal() { editingHeroId = null; renderHeroForm({}); document.getElementById('heroModal').classList.add('active'); }
+    function editHero(id) { const h = heroData.find(x => x.id === id); if (h) { editingHeroId = id; renderHeroForm(h); document.getElementById('heroModal').classList.add('active'); } }
+    
+    function renderHeroForm(data) {
+        document.getElementById('heroModalBody').innerHTML = `
+            <div class="form-group"><label>Başlık *</label><input type="text" id="hero_title" value="${window.escapeHtml(data.title || '')}" required></div>
+            <div class="form-group"><label>Alt Başlık</label><input type="text" id="hero_subtitle" value="${window.escapeHtml(data.subtitle || '')}"></div>
+            <div class="form-group"><label>Buton Metni</label><input type="text" id="hero_button_text" value="${window.escapeHtml(data.button_text || '')}"></div>
+            <div class="form-group"><label>Buton Linki</label><input type="url" id="hero_link" value="${window.escapeHtml(data.link || '')}"></div>
+            <div class="form-group"><label>Arka Plan Resmi (URL)</label><input type="url" id="hero_bg_image" value="${window.escapeHtml(data.bg_image || '')}"></div>
+            <div class="form-group"><label>Medya Türü</label><select id="hero_media_type"><option value="image" ${data.media_type === 'image' ? 'selected' : ''}>Resim</option><option value="video" ${data.media_type === 'video' ? 'selected' : ''}>Video</option></select></div>
+            <div class="form-group"><label>Video URL</label><input type="url" id="hero_video_url" value="${window.escapeHtml(data.video_url || '')}"></div>
+            <div class="form-group"><label>Video Kapak Resmi</label><input type="url" id="hero_video_poster" value="${window.escapeHtml(data.video_poster || '')}"></div>
+            <div class="form-group"><label>Detaylı Açıklama</label><textarea id="hero_full_description" rows="3">${window.escapeHtml(data.full_description || '')}</textarea></div>
+            <div class="form-row"><div class="form-group"><label>Sıralama</label><input type="number" id="hero_order" value="${data.order || 0}"></div></div>
+            <div class="form-group checkbox-row"><label><input type="checkbox" id="hero_is_active" ${data.is_active ? 'checked' : ''}> Aktif</label></div>
+        `;
+    }
+
+    async function saveHero() {
+        const heroItem = {
+            title: document.getElementById('hero_title').value.trim(),
+            subtitle: document.getElementById('hero_subtitle').value.trim() || null,
+            button_text: document.getElementById('hero_button_text').value.trim() || null,
+            link: document.getElementById('hero_link').value.trim() || null,
+            bg_image: document.getElementById('hero_bg_image').value.trim() || null,
+            media_type: document.getElementById('hero_media_type').value,
+            video_url: document.getElementById('hero_video_url').value.trim() || null,
+            video_poster: document.getElementById('hero_video_poster').value.trim() || null,
+            full_description: document.getElementById('hero_full_description').value.trim() || null,
+            order: parseInt(document.getElementById('hero_order').value) || 0,
+            is_active: document.getElementById('hero_is_active').checked,
+            updated_at: new Date().toISOString()
+        };
+        if (!heroItem.title) { window.showToast('Başlık zorunludur', 'warning'); return; }
+        
+        let result;
+        if (editingHeroId) result = await window.supabaseClient.from('hero').update(heroItem).eq('id', editingHeroId);
+        else { heroItem.created_at = new Date().toISOString(); result = await window.supabaseClient.from('hero').insert([heroItem]); }
+        
+        if (result.error) { window.showToast('Hata: ' + result.error.message, 'error'); return; }
+        window.showToast(editingHeroId ? 'Hero güncellendi' : 'Hero eklendi', 'success');
+        closeHeroModal();
+        loadHero();
+    }
+
+    async function deleteHero(id) {
+        window.showDeleteConfirm('Bu hero kaydını silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('hero').delete().eq('id', id);
+            if (error) { window.showToast('Hata: ' + error.message, 'error'); return; }
+            window.showToast('Hero silindi', 'success');
+            loadHero();
+        });
+    }
+
+    function closeHeroModal() { document.getElementById('heroModal').classList.remove('active'); }
+</script>

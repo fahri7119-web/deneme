@@ -1,0 +1,347 @@
+<div class="page-content">
+    <div class="form-card admin-only">
+        <div class="form-header"><i class="fas fa-user-plus"></i> Yeni Üye Kaydı</div>
+        <div class="form-body">
+            <form id="memberForm" onsubmit="addMember(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Ad *</label><input type="text" id="first_name" required></div>
+                    <div class="form-group"><label>Soyad *</label><input type="text" id="last_name" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>TC Kimlik No (11 Hane) *</label><input type="text" id="tc_id" maxlength="11" required></div>
+                    <div class="form-group"><label>Telefon</label><input type="text" id="phone" placeholder="05xx xxx xxxx"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Üyelik Türü *</label>
+                        <select id="member_type" required>
+                            <option value="asil">Asıl Üye</option>
+                            <option value="kurucu">Kurucu Üye</option>
+                            <option value="onursal">Onursal Üye</option>
+                            <option value="degil">Üye Değil (İletişime Geçen)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Meslek</label><input type="text" id="profession"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Doğum Tarihi</label><input type="date" id="birth_date"></div>
+                    <div class="form-group"><label>Üyelik Tarihi</label><input type="date" id="membership_date"></div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                        <label style="font-weight:600;">Çölyaklı Bireyler</label>
+                        <button type="button" class="btn btn-info btn-small" onclick="addCeliacField()"><i class="fas fa-plus"></i> Çölyaklı Ekle</button>
+                    </div>
+                    <div id="celiacListContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Açıklama / Notlar</label>
+                    <textarea id="member_description" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Üyeyi Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: flex; gap: 0.5rem; flex-wrap: wrap;" id="memberTypeFilter">
+            <button class="btn btn-small btn-primary" onclick="setMemberFilter('all')">Tümü</button>
+            <button class="btn btn-small btn-secondary" onclick="setMemberFilter('asil')">Asıl</button>
+            <button class="btn btn-small btn-secondary" onclick="setMemberFilter('kurucu')">Kurucu</button>
+            <button class="btn btn-small btn-secondary" onclick="setMemberFilter('onursal')">Onursal</button>
+            <button class="btn btn-small btn-secondary" onclick="setMemberFilter('degil')">Üye Değil</button>
+            <button class="btn btn-small btn-secondary" onclick="setMemberFilter('passive')">Pasifler</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ad Soyad / TC / Tel</th>
+                    <th>Tür</th>
+                    <th>Tarihler</th>
+                    <th>Meslek</th>
+                    <th>Çölyaklılar</th>
+                    <th>Açıklama</th>
+                    <th class="admin-only">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="membersTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let memberFilter = 'all';
+
+    function initMembers() {
+        renderMembers();
+    }
+
+    function setMemberFilter(type) {
+        memberFilter = type;
+        document.querySelectorAll('#memberTypeFilter button').forEach(btn => {
+            const isMatch = btn.getAttribute('onclick').includes(`'${type}'`);
+            btn.className = `btn btn-small ${isMatch ? 'btn-primary' : 'btn-secondary'}`;
+        });
+        renderMembers();
+    }
+
+    function addCeliacField() {
+        const container = document.getElementById('celiacListContainer');
+        const div = document.createElement('div');
+        div.className = 'celiac-card';
+        div.innerHTML = `
+            <button type="button" class="remove-celiac" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            <div class="form-row">
+                <div class="form-group"><label>Ad</label><input type="text" name="cel_name" required></div>
+                <div class="form-group"><label>Soyad</label><input type="text" name="cel_surname" required></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Yakınlık</label>
+                    <select name="cel_relation">
+                        <option value="Kendisi">Kendisi</option>
+                        <option value="Eşi">Eşi</option>
+                        <option value="Çocuğu">Çocuğu</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Notlar</label><input type="text" name="cel_desc"></div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    async function addMember(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+
+        const celiacs = [];
+        document.querySelectorAll('#celiacListContainer .celiac-card').forEach(card => {
+            const name = card.querySelector('[name="cel_name"]').value.trim();
+            const surname = card.querySelector('[name="cel_surname"]').value.trim();
+            if (name && surname) {
+                celiacs.push({
+                    name, surname,
+                    relation: card.querySelector('[name="cel_relation"]').value,
+                    description: card.querySelector('[name="cel_desc"]').value.trim()
+                });
+            }
+        });
+
+        const member = {
+            id: crypto.randomUUID(),
+            first_name: document.getElementById('first_name').value.trim(),
+            last_name: document.getElementById('last_name').value.trim(),
+            tc_id: document.getElementById('tc_id').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            member_type: document.getElementById('member_type').value,
+            profession: document.getElementById('profession').value.trim(),
+            birth_date: document.getElementById('birth_date').value || null,
+            membership_date: document.getElementById('membership_date').value || null,
+            celiacs,
+            description: document.getElementById('member_description').value.trim(),
+            created_at: new Date().toISOString()
+        };
+
+        const { error } = await window.supabaseClient.from('members').insert(member);
+        if (!error) {
+            window.data.members.unshift(member);
+            document.getElementById('memberForm').reset();
+            document.getElementById('celiacListContainer').innerHTML = '';
+            renderMembers();
+            window.showToast('Üye kaydedildi', 'success');
+        } else {
+            window.showToast('Hata: ' + error.message, 'error');
+        }
+    }
+
+    function renderMembers() {
+        let filtered = [...window.data.members];
+        if (memberFilter === 'passive') {
+            filtered = filtered.filter(m => m.is_passive === true || m.is_passive === 1);
+        } else if (memberFilter !== 'all') {
+            filtered = filtered.filter(m => m.member_type === memberFilter && !m.is_passive);
+        } else {
+            filtered = filtered.filter(m => !m.is_passive);
+        }
+
+        const tbody = document.getElementById('membersTableBody');
+        const typeMap = { asil: 'Asıl', kurucu: 'Kurucu', onursal: 'Onursal', degil: 'Üye Değil' };
+
+        tbody.innerHTML = filtered.map((m, idx) => `
+            <tr style="${m.is_passive ? 'background:#fef2f2;' : ''}">
+                <td>${idx + 1}</td>
+                <td>
+                    <strong>${window.escapeHtml(m.first_name)} ${window.escapeHtml(m.last_name)}</strong>
+                    ${m.is_passive ? '<br><span class="badge badge-red">Pasif</span>' : ''}
+                    <br><small>${m.tc_id || '-'}</small>
+                    <br><small>${m.phone || '-'}</small>
+                </td>
+                <td><span class="badge badge-purple">${typeMap[m.member_type] || m.member_type}</span></td>
+                <td>
+                    <small>D: ${window.formatDateTR(m.birth_date)}</small><br>
+                    <small>Ü: ${window.formatDateTR(m.membership_date)}</small>
+                </td>
+                <td>${window.escapeHtml(m.profession) || '-'}</td>
+                <td>${(m.celiacs || []).map(c => `<span class="celiac-tag">${c.name} ${c.surname}</span>`).join(' ')}</td>
+                <td><small>${window.escapeHtml(m.description) || '-'}</small></td>
+                <td class="admin-only">
+                    ${m.is_passive ? 
+                        `<button class="btn btn-success btn-small" onclick="togglePassive('${m.id}', false)"><i class="fas fa-user-check"></i> Aktif Et</button>` :
+                        `<button class="btn btn-info btn-small" onclick="viewMember('${m.id}')"><i class="fas fa-eye"></i></button>
+                         <button class="btn btn-secondary btn-small" onclick="editMember('${m.id}')"><i class="fas fa-edit"></i></button>`
+                    }
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function togglePassive(id, status) {
+        if (!window.checkAdmin()) return;
+        const { error } = await window.supabaseClient.from('members').update({ is_passive: status }).eq('id', id);
+        if (!error) {
+            const m = window.data.members.find(x => x.id === id);
+            if (m) m.is_passive = status;
+            renderMembers();
+            window.showToast(status ? 'Üye pasif yapıldı' : 'Üye aktif edildi', 'success');
+        }
+    }
+
+    function viewMember(id) {
+        const m = window.data.members.find(x => x.id === id);
+        if (!m) return;
+        const body = `
+            <div class="member-detail-card">
+                <p><strong>Ad Soyad:</strong> ${m.first_name} ${m.last_name}</p>
+                <p><strong>TC No:</strong> ${m.tc_id}</p>
+                <p><strong>Telefon:</strong> ${m.phone || '-'}</p>
+                <p><strong>Üyelik:</strong> ${m.member_type}</p>
+                <p><strong>Çölyaklılar:</strong></p>
+                <ul>${(m.celiacs || []).map(c => `<li>${c.name} ${c.surname} (${c.relation}) - ${c.description || ''}</li>`).join('')}</ul>
+                <p><strong>Notlar:</strong> ${m.description || '-'}</p>
+            </div>
+            <div style="margin-top:1rem;">
+                <button class="btn btn-danger btn-small" onclick="confirmDeleteMember('${m.id}')"><i class="fas fa-trash"></i> Üyeyi Tamamen Sil</button>
+                <button class="btn btn-warning btn-small" onclick="togglePassive('${m.id}', true); window.closeEditModal();"><i class="fas fa-user-slash"></i> Üyeyi Pasif Yap</button>
+            </div>
+        `;
+        document.getElementById('editModalTitle').textContent = 'Üye Detayı';
+        document.getElementById('editModalBody').innerHTML = body;
+        document.getElementById('saveEditBtn').style.display = 'none';
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function confirmDeleteMember(id) {
+        window.showDeleteConfirm('Bu üyeyi ve tüm verilerini silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('members').delete().eq('id', id);
+            if (!error) {
+                window.data.members = window.data.members.filter(x => x.id !== id);
+                renderMembers();
+                window.closeEditModal();
+                window.showToast('Üye silindi', 'success');
+            }
+        });
+    }
+
+    function editMember(id) {
+        const m = window.data.members.find(x => x.id === id);
+        if (!m) return;
+        window.editingData = { type: 'member', id: m.id };
+        
+        let celiacsHtml = '';
+        (m.celiacs || []).forEach((c, i) => {
+            celiacsHtml += `
+                <div class="celiac-card edit-celiac-card">
+                    <button type="button" class="remove-celiac" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                    <div class="form-row">
+                        <div class="form-group"><label>Ad</label><input type="text" class="edit-cel-name" value="${c.name}" required></div>
+                        <div class="form-group"><label>Soyad</label><input type="text" class="edit-cel-surname" value="${c.surname}" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Yakınlık</label>
+                            <select class="edit-cel-relation">
+                                <option value="Kendisi" ${c.relation === 'Kendisi' ? 'selected' : ''}>Kendisi</option>
+                                <option value="Eşi" ${c.relation === 'Eşi' ? 'selected' : ''}>Eşi</option>
+                                <option value="Çocuğu" ${c.relation === 'Çocuğu' ? 'selected' : ''}>Çocuğu</option>
+                                <option value="Diğer" ${c.relation === 'Diğer' ? 'selected' : ''}>Diğer</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Notlar</label><input type="text" class="edit-cel-desc" value="${c.description || ''}"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        const body = `
+            <div class="form-row">
+                <div class="form-group"><label>Ad</label><input type="text" id="edit_first_name" value="${m.first_name}"></div>
+                <div class="form-group"><label>Soyad</label><input type="text" id="edit_last_name" value="${m.last_name}"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>TC No</label><input type="text" id="edit_tc_id" value="${m.tc_id}"></div>
+                <div class="form-group"><label>Tel</label><input type="text" id="edit_phone" value="${m.phone || ''}"></div>
+            </div>
+            <div id="editCeliacContainer">${celiacsHtml}</div>
+            <button type="button" class="btn btn-info btn-small" onclick="addEditCeliacField()"><i class="fas fa-plus"></i> Çölyaklı Ekle</button>
+        `;
+        
+        document.getElementById('editModalTitle').textContent = 'Üye Düzenle';
+        document.getElementById('editModalBody').innerHTML = body;
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = saveMemberEdit;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function addEditCeliacField() {
+        const container = document.getElementById('editCeliacContainer');
+        const div = document.createElement('div');
+        div.className = 'celiac-card edit-celiac-card';
+        div.innerHTML = `
+            <button type="button" class="remove-celiac" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            <div class="form-row">
+                <div class="form-group"><label>Ad</label><input type="text" class="edit-cel-name" required></div>
+                <div class="form-group"><label>Soyad</label><input type="text" class="edit-cel-surname" required></div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    async function saveMemberEdit() {
+        if (!window.checkAdmin()) return;
+        const id = window.editingData.id;
+        const celiacs = [];
+        document.querySelectorAll('.edit-celiac-card').forEach(card => {
+            const name = card.querySelector('.edit-cel-name').value.trim();
+            const surname = card.querySelector('.edit-cel-surname').value.trim();
+            if (name && surname) {
+                celiacs.push({
+                    name, surname,
+                    relation: card.querySelector('.edit-cel-relation')?.value || 'Diğer',
+                    description: card.querySelector('.edit-cel-desc')?.value || ''
+                });
+            }
+        });
+
+        const updates = {
+            first_name: document.getElementById('edit_first_name').value.trim(),
+            last_name: document.getElementById('edit_last_name').value.trim(),
+            tc_id: document.getElementById('edit_tc_id').value.trim(),
+            phone: document.getElementById('edit_phone').value.trim(),
+            celiacs
+        };
+
+        const { error } = await window.supabaseClient.from('members').update(updates).eq('id', id);
+        if (!error) {
+            const idx = window.data.members.findIndex(x => x.id === id);
+            if (idx !== -1) Object.assign(window.data.members[idx], updates);
+            renderMembers();
+            window.closeEditModal();
+            window.showToast('Üye güncellendi', 'success');
+        }
+    }
+</script>

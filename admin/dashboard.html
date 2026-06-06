@@ -1,0 +1,95 @@
+<div class="page-content">
+    <div class="summary-cards" id="dashboardCards"></div>
+
+    <div style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--gray-700);"><i class="fas fa-bolt"></i> Hızlı İşlemler</h3>
+        <div class="quick-actions">
+            <button class="btn btn-primary admin-only" onclick="window.navigateTo('members')"><i class="fas fa-user-plus"></i> Üye Ekle</button>
+            <button class="btn btn-info admin-only" onclick="window.navigateTo('stock')"><i class="fas fa-plus-circle"></i> Stok Giriş</button>
+            <button class="btn btn-warning admin-only" onclick="window.navigateTo('distribution')"><i class="fas fa-hand-holding-heart"></i> Dağıtım</button>
+            <button class="btn btn-primary admin-only" onclick="window.navigateTo('financial')"><i class="fas fa-money-bill-wave"></i> Finansal İşlem</button>
+            <button class="btn btn-secondary admin-only" onclick="window.navigateTo('distribution_plan')"><i class="fas fa-clipboard-list"></i> Dağıtım Planı</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initDashboard() {
+        updateDashboard();
+    }
+
+    function updateDashboard() {
+        const { families } = window.buildFamiliesRobust();
+        const totalFamilies = families.length;
+        const familiesWithCeliac = families.filter(f => f.type === 'family').length;
+        const totalCeliacsCount = families.reduce((sum, f) => sum + f.celiacPatients.length, 0);
+        
+        const activeMembers = window.data.members.filter(m => !(m.is_passive === true || m.is_passive === 1 || m.is_passive === 'true'));
+        const totalMembers = activeMembers.length;
+        const kurucu = activeMembers.filter(m => m.member_type === 'kurucu').length;
+        const asil = activeMembers.filter(m => m.member_type === 'asil').length;
+        const onursal = activeMembers.filter(m => m.member_type === 'onursal').length;
+        const uyeDegil = activeMembers.filter(m => m.member_type === 'degil').length;
+
+        // Aktif Ürünler (FIFO ile kalan stok)
+        const fifoMap = window.computeFifoRemaining();
+        const activeMap = new Map();
+        window.data.stock.forEach(s => {
+            const computed = fifoMap[s.id];
+            const rem = computed ? computed._computed_remaining : s.remaining_quantity;
+            if (rem > 0) {
+                activeMap.set(s.product_name, (activeMap.get(s.product_name) || 0) + rem);
+            }
+        });
+        const totalActiveQty = Array.from(activeMap.values()).reduce((a, b) => a + b, 0);
+
+        // Dağıtılan Ürünler
+        const distMap = new Map();
+        window.data.distributions.forEach(d => {
+            (d.items || []).forEach(i => {
+                distMap.set(i.productName, (distMap.get(i.productName) || 0) + i.quantity);
+            });
+        });
+        const totalDistQty = Array.from(distMap.values()).reduce((a, b) => a + b, 0);
+
+        // Planlanan Dağıtım
+        const plannedItems = window.data.distributionPlans.filter(p => p.status === 'planned');
+        const planMap = new Map();
+        plannedItems.forEach(p => {
+            (p.items || []).forEach(i => {
+                planMap.set(i.productName, (planMap.get(i.productName) || 0) + i.quantity);
+            });
+        });
+        const totalPlanQty = Array.from(planMap.values()).reduce((a, b) => a + b, 0);
+
+        // Finansal (Transferler hariç)
+        const isTransfer = (r) => {
+            const desc = (r.description || '').toLowerCase();
+            return desc.includes('[transfer]') || desc.includes('kasa banka') || desc.includes('banka kasa');
+        };
+        const inc = window.data.financial.filter(r => r.type === 'Gelir' && !isTransfer(r)).reduce((s, r) => s + r.amount, 0);
+        const exp = window.data.financial.filter(r => r.type === 'Gider' && !isTransfer(r)).reduce((s, r) => s + r.amount, 0);
+        const balance = inc - exp;
+
+        const dashboardCards = [
+            { title: 'Toplam Kayıt', value: totalMembers, icon: 'fa-database', color: '#10b981', sub: `K:${kurucu} | A:${asil} | O:${onursal} | D:${uyeDegil}` },
+            { title: 'Toplam Aile', value: totalFamilies, icon: 'fa-home', color: '#3b82f6' },
+            { title: 'Çölyaklı Aile', value: familiesWithCeliac, icon: 'fa-hospital-user', color: '#f43f5e' },
+            { title: 'Çölyaklı Sayısı', value: totalCeliacsCount, icon: 'fa-heartbeat', color: '#ec4899' },
+            { title: 'Aktif Ürünler', value: totalActiveQty.toLocaleString('tr-TR'), icon: 'fa-boxes', color: '#f59e0b' },
+            { title: 'Dağıtılan Ürünler', value: totalDistQty.toLocaleString('tr-TR'), icon: 'fa-truck', color: '#06b6d4' },
+            { title: 'Planlanan Dağıtım', value: totalPlanQty.toLocaleString('tr-TR'), icon: 'fa-clipboard-list', color: '#8b5cf6', sub: `${plannedItems.length} plan` },
+            { title: 'Toplam Gelir', value: inc.toLocaleString('tr-TR') + ' ₺', icon: 'fa-chart-line', color: '#10b981' },
+            { title: 'Toplam Gider', value: exp.toLocaleString('tr-TR') + ' ₺', icon: 'fa-chart-line', color: '#ef4444' },
+            { title: 'Genel Bakiye', value: balance.toLocaleString('tr-TR') + ' ₺', icon: 'fa-wallet', color: balance >= 0 ? '#10b981' : '#ef4444' }
+        ];
+
+        document.getElementById('dashboardCards').innerHTML = dashboardCards.map(c => `
+            <div class="card">
+                <div class="card-header" style="color: ${c.color}"><i class="fas ${c.icon}"></i> ${c.title}</div>
+                <div class="card-value">${c.value}</div>
+                ${c.sub ? `<div class="small-stats">${c.sub}</div>` : ''}
+            </div>
+        `).join('');
+    }
+</script>

@@ -1,0 +1,501 @@
+<div class="page-content">
+    <!-- Transfer Toplamları Kartı -->
+    <div style="margin-bottom:1.5rem; padding:1rem 1.25rem; background:#eff6ff; border-radius:var(--radius-md); border:1px solid #bfdbfe;">
+        <h3 style="margin-bottom:0.75rem; color:#1d4ed8; display:flex; align-items:center; gap:0.5rem; font-size:1rem;">
+            <i class="fas fa-exchange-alt"></i> Transferler 
+            <small style="font-size:0.7rem; font-weight:400; color:#6b7280; margin-left:0.5rem;">(Bilgi amaçlı, bakiyelere dahildir)</small>
+        </h3>
+        <div class="financial-summary" style="margin:0;">
+            <div class="summary-box" style="border-left:4px solid #3b82f6;">
+                <div class="summary-label">🏦 Banka → 🧾 Kasa<br><small style="font-size:0.7rem;color:#6b7280;">Bankadan nakit çekildi</small></div>
+                <div class="summary-value" id="transferBankaKasa" style="font-size:1.4rem; color:#1d4ed8;">0 ₺</div>
+            </div>
+            <div class="summary-box" style="border-left:4px solid #8b5cf6;">
+                <div class="summary-label">🧾 Kasa → 🏦 Banka<br><small style="font-size:0.7rem;color:#6b7280;">Nakit bankaya yatırıldı</small></div>
+                <div class="summary-value" id="transferKasaBanka" style="font-size:1.4rem; color:#6d28d9;">0 ₺</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banka ve Kasa Bakiyesi Kartları -->
+    <div style="margin-bottom:1.5rem;">
+        <h3 style="margin-bottom:0.75rem; color:var(--gray-700); display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-university"></i> Ödeme Yöntemine Göre Bakiyeler
+            <small style="font-size:0.7rem; font-weight:400; color:var(--gray-500); margin-left:0.5rem;">(Transferler DAHİLDİR)</small>
+        </h3>
+        <div class="financial-summary">
+            <div class="summary-box" style="border-left:4px solid var(--secondary);">
+                <div class="summary-label"><i class="fas fa-university"></i> Banka Bakiyesi</div>
+                <div class="summary-value" id="bankBalanceCard" style="font-size:1.6rem;">0 ₺</div>
+                <div class="small-stats" id="bankDetail">Gelir: 0 ₺ | Gider: 0 ₺</div>
+            </div>
+            <div class="summary-box" style="border-left:4px solid var(--warning);">
+                <div class="summary-label"><i class="fas fa-wallet"></i> Kasa Bakiyesi</div>
+                <div class="summary-value" id="kasaBalanceCard" style="font-size:1.6rem;">0 ₺</div>
+                <div class="small-stats" id="kasaDetail">Gelir: 0 ₺ | Gider: 0 ₺</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Genel Gelir/Gider Özeti -->
+    <div style="margin-bottom:1.5rem;">
+        <h3 id="financialSummaryTitle" style="margin-bottom:0.75rem; color:var(--primary-dark); display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-chart-line"></i> Dönem Özeti 
+            <small style="font-size:0.7rem; font-weight:400; color:var(--gray-500); margin-left:0.5rem;">(Transferler HARİÇTİR)</small>
+        </h3>
+        <div class="financial-summary">
+            <div class="summary-box" style="border-left:4px solid var(--primary);">
+                <div class="summary-label">Toplam Gelir</div>
+                <div class="summary-value" id="totalIncome">0 ₺</div>
+            </div>
+            <div class="summary-box" style="border-left:4px solid var(--danger);">
+                <div class="summary-label">Toplam Gider</div>
+                <div class="summary-value" id="totalExpense">0 ₺</div>
+            </div>
+            <div class="summary-box" style="border-left:4px solid var(--gray-800);">
+                <div class="summary-label">Net Bakiye</div>
+                <div class="summary-value" id="netBalance">0 ₺</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yeni Kayıt Formu -->
+    <div class="form-card admin-only">
+        <div class="form-header"><i class="fas fa-plus-circle"></i> Yeni Kayıt</div>
+        <div class="form-body">
+            <form id="financialForm" onsubmit="addFinancial(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Tarih *</label><input type="date" id="date" required></div>
+                    <div class="form-group"><label>Tür *</label><select id="type" required onchange="updateIncomeExpenseCategories()"><option value="Gelir">📈 Gelir</option><option value="Gider">📉 Gider</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" id="income_type_group" style="display:block;">
+                        <label>Gelir Türü</label>
+                        <select id="income_type">
+                            <option value="">Seçiniz...</option>
+                            <option value="Aidat">💰 Aidat</option>
+                            <option value="Bağış">🎁 Bağış</option>
+                            <option value="Transfer">🔄 Transfer</option>
+                            <option value="Diğer">📌 Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="expense_type_group" style="display:none;">
+                        <label>Gider Türü</label>
+                        <select id="expense_type">
+                            <option value="">Seçiniz...</option>
+                            <option value="Faaliyet">🏢 Faaliyet</option>
+                            <option value="Proje">📋 Proje</option>
+                            <option value="Gıda Alımı">🍎 Gıda Alımı</option>
+                            <option value="Kırtasiye">📝 Kırtasiye</option>
+                            <option value="Hizmet">🔧 Hizmet</option>
+                            <option value="Transfer">🔄 Transfer</option>
+                            <option value="Banka Hizmetleri">🏦 Banka Hizmetleri</option>
+                            <option value="Diğer">📌 Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Ödeme Yöntemi *</label><select id="payment_method" required><option value="">Seçiniz...</option><option value="Banka">🏦 Banka</option><option value="Makbuz">🧾 Makbuz / Elden</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Ödemeyi Yapan Kişi *</label><input type="text" id="payer_name" required placeholder="Ad Soyad"></div>
+                    <div class="form-group"><label>Tutar (₺) *</label><input type="number" id="amount" step="0.01" required></div>
+                </div>
+                <div class="form-group"><label>Açıklama *</label><textarea id="financial_description" required></textarea></div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Kayıt Ekle</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transfer Formu -->
+    <div class="form-card admin-only" style="margin-top:1rem;">
+        <div class="form-header"><i class="fas fa-exchange-alt"></i> Kategoriler Arası Transfer</div>
+        <div class="form-body">
+            <form id="transferForm" onsubmit="addTransfer(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Transfer Yönü *</label><select id="transfer_direction" required><option value="">Seçiniz...</option><option value="BankaToKasa">🏦 Banka → 🧾 Kasa</option><option value="KasaToBanka">🧾 Kasa → 🏦 Banka</option></select></div>
+                    <div class="form-group"><label>Tarih *</label><input type="date" id="transfer_date" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>İşlemi Yapan Kişi *</label><input type="text" id="transfer_payer" required placeholder="Ad Soyad"></div>
+                    <div class="form-group"><label>Tutar (₺) *</label><input type="number" id="transfer_amount" step="0.01" required></div>
+                </div>
+                <div class="form-group"><label>Açıklama</label><textarea id="transfer_description" placeholder="Transfer açıklaması..."></textarea></div>
+                <button type="submit" class="btn btn-warning btn-block"><i class="fas fa-exchange-alt"></i> Transfer Yap</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem; align-items:flex-end;">
+        <div class="form-group" style="margin:0; min-width:140px;"><label style="font-size:0.8rem;">Tür</label><select id="finFilterType" onchange="renderFinancial()"><option value="">Tümü</option><option value="Gelir">Gelir</option><option value="Gider">Gider</option></select></div>
+        <div class="form-group" style="margin:0; min-width:140px;"><label style="font-size:0.8rem;">Gelir Türü</label><select id="finFilterIncomeType" onchange="renderFinancial()"><option value="">Tümü</option><option value="Aidat">Aidat</option><option value="Bağış">Bağış</option><option value="Transfer">Transfer</option><option value="Diğer">Diğer</option></select></div>
+        <div class="form-group" style="margin:0; min-width:140px;"><label style="font-size:0.8rem;">Gider Türü</label><select id="finFilterExpenseType" onchange="renderFinancial()"><option value="">Tümü</option><option value="Faaliyet">Faaliyet</option><option value="Proje">Proje</option><option value="Gıda Alımı">Gıda Alımı</option><option value="Kırtasiye">Kırtasiye</option><option value="Hizmet">Hizmet</option><option value="Transfer">Transfer</option><option value="Banka Hizmetleri">Banka Hizmetleri</option><option value="Diğer">Diğer</option></select></div>
+        <div class="form-group" style="margin:0; min-width:180px;"><label style="font-size:0.8rem;">Ödeme Yöntemi</label><select id="finFilterMethod" onchange="renderFinancial()"><option value="">Tümü</option><option value="Banka">Banka</option><option value="Makbuz">Makbuz / Elden</option></select></div>
+        <div class="form-group" style="margin:0; min-width:140px;"><label style="font-size:0.8rem;">Başlangıç</label><input type="date" id="finFilterDateFrom" onchange="renderFinancial()"></div>
+        <div class="form-group" style="margin:0; min-width:140px;"><label style="font-size:0.8rem;">Bitiş</label><input type="date" id="finFilterDateTo" onchange="renderFinancial()"></div>
+        <button class="btn btn-secondary btn-small" onclick="clearFinancialFilters()"><i class="fas fa-times"></i> Temizle</button>
+    </div>
+
+    <!-- Finansal Kayıtlar Tablosu -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>#</th><th>Tarih</th><th>Tür</th><th>Gelir Türü</th><th>Gider Türü</th><th>Ödeme Yöntemi</th><th>Ödemeyi Yapan</th><th>Açıklama</th><th>Tutar</th><th class="admin-only">İşlemler</th></tr>
+            </thead>
+            <tbody id="financialTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function initFinancial() {
+        document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('transfer_date').valueAsDate = new Date();
+        updateIncomeExpenseCategories();
+        renderFinancial();
+    }
+
+    function updateIncomeExpenseCategories() {
+        const type = document.getElementById('type').value;
+        const incomeGroup = document.getElementById('income_type_group');
+        const expenseGroup = document.getElementById('expense_type_group');
+        
+        if (type === 'Gelir') {
+            incomeGroup.style.display = 'block';
+            expenseGroup.style.display = 'none';
+        } else {
+            incomeGroup.style.display = 'none';
+            expenseGroup.style.display = 'block';
+        }
+    }
+
+    async function addFinancial(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+        
+        const type = document.getElementById('type').value;
+        const incomeType = type === 'Gelir' ? document.getElementById('income_type').value : null;
+        const expenseType = type === 'Gider' ? document.getElementById('expense_type').value : null;
+        
+        const rec = {
+            id: crypto.randomUUID(),
+            date: document.getElementById('date').value,
+            type: type,
+            income_type: incomeType,
+            expense_type: expenseType,
+            payment_method: document.getElementById('payment_method').value,
+            payer_name: document.getElementById('payer_name').value.trim(),
+            description: document.getElementById('financial_description').value.trim(),
+            amount: parseFloat(document.getElementById('amount').value),
+            created_at: new Date().toISOString()
+        };
+        
+        const { error } = await window.supabaseClient.from('financial').insert(rec);
+        if (!error) {
+            window.data.financial.unshift(rec);
+            renderFinancial();
+            document.getElementById('financialForm').reset();
+            document.getElementById('date').valueAsDate = new Date();
+            updateIncomeExpenseCategories();
+            window.showToast('Kayıt eklendi', 'success');
+        } else {
+            window.showToast('Hata: ' + error.message, 'error');
+        }
+    }
+
+    async function addTransfer(e) {
+        e.preventDefault();
+        if (!window.checkAdmin()) return;
+        
+        const dir = document.getElementById('transfer_direction').value;
+        const amount = parseFloat(document.getElementById('transfer_amount').value);
+        const tDate = document.getElementById('transfer_date').value;
+        const payer = document.getElementById('transfer_payer').value.trim();
+        const desc = document.getElementById('transfer_description').value.trim() || 'Kategoriler arası transfer';
+        
+        if (!dir || !amount || amount <= 0 || !tDate || !payer) {
+            window.showToast('Lütfen tüm alanları doldurun', 'warning');
+            return;
+        }
+        
+        let fromMethod, toMethod, fromLabel, toLabel;
+        if (dir === 'BankaToKasa') {
+            fromMethod = 'Banka';
+            toMethod = 'Makbuz';
+            fromLabel = 'Banka→Kasa Transfer';
+            toLabel = 'Banka→Kasa Transfer';
+        } else {
+            fromMethod = 'Makbuz';
+            toMethod = 'Banka';
+            fromLabel = 'Kasa→Banka Transfer';
+            toLabel = 'Kasa→Banka Transfer';
+        }
+        
+        const recOut = {
+            id: crypto.randomUUID(),
+            date: tDate,
+            type: 'Gider',
+            payment_method: fromMethod,
+            payer_name: payer,
+            description: `[TRANSFER] ${fromLabel}: ${desc}`,
+            amount: amount,
+            created_at: new Date().toISOString()
+        };
+        
+        const recIn = {
+            id: crypto.randomUUID(),
+            date: tDate,
+            type: 'Gelir',
+            payment_method: toMethod,
+            payer_name: payer,
+            description: `[TRANSFER] ${toLabel}: ${desc}`,
+            amount: amount,
+            created_at: new Date().toISOString()
+        };
+        
+        const { error: e1 } = await window.supabaseClient.from('financial').insert(recOut);
+        const { error: e2 } = await window.supabaseClient.from('financial').insert(recIn);
+        
+        if (!e1 && !e2) {
+            window.data.financial.unshift(recIn, recOut);
+            renderFinancial();
+            document.getElementById('transferForm').reset();
+            document.getElementById('transfer_date').valueAsDate = new Date();
+            window.showToast('Transfer başarıyla kaydedildi', 'success');
+        } else {
+            window.showToast('Transfer hatası', 'error');
+        }
+    }
+
+    // Transfer kaydı kontrolü
+    function isTransferRecord(record) {
+        return (record.description || '').includes('[TRANSFER]');
+    }
+
+    function renderFinancial() {
+        // Filtre değerlerini al
+        const typeFilter = document.getElementById('finFilterType')?.value || '';
+        const incomeTypeFilter = document.getElementById('finFilterIncomeType')?.value || '';
+        const expenseTypeFilter = document.getElementById('finFilterExpenseType')?.value || '';
+        const methodFilter = document.getElementById('finFilterMethod')?.value || '';
+        const dateFrom = document.getElementById('finFilterDateFrom')?.value || '';
+        const dateTo = document.getElementById('finFilterDateTo')?.value || '';
+        
+        // Tüm kayıtları tarihe göre sırala
+        const allRecords = [...window.data.financial].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Filtre uygula
+        const filteredForTable = allRecords.filter(r => {
+            if (typeFilter && r.type !== typeFilter) return false;
+            if (typeFilter === 'Gelir' && incomeTypeFilter && r.income_type !== incomeTypeFilter) return false;
+            if (typeFilter === 'Gider' && expenseTypeFilter && r.expense_type !== expenseTypeFilter) return false;
+            if (methodFilter && r.payment_method !== methodFilter) return false;
+            if (dateFrom && r.date < dateFrom) return false;
+            if (dateTo && r.date > dateTo) return false;
+            return true;
+        });
+        
+        // Tablo gösterimi
+        const tbody = document.getElementById('financialTableBody');
+        if (!filteredForTable.length) {
+            tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Kayıt yok</td></tr>`;
+        } else {
+            tbody.innerHTML = filteredForTable.map((r, idx) => {
+                const incomeTypeDisplay = r.income_type ? `<span class="badge badge-green">${r.income_type}</span>` : '-';
+                const expenseTypeDisplay = r.expense_type ? `<span class="badge badge-yellow">${r.expense_type}</span>` : '-';
+                const isTransferBadge = isTransferRecord(r) ? ' <span class="badge badge-info" style="background:#e0f2fe; color:#0369a1;">Transfer</span>' : '';
+                return `
+                    <tr style="${isTransferRecord(r) ? 'background:#f0f9ff;' : ''}">
+                        <td>${idx+1}</td>
+                        <td>${window.formatDateTR(r.date)}</td>
+                        <td><span class="badge ${r.type === 'Gelir' ? 'badge-green' : 'badge-red'}">${r.type}${isTransferBadge}</span></td>
+                        <td>${incomeTypeDisplay}</td>
+                        <td>${expenseTypeDisplay}</td>
+                        <td>${r.payment_method === 'Banka' ? '🏦 Banka' : '🧾 Makbuz'}</td>
+                        <td>${window.escapeHtml(r.payer_name || '-')}</td>
+                        <td>${window.escapeHtml(r.description)}</td>
+                        <td><strong>${r.amount.toLocaleString('tr-TR')} ₺</strong></td>
+                        <td class="admin-only">
+                            <button class="btn btn-info btn-small" onclick="editFinancialRecord('${r.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-small" onclick="confirmDeleteFinancial('${r.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================================
+        // BANKA VE KASA BAKİYESİ (Transferler DAHİL)
+        // ============================================================
+        // Banka bakiyesi: Banka ile yapılan TÜM işlemler
+        const bankRecords = filteredForTable.filter(r => r.payment_method === 'Banka');
+        const bankIncome = bankRecords.filter(r => r.type === 'Gelir').reduce((s, r) => s + r.amount, 0);
+        const bankExpense = bankRecords.filter(r => r.type === 'Gider').reduce((s, r) => s + r.amount, 0);
+        const bankBalance = bankIncome - bankExpense;
+        
+        // Kasa bakiyesi: Makbuz ile yapılan TÜM işlemler
+        const kasaRecords = filteredForTable.filter(r => r.payment_method === 'Makbuz');
+        const kasaIncome = kasaRecords.filter(r => r.type === 'Gelir').reduce((s, r) => s + r.amount, 0);
+        const kasaExpense = kasaRecords.filter(r => r.type === 'Gider').reduce((s, r) => s + r.amount, 0);
+        const kasaBalance = kasaIncome - kasaExpense;
+        
+        document.getElementById('bankBalanceCard').innerHTML = bankBalance.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('kasaBalanceCard').innerHTML = kasaBalance.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('bankDetail').innerHTML = `Gelir: ${bankIncome.toLocaleString('tr-TR')} ₺ | Gider: ${bankExpense.toLocaleString('tr-TR')} ₺`;
+        document.getElementById('kasaDetail').innerHTML = `Gelir: ${kasaIncome.toLocaleString('tr-TR')} ₺ | Gider: ${kasaExpense.toLocaleString('tr-TR')} ₺`;
+        
+        // ============================================================
+        // GELİR/GİDER ÖZETİ (Transferler HARİÇ)
+        // ============================================================
+        const nonTransferRecords = filteredForTable.filter(r => !isTransferRecord(r));
+        
+        const totalIncome = nonTransferRecords
+            .filter(r => r.type === 'Gelir')
+            .reduce((s, r) => s + r.amount, 0);
+        const totalExpense = nonTransferRecords
+            .filter(r => r.type === 'Gider')
+            .reduce((s, r) => s + r.amount, 0);
+        
+        document.getElementById('totalIncome').innerHTML = totalIncome.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('totalExpense').innerHTML = totalExpense.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('netBalance').innerHTML = (totalIncome - totalExpense).toLocaleString('tr-TR') + ' ₺';
+        
+        // ============================================================
+        // TRANSFER TOPLAMLARI (Bilgi amaçlı)
+        // ============================================================
+        const allTransferRecords = window.data.financial.filter(isTransferRecord);
+        const bankaToKasaTotal = allTransferRecords
+            .filter(r => r.type === 'Gider' && (r.description || '').includes('Banka→Kasa'))
+            .reduce((s, r) => s + r.amount, 0);
+        const kasaToBankaTotal = allTransferRecords
+            .filter(r => r.type === 'Gider' && (r.description || '').includes('Kasa→Banka'))
+            .reduce((s, r) => s + r.amount, 0);
+        
+        document.getElementById('transferBankaKasa').innerHTML = bankaToKasaTotal.toLocaleString('tr-TR') + ' ₺';
+        document.getElementById('transferKasaBanka').innerHTML = kasaToBankaTotal.toLocaleString('tr-TR') + ' ₺';
+        
+        // Filtre durumuna göre başlık
+        const hasFilter = typeFilter || incomeTypeFilter || expenseTypeFilter || methodFilter || dateFrom || dateTo;
+        const summaryTitle = document.getElementById('financialSummaryTitle');
+        if (summaryTitle) {
+            summaryTitle.innerHTML = hasFilter 
+                ? `<i class="fas fa-filter"></i> Filtrelenmiş Dönem Özeti <small>(Transferler hariç)</small>`
+                : `<i class="fas fa-chart-line"></i> Genel Dönem Özeti <small>(Transferler hariç)</small>`;
+        }
+    }
+
+    function clearFinancialFilters() {
+        document.getElementById('finFilterType').value = '';
+        document.getElementById('finFilterIncomeType').value = '';
+        document.getElementById('finFilterExpenseType').value = '';
+        document.getElementById('finFilterMethod').value = '';
+        document.getElementById('finFilterDateFrom').value = '';
+        document.getElementById('finFilterDateTo').value = '';
+        renderFinancial();
+    }
+
+    // FİNANSAL KAYIT DÜZENLEME
+    function editFinancialRecord(id) {
+        if (!window.checkAdmin()) return;
+        const rec = window.data.financial.find(r => r.id === id);
+        if (!rec) return;
+        window.editingData = { type: 'financial', id: rec.id };
+        
+        let categoryFields = '';
+        if (rec.type === 'Gelir') {
+            categoryFields = `
+                <div class="form-group">
+                    <label>Gelir Türü</label>
+                    <select id="edit_fin_income_type">
+                        <option value="">Seçiniz...</option>
+                        <option ${rec.income_type==='Aidat'?'selected':''}>Aidat</option>
+                        <option ${rec.income_type==='Bağış'?'selected':''}>Bağış</option>
+                        <option ${rec.income_type==='Transfer'?'selected':''}>Transfer</option>
+                        <option ${rec.income_type==='Diğer'?'selected':''}>Diğer</option>
+                    </select>
+                </div>
+            `;
+        } else {
+            categoryFields = `
+                <div class="form-group">
+                    <label>Gider Türü</label>
+                    <select id="edit_fin_expense_type">
+                        <option value="">Seçiniz...</option>
+                        <option ${rec.expense_type==='Faaliyet'?'selected':''}>Faaliyet</option>
+                        <option ${rec.expense_type==='Proje'?'selected':''}>Proje</option>
+                        <option ${rec.expense_type==='Gıda Alımı'?'selected':''}>Gıda Alımı</option>
+                        <option ${rec.expense_type==='Kırtasiye'?'selected':''}>Kırtasiye</option>
+                        <option ${rec.expense_type==='Hizmet'?'selected':''}>Hizmet</option>
+                        <option ${rec.expense_type==='Transfer'?'selected':''}>Transfer</option>
+                        <option ${rec.expense_type==='Banka Hizmetleri'?'selected':''}>Banka Hizmetleri</option>
+                        <option ${rec.expense_type==='Diğer'?'selected':''}>Diğer</option>
+                    </select>
+                </div>
+            `;
+        }
+        
+        const content = `
+            <div class="form-group"><label>Tarih</label><input type="date" id="edit_fin_date" value="${rec.date}"></div>
+            <div class="form-group"><label>Tür</label><select id="edit_fin_type">
+                <option ${rec.type==='Gelir'?'selected':''}>Gelir</option>
+                <option ${rec.type==='Gider'?'selected':''}>Gider</option>
+            </select></div>
+            ${categoryFields}
+            <div class="form-group"><label>Ödeme Yöntemi</label><select id="edit_fin_payment">
+                <option ${rec.payment_method==='Banka'?'selected':''}>Banka</option>
+                <option ${rec.payment_method==='Makbuz'?'selected':''}>Makbuz</option>
+            </select></div>
+            <div class="form-group"><label>Ödemeyi Yapan Kişi</label><input type="text" id="edit_fin_payer" value="${window.escapeHtml(rec.payer_name || '')}"></div>
+            <div class="form-group"><label>Açıklama</label><textarea id="edit_fin_desc">${window.escapeHtml(rec.description)}</textarea></div>
+            <div class="form-group"><label>Tutar</label><input type="number" step="0.01" id="edit_fin_amount" value="${rec.amount}"></div>
+        `;
+        
+        document.getElementById('editModalTitle').innerHTML = 'Finansal Düzenle';
+        document.getElementById('editModalBody').innerHTML = content;
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = saveFinancialEdit;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    async function saveFinancialEdit() {
+        if (!window.checkAdmin()) return;
+        
+        const type = document.getElementById('edit_fin_type').value;
+        const incomeType = type === 'Gelir' ? (document.getElementById('edit_fin_income_type')?.value || null) : null;
+        const expenseType = type === 'Gider' ? (document.getElementById('edit_fin_expense_type')?.value || null) : null;
+        
+        const updates = {
+            date: document.getElementById('edit_fin_date').value,
+            type: type,
+            income_type: incomeType,
+            expense_type: expenseType,
+            payment_method: document.getElementById('edit_fin_payment').value,
+            payer_name: document.getElementById('edit_fin_payer').value.trim(),
+            description: document.getElementById('edit_fin_desc').value.trim(),
+            amount: parseFloat(document.getElementById('edit_fin_amount').value)
+        };
+        
+        const { error } = await window.supabaseClient.from('financial').update(updates).eq('id', window.editingData.id);
+        if (!error) {
+            const idx = window.data.financial.findIndex(f => f.id === window.editingData.id);
+            if (idx !== -1) Object.assign(window.data.financial[idx], updates);
+            renderFinancial();
+            window.closeEditModal();
+            window.showToast('Kayıt güncellendi', 'success');
+        } else {
+            window.showToast('Hata: ' + error.message, 'error');
+        }
+    }
+
+    function confirmDeleteFinancial(id) {
+        if (!window.checkAdmin()) return;
+        window.showDeleteConfirm('Bu finansal kaydı silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('financial').delete().eq('id', id);
+            if (!error) {
+                window.data.financial = window.data.financial.filter(f => f.id !== id);
+                renderFinancial();
+                window.showToast('Kayıt silindi', 'success');
+            }
+        });
+    }
+</script>

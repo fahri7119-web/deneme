@@ -1,0 +1,327 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-newspaper"></i> Makaleler Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openArticleModal()"><i class="fas fa-plus"></i> Yeni Makale</button>
+    </div>
+
+    <!-- Filtreler -->
+    <div style="background: white; border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <input type="text" id="filterArticleTitle" placeholder="Başlık ile ara..." class="filter-select" style="width: 250px;" oninput="renderArticles()">
+        <select id="filterArticleStatus" class="filter-select" style="width: 150px;" onchange="renderArticles()">
+            <option value="all">Tümü</option>
+            <option value="published">Yayında</option>
+            <option value="draft">Taslak</option>
+        </select>
+        <button class="btn btn-secondary btn-small" onclick="clearArticleFilters()"><i class="fas fa-times"></i> Temizle</button>
+    </div>
+
+    <!-- Makaleler Tablosu -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr style="background: var(--primary-bg);">
+                        <th>#</th>
+                        <th>Başlık</th>
+                        <th>Yazar</th>
+                        <th>Yayın Tarihi</th>
+                        <th>Durum</th>
+                        <th>Görüntülenme</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="articlesTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Makale Modal -->
+    <div id="articleModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 900px; width: 90%;">
+            <div class="modal-header">
+                <div class="modal-title" id="articleModalTitle">Yeni Makale</div>
+                <button class="modal-close" onclick="closeArticleModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="articleModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeArticleModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveArticle()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let articlesData = [];
+    let editingArticleId = null;
+
+    function initArticles() {
+        loadArticles();
+    }
+
+    async function loadArticles() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('articles')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            articlesData = data || [];
+            renderArticles();
+        } catch (err) {
+            window.showToast('Makaleler yüklenemedi: ' + err.message, 'error');
+        }
+    }
+
+    function renderArticles() {
+        const tbody = document.getElementById('articlesTableBody');
+        const titleFilter = document.getElementById('filterArticleTitle')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('filterArticleStatus')?.value || 'all';
+        
+        let filtered = [...articlesData];
+        if (titleFilter) filtered = filtered.filter(a => (a.title || '').toLowerCase().includes(titleFilter));
+        if (statusFilter === 'published') filtered = filtered.filter(a => a.is_published === true);
+        else if (statusFilter === 'draft') filtered = filtered.filter(a => a.is_published !== true);
+        
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Henüz makale yok</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = filtered.map((article, idx) => {
+            const statusBadge = article.is_published 
+                ? '<span class="badge badge-green"><i class="fas fa-globe"></i> Yayında</span>' 
+                : '<span class="badge badge-yellow"><i class="fas fa-edit"></i> Taslak</span>';
+            return `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${window.escapeHtml(article.title) || '-'}</strong></td>
+                    <td>${window.escapeHtml(article.author_name) || '-'}</td>
+                    <td>${article.pubDate ? window.formatDateTR(article.pubDate) : '-'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${article.view_count || 0}</td>
+                    <td class="admin-only">
+                        <button class="btn btn-info btn-small" onclick="previewArticle('${article.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-secondary btn-small" onclick="editArticle('${article.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-small" onclick="deleteArticle('${article.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function clearArticleFilters() {
+        document.getElementById('filterArticleTitle').value = '';
+        document.getElementById('filterArticleStatus').value = 'all';
+        renderArticles();
+    }
+
+    function openArticleModal() {
+        editingArticleId = null;
+        document.getElementById('articleModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Yeni Makale';
+        renderArticleForm({});
+        document.getElementById('articleModal').classList.add('active');
+        setTimeout(() => initTinyMCE(), 200);
+    }
+
+    function editArticle(id) {
+        const article = articlesData.find(a => a.id === id);
+        if (!article) return;
+        editingArticleId = id;
+        document.getElementById('articleModalTitle').innerHTML = '<i class="fas fa-edit"></i> Makale Düzenle';
+        renderArticleForm(article);
+        document.getElementById('articleModal').classList.add('active');
+        setTimeout(() => initTinyMCE(article.fullContent || ''), 200);
+    }
+
+    function renderArticleForm(data) {
+        const body = document.getElementById('articleModalBody');
+        body.innerHTML = `
+            <div class="form-group">
+                <label>Başlık *</label>
+                <input type="text" id="article_title" class="form-control" value="${window.escapeHtml(data.title || '')}" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>URL Uzantısı (slug)</label>
+                    <input type="text" id="article_slug" class="form-control" value="${window.escapeHtml(data.slug || '')}" placeholder="otomatik oluşturulacak">
+                </div>
+                <div class="form-group">
+                    <label>Yayın Tarihi</label>
+                    <input type="date" id="article_pubDate" class="form-control" value="${data.pubDate?.split('T')[0] || new Date().toISOString().split('T')[0]}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Yazar Adı *</label>
+                    <input type="text" id="article_author_name" class="form-control" value="${window.escapeHtml(data.author_name || window.currentUserEmail || '')}" required>
+                </div>
+                <div class="form-group">
+                    <label>Yazar Unvanı</label>
+                    <input type="text" id="article_author_title" class="form-control" value="${window.escapeHtml(data.author_title || '')}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Yazar E-postası</label>
+                    <input type="email" id="article_author_email" class="form-control" value="${window.escapeHtml(data.author_email || '')}">
+                </div>
+                <div class="form-group">
+                    <label>Yazar Avatar (URL)</label>
+                    <input type="url" id="article_author_avatar" class="form-control" value="${window.escapeHtml(data.author_avatar || '')}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Özet *</label>
+                <textarea id="article_summary" rows="3" class="form-control">${window.escapeHtml(data.summary || '')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Tam İçerik *</label>
+                <textarea id="article_content" rows="15" class="form-control editor-area"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kapak Görseli (URL)</label>
+                    <input type="url" id="article_featured_image" class="form-control" value="${window.escapeHtml(data.featured_image || '')}">
+                </div>
+                <div class="form-group">
+                    <label>Video URL</label>
+                    <input type="url" id="article_video_url" class="form-control" value="${window.escapeHtml(data.video_url || '')}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Etiketler</label>
+                    <input type="text" id="article_tags" class="form-control" value="${window.escapeHtml(Array.isArray(data.tags) ? data.tags.join(', ') : data.tags || '')}" placeholder="virgülle ayırın">
+                </div>
+                <div class="form-group">
+                    <label>Meta Açıklama (SEO)</label>
+                    <textarea id="article_meta_description" rows="2" class="form-control">${window.escapeHtml(data.meta_description || '')}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Anahtar Kelimeler (SEO)</label>
+                    <input type="text" id="article_meta_keywords" class="form-control" value="${window.escapeHtml(data.meta_keywords || '')}">
+                </div>
+                <div class="form-group checkbox-row">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="article_is_published" ${data.is_published ? 'checked' : ''}>
+                        <span>Yayınla</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-left: 1rem;">
+                        <input type="checkbox" id="article_featured" ${data.featured ? 'checked' : ''}>
+                        <span>Öne Çıkar</span>
+                    </label>
+                </div>
+            </div>
+        `;
+
+        const titleInput = document.getElementById('article_title');
+        const slugInput = document.getElementById('article_slug');
+        if (titleInput && slugInput && !data.slug) {
+            titleInput.oninput = () => { slugInput.value = window.slugify(titleInput.value); };
+        }
+    }
+
+    function initTinyMCE(content = '') {
+        if (typeof tinymce !== 'undefined') {
+            tinymce.remove('#article_content');
+            tinymce.init({
+                selector: '#article_content',
+                height: 400,
+                plugins: 'link image table code lists advlist anchor',
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                menubar: false,
+                setup: function(editor) {
+                    editor.on('init', function() { if (content) editor.setContent(content); });
+                }
+            });
+        }
+    }
+
+    function getTinyContent() {
+        if (typeof tinymce !== 'undefined' && tinymce.get('article_content')) {
+            return tinymce.get('article_content').getContent();
+        }
+        return document.getElementById('article_content')?.value || '';
+    }
+
+    async function saveArticle() {
+        const title = document.getElementById('article_title')?.value.trim();
+        if (!title) { window.showToast('Başlık zorunludur!', 'warning'); return; }
+        
+        const slug = document.getElementById('article_slug')?.value.trim() || window.slugify(title);
+        const tagsValue = document.getElementById('article_tags')?.value || '';
+        const tags = tagsValue.split(',').map(t => t.trim()).filter(t => t);
+        
+        const articleData = {
+            title: title,
+            slug: slug,
+            summary: document.getElementById('article_summary')?.value.trim() || '',
+            fullContent: getTinyContent(),
+            author_name: document.getElementById('article_author_name')?.value.trim() || '',
+            author_title: document.getElementById('article_author_title')?.value.trim() || null,
+            author_email: document.getElementById('article_author_email')?.value.trim() || null,
+            author_avatar: document.getElementById('article_author_avatar')?.value.trim() || null,
+            pubDate: document.getElementById('article_pubDate')?.value || new Date().toISOString().split('T')[0],
+            featured_image: document.getElementById('article_featured_image')?.value.trim() || null,
+            video_url: document.getElementById('article_video_url')?.value.trim() || null,
+            meta_description: document.getElementById('article_meta_description')?.value.trim() || null,
+            meta_keywords: document.getElementById('article_meta_keywords')?.value.trim() || null,
+            tags: tags,
+            is_published: document.getElementById('article_is_published')?.checked || false,
+            featured: document.getElementById('article_featured')?.checked || false,
+            updated_at: new Date().toISOString()
+        };
+        
+        try {
+            let result;
+            if (editingArticleId) {
+                result = await window.supabaseClient.from('articles').update(articleData).eq('id', editingArticleId);
+            } else {
+                articleData.created_at = new Date().toISOString();
+                articleData.view_count = 0;
+                result = await window.supabaseClient.from('articles').insert([articleData]);
+            }
+            if (result.error) throw result.error;
+            window.showToast(editingArticleId ? 'Makale güncellendi!' : 'Makale oluşturuldu!', 'success');
+            closeArticleModal();
+            loadArticles();
+        } catch (err) {
+            window.showToast('Hata: ' + err.message, 'error');
+        }
+    }
+
+    async function deleteArticle(id) {
+        window.showDeleteConfirm('Bu makaleyi silmek istediğinizden emin misiniz?', async () => {
+            const { error } = await window.supabaseClient.from('articles').delete().eq('id', id);
+            if (error) { window.showToast('Hata: ' + error.message, 'error'); return; }
+            window.showToast('Makale silindi', 'success');
+            loadArticles();
+        });
+    }
+
+    function previewArticle(id) {
+        const article = articlesData.find(a => a.id === id);
+        if (!article) return;
+        const previewWindow = window.open('', '_blank');
+        previewWindow.document.write(`
+            <html><head><title>${window.escapeHtml(article.title)}</title>
+            <style>body{font-family:'Times New Roman',serif;margin:2cm;line-height:1.6;} img{max-width:100%;}</style></head>
+            <body>
+                <h1>${window.escapeHtml(article.title)}</h1>
+                <p><strong>${window.escapeHtml(article.author_name)}</strong> | ${window.formatDateTR(article.pubDate)}</p>
+                ${article.featured_image ? `<img src="${article.featured_image}">` : ''}
+                <p><em>${window.escapeHtml(article.summary)}</em></p>
+                <div>${article.fullContent || ''}</div>
+            </body></html>
+        `);
+        previewWindow.document.close();
+    }
+
+    function closeArticleModal() {
+        document.getElementById('articleModal').classList.remove('active');
+        if (typeof tinymce !== 'undefined') tinymce.remove('#article_content');
+    }
+</script>

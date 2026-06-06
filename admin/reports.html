@@ -1,0 +1,473 @@
+<div class="page-content">
+    <!-- Genel İstatistik Kartları -->
+    <div class="summary-cards" id="reportSummaryCards"></div>
+
+    <!-- Çölyaklı Bazlı Dağıtım Analizi -->
+    <div class="form-card">
+        <div class="form-header"><i class="fas fa-heartbeat"></i> Çölyaklı Bazlı Dağıtım Analizi</div>
+        <div class="form-body">
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem;">
+                <select id="celiacSelect" class="filter-select" style="flex:1; min-width:250px;">
+                    <option value="">-- Çölyaklı Seçiniz --</option>
+                </select>
+                <button class="btn btn-primary" onclick="analyzeCeliac()"><i class="fas fa-microscope"></i> Analiz Et</button>
+                <button class="btn btn-secondary" onclick="printCeliacAnalysis()"><i class="fas fa-print"></i> Yazdır</button>
+            </div>
+            <div id="celiacAnalysisResult" style="margin-top:1.5rem;"></div>
+        </div>
+    </div>
+
+    <!-- Dağıtım Detayları (Çölyaklı bazlı) -->
+    <div style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--gray-700);">
+            <i class="fas fa-chart-bar"></i> Çölyaklı Bazlı Dağıtım Detayları
+            <small style="font-size:0.7rem; font-weight:400;">(Aynı isimdeki çölyaklılar tek satırda toplanmıştır)</small>
+        </h3>
+        <div class="table-container">
+            <table id="celiacDistributionTable">
+                <thead>
+                    <tr style="background: var(--primary); color: white;">
+                        <th>Çölyaklı Adı</th>
+                        <th>Bağlı Olduğu Aileler</th>
+                        <th>Toplam Dağıtım</th>
+                        <th>Kişi Başı Ortalama</th>
+                        <th>Alınan Ürünler</th>
+                        <th>Son Dağıtım</th>
+                    </tr>
+                </thead>
+                <tbody id="celiacDistributionBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Destek Tavsiyesi - Çölyaklı Bazlı -->
+    <div style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--gray-700);">
+            <i class="fas fa-exclamation-triangle"></i> Destek Tavsiyesi - En Az Dağıtım Alan Çölyaklılar
+            <small style="font-size:0.7rem; font-weight:400;">(Bu yıl içindeki dağıtımlara göre)</small>
+        </h3>
+        <div class="table-container">
+            <table id="leastDistributedTable">
+                <thead>
+                    <tr style="background: var(--danger); color: white;">
+                        <th>#</th>
+                        <th>Çölyaklı Adı</th>
+                        <th>Bağlı Aileler</th>
+                        <th>Bu Yıl Dağıtım</th>
+                        <th>Ortalama/Sefer</th>
+                        <th>Önerilen Dağıtım</th>
+                        <th>Acil Durum</th>
+                    </tr>
+                </thead>
+                <tbody id="leastDistributedBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Dağıtım Geçmişi Grafiği -->
+    <div style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Çölyaklı Bazlı Dağıtım Grafiği</h3>
+        <div class="card">
+            <div id="celiacDistributionChart" style="height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gruplanmış çölyaklılar: { fullName, members: [{ memberId, memberName, familyName, relation, tc_id, phone }] }
+    let groupedCeliacs = [];
+
+    function initReports() {
+        buildGroupedCeliacList();
+        populateCeliacSelect();
+        renderReportSummaries();
+        renderCeliacDistributionTable();
+        renderLeastDistributedCeliacs();
+        renderCeliacChart();
+    }
+
+    // Çölyaklıları isim bazında grupla (aynı isim + soyisim tek bir çölyaklı olarak kabul edilir)
+    function buildGroupedCeliacList() {
+        const tempMap = new Map(); // key: fullName (büyük harf normalize edilmiş)
+        
+        window.data.members.forEach(member => {
+            const memberName = `${member.first_name} ${member.last_name}`;
+            const familyName = member.last_name || 'Bilinmeyen';
+            
+            (member.celiacs || []).forEach(c => {
+                const fullNameRaw = `${c.name} ${c.surname}`.trim();
+                const fullNameKey = fullNameRaw.toUpperCase().replace(/\s+/g, ' ');
+                
+                if (!tempMap.has(fullNameKey)) {
+                    tempMap.set(fullNameKey, {
+                        fullName: fullNameRaw,
+                        name: c.name,
+                        surname: c.surname,
+                        members: []
+                    });
+                }
+                
+                const celiacGroup = tempMap.get(fullNameKey);
+                // Aynı üye aynı çölyaklıyı birden fazla kez ekleme (kontrol)
+                const existingMember = celiacGroup.members.find(m => m.memberId === member.id);
+                if (!existingMember) {
+                    celiacGroup.members.push({
+                        memberId: member.id,
+                        memberName: memberName,
+                        familyName: familyName,
+                        relation: c.relation,
+                        tc_id: member.tc_id,
+                        phone: member.phone
+                    });
+                }
+            });
+        });
+        
+        // Map'i array'e çevir ve alfabetik sırala
+        groupedCeliacs = Array.from(tempMap.values())
+            .sort((a, b) => a.fullName.localeCompare(b.fullName, 'tr'));
+    }
+
+    function populateCeliacSelect() {
+        const select = document.getElementById('celiacSelect');
+        select.innerHTML = '<option value="">-- Çölyaklı Seçiniz --</option>';
+        
+        groupedCeliacs.forEach(c => {
+            const familyList = [...new Set(c.members.map(m => m.familyName))].join(', ');
+            const opt = document.createElement('option');
+            opt.value = c.fullName;
+            opt.textContent = `${c.fullName} (${familyList})`;
+            select.appendChild(opt);
+        });
+    }
+
+    // Bir çölyaklının tüm dağıtımlarını bul (tüm bağlı olduğu üyeler üzerinden)
+    function getCeliacDistributions(fullName) {
+        const celiacGroup = groupedCeliacs.find(c => c.fullName === fullName);
+        if (!celiacGroup) return [];
+        
+        const allDistributions = [];
+        
+        celiacGroup.members.forEach(member => {
+            const memberDists = window.data.distributions.filter(d => d.member_id === member.memberId);
+            
+            memberDists.forEach(dist => {
+                const celiacNamesInDist = (dist.celiac_name || '').split(',').map(n => n.trim());
+                const celiacCount = celiacNamesInDist.length;
+                const isIncluded = celiacNamesInDist.some(name => name === fullName);
+                
+                if (isIncluded && celiacCount > 0) {
+                    const dividedItems = (dist.items || []).map(item => ({
+                        productName: item.productName,
+                        totalQuantity: item.quantity,
+                        perCeliacQuantity: item.quantity / celiacCount,
+                        unit: item.unit
+                    }));
+                    
+                    allDistributions.push({
+                        id: dist.id,
+                        date: dist.distribution_date,
+                        receipt_number: dist.receipt_number,
+                        memberName: member.memberName,
+                        familyName: member.familyName,
+                        celiacCount: celiacCount,
+                        totalItems: dist.items || [],
+                        dividedItems: dividedItems,
+                        totalQuantity: dividedItems.reduce((s, i) => s + i.perCeliacQuantity, 0)
+                    });
+                }
+            });
+        });
+        
+        return allDistributions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    // Çölyaklı analizi
+    function analyzeCeliac() {
+        const fullName = document.getElementById('celiacSelect').value;
+        if (!fullName) {
+            window.showToast('Lütfen bir çölyaklı seçin', 'warning');
+            return;
+        }
+        
+        const celiacGroup = groupedCeliacs.find(c => c.fullName === fullName);
+        if (!celiacGroup) return;
+        
+        const distributions = getCeliacDistributions(fullName);
+        const totalDistCount = distributions.length;
+        const totalQuantity = distributions.reduce((s, d) => s + d.totalQuantity, 0);
+        const avgPerDist = totalDistCount > 0 ? totalQuantity / totalDistCount : 0;
+        
+        // Ürün bazlı toplamlar
+        const productMap = new Map();
+        distributions.forEach(dist => {
+            dist.dividedItems.forEach(item => {
+                productMap.set(item.productName, (productMap.get(item.productName) || 0) + item.perCeliacQuantity);
+            });
+        });
+        
+        const productList = Array.from(productMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, qty]) => `${name}: ${qty.toFixed(2)} ${distributions[0]?.dividedItems[0]?.unit || 'adet'}`)
+            .join('<br>');
+        
+        const lastDistDate = distributions.length > 0 ? window.formatDateTR(distributions[0].date) : 'Hiç dağıtım yok';
+        
+        // Aile listesi
+        const familyList = [...new Set(celiacGroup.members.map(m => `${m.familyName} (${m.relation})`))].join(', ');
+        
+        const html = `
+            <div class="member-detail-card">
+                <h3><i class="fas fa-heartbeat"></i> ${celiacGroup.fullName}</h3>
+                <p><strong>Bağlı Olduğu Aileler:</strong> ${familyList}</p>
+                <hr>
+                <div class="stats-box">
+                    <div><strong>📦 Toplam Dağıtım Sayısı:</strong> ${totalDistCount}</div>
+                    <div><strong>📊 Toplam Alınan Ürün (Kişi Bazlı):</strong> ${totalQuantity.toFixed(2)} birim</div>
+                    <div><strong>📈 Ortalama/Sefer:</strong> ${avgPerDist.toFixed(2)} birim</div>
+                    <div><strong>📅 Son Dağıtım:</strong> ${lastDistDate}</div>
+                </div>
+                <h4 style="margin-top:1rem;">📋 Alınan Ürünler (Toplam)</h4>
+                <div class="product-list" style="background:#f8fafc; padding:0.75rem; border-radius:0.5rem;">
+                    ${productList || 'Henüz ürün alınmamış'}
+                </div>
+                <h4 style="margin-top:1rem;">🕒 Dağıtım Geçmişi</h4>
+                <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                    <table class="data-table" style="font-size:0.75rem;">
+                        <thead>
+                            <tr><th>Tarih</th><th>Makbuz No</th><th>Alan Aile</th><th>Dağıtımdaki Çölyaklı</th><th>Bu Çölyaklıya Düşen</th><th>Ürünler</th></tr>
+                        </thead>
+                        <tbody>
+                            ${distributions.map(d => `
+                                <tr>
+                                    <td>${window.formatDateTR(d.date)}</td>
+                                    <td>${d.receipt_number}</td>
+                                    <td>${d.familyName} Ailesi (${d.memberName})</td>
+                                    <td>${d.celiacCount} kişi</td>
+                                    <td><strong>${d.totalQuantity.toFixed(2)} birim</strong></td>
+                                    <td>${d.dividedItems.map(i => `${i.productName} (${i.perCeliacQuantity.toFixed(2)} ${i.unit})`).join(', ')}</td>
+                                </tr>
+                            `).join('')}
+                            ${distributions.length === 0 ? '<tr><td colspan="6">Dağıtım kaydı yok</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('celiacAnalysisResult').innerHTML = html;
+    }
+
+    function printCeliacAnalysis() {
+        const content = document.getElementById('celiacAnalysisResult').innerHTML;
+        if (!content || content === '') {
+            window.showToast('Lütfen önce bir çölyaklı seçip analiz yapın', 'warning');
+            return;
+        }
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html><head><title>Çölyaklı Analizi</title>
+            <style>
+                body { font-family: 'Times New Roman', Times, serif; margin: 2cm; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #999; padding: 6px; }
+                .member-detail-card { padding: 1rem; }
+                .stats-box { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+            </style></head>
+            <body>${content}</body>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    function renderReportSummaries() {
+        const totalCeliacs = groupedCeliacs.length;
+        
+        // Dağıtım alan çölyaklı sayısı (en az bir dağıtımı olan)
+        let activeCeliacs = 0;
+        groupedCeliacs.forEach(c => {
+            const dists = getCeliacDistributions(c.fullName);
+            if (dists.length > 0) activeCeliacs++;
+        });
+        
+        const totalDistributions = window.data.distributions.length;
+        
+        // Toplam dağıtılan ürün miktarı
+        let totalProductsDistributed = 0;
+        window.data.distributions.forEach(d => {
+            totalProductsDistributed += (d.items || []).reduce((s, i) => s + i.quantity, 0);
+        });
+        
+        const cards = [
+            { title: 'Toplam Çölyaklı', value: totalCeliacs, icon: 'fa-heartbeat', color: 'var(--danger)' },
+            { title: 'Dağıtım Alan Çölyaklı', value: activeCeliacs, icon: 'fa-check-circle', color: '#10b981' },
+            { title: 'Toplam Dağıtım', value: totalDistributions, icon: 'fa-truck', color: 'var(--primary)' },
+            { title: 'Dağıtılan Ürün', value: totalProductsDistributed.toLocaleString() + ' adet', icon: 'fa-boxes', color: 'var(--warning)' }
+        ];
+        
+        document.getElementById('reportSummaryCards').innerHTML = cards.map(c => `
+            <div class="card">
+                <div class="card-header" style="color:${c.color}"><i class="fas ${c.icon}"></i> ${c.title}</div>
+                <div class="card-value">${c.value}</div>
+            </div>
+        `).join('');
+    }
+
+    function renderCeliacDistributionTable() {
+        const tbody = document.getElementById('celiacDistributionBody');
+        
+        const celiacStats = groupedCeliacs.map(celiac => {
+            const dists = getCeliacDistributions(celiac.fullName);
+            const totalQty = dists.reduce((s, d) => s + d.totalQuantity, 0);
+            const distCount = dists.length;
+            const avgPerDist = distCount > 0 ? totalQty / distCount : 0;
+            const lastDist = dists.length > 0 ? dists[0].date : null;
+            
+            // Ürün listesi (ilk 3)
+            const productMap = new Map();
+            dists.forEach(dist => {
+                dist.dividedItems.forEach(item => {
+                    productMap.set(item.productName, (productMap.get(item.productName) || 0) + item.perCeliacQuantity);
+                });
+            });
+            const productList = Array.from(productMap.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, qty]) => `${name}: ${qty.toFixed(1)}`)
+                .join(', ');
+            
+            // Aile listesi
+            const familyList = [...new Set(celiac.members.map(m => m.familyName))].join(', ');
+            
+            return {
+                celiac,
+                familyList,
+                distCount,
+                totalQty,
+                avgPerDist,
+                lastDist,
+                productList
+            };
+        }).sort((a, b) => b.totalQty - a.totalQty);
+        
+        tbody.innerHTML = celiacStats.map(stat => `
+            <tr onclick="selectCeliacAndAnalyze('${stat.celiac.fullName}')" style="cursor:pointer;">
+                <td><strong>${stat.celiac.fullName}</strong></td>
+                <td>${stat.familyList}</td>
+                <td style="text-align:center;">${stat.distCount} kez</td>
+                <td style="text-align:center;">${stat.avgPerDist.toFixed(2)} birim</td>
+                <td><small>${stat.productList || '-'}</small></td>
+                <td><small>${stat.lastDist ? window.formatDateTR(stat.lastDist) : '-'}</small></td>
+              </tr>
+        `).join('');
+    }
+
+    function selectCeliacAndAnalyze(fullName) {
+        document.getElementById('celiacSelect').value = fullName;
+        analyzeCeliac();
+    }
+
+    function renderLeastDistributedCeliacs() {
+        const currentYear = new Date().getFullYear();
+        const yearStart = `${currentYear}-01-01`;
+        
+        const celiacStats = groupedCeliacs.map(celiac => {
+            const allDists = getCeliacDistributions(celiac.fullName);
+            // Sadece bu yılki dağıtımlar
+            const thisYearDists = allDists.filter(d => d.date >= yearStart);
+            const totalQty = thisYearDists.reduce((s, d) => s + d.totalQuantity, 0);
+            const distCount = thisYearDists.length;
+            const avgPerDist = distCount > 0 ? totalQty / distCount : 0;
+            const familyList = [...new Set(celiac.members.map(m => m.familyName))].join(', ');
+            
+            return { celiac, familyList, totalQty, distCount, avgPerDist };
+        }).sort((a, b) => a.totalQty - b.totalQty);
+        
+        // En az dağıtım alan 50 çölyaklı
+        const leastDistributed = celiacStats.slice(0, 50);
+        
+        const tbody = document.getElementById('leastDistributedBody');
+        tbody.innerHTML = leastDistributed.map((stat, idx) => {
+            let urgency = '';
+            let urgencyColor = '';
+            let recommended = '';
+            
+            if (stat.totalQty === 0) {
+                urgency = '🔴 KRİTİK - Hiç dağıtım yok';
+                urgencyColor = '#dc2626';
+                recommended = 'Acil dağıtım yapılmalı';
+            } else if (stat.totalQty < 10) {
+                urgency = '🟠 YÜKSEK - Çok az dağıtım';
+                urgencyColor = '#f97316';
+                recommended = 'Aylık en az 2 sefer dağıtım';
+            } else if (stat.totalQty < 30) {
+                urgency = '🟡 ORTA - Yetersiz';
+                urgencyColor = '#eab308';
+                recommended = 'Aylık 1-2 sefer dağıtım';
+            } else {
+                urgency = '🟢 NORMAL';
+                urgencyColor = '#10b981';
+                recommended = 'Mevcut düzen devam';
+            }
+            
+            return `
+                <tr style="cursor:pointer;" onclick="selectCeliacAndAnalyze('${stat.celiac.fullName}')">
+                    <td style="text-align:center; font-weight:700;">${idx + 1}</td>
+                    <td><strong>${stat.celiac.fullName}</strong></td>
+                    <td>${stat.familyList}</td>
+                    <td style="text-align:center;">${stat.distCount} sefer / ${stat.totalQty.toFixed(1)} birim</td>
+                    <td style="text-align:center;">${stat.avgPerDist.toFixed(1)} birim</td>
+                    <td style="color:${urgencyColor}; font-weight:bold;">${recommended}</td>
+                    <td style="color:${urgencyColor};">${urgency}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderCeliacChart() {
+        // En çok dağıtım alan 15 çölyaklı
+        const celiacStats = groupedCeliacs.map(celiac => {
+            const dists = getCeliacDistributions(celiac.fullName);
+            const totalQty = dists.reduce((s, d) => s + d.totalQuantity, 0);
+            return { name: celiac.fullName, totalQty };
+        }).sort((a, b) => b.totalQty - a.totalQty).slice(0, 15);
+        
+        if (typeof ApexCharts !== 'undefined') {
+            // Eski chart varsa temizle
+            const chartContainer = document.getElementById('celiacDistributionChart');
+            if (chartContainer.chart) {
+                chartContainer.chart.destroy();
+            }
+            
+            const chart = new ApexCharts(chartContainer, {
+                series: [{
+                    name: 'Alınan Ürün Miktarı (birim)',
+                    data: celiacStats.map(s => s.totalQty.toFixed(1))
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 400,
+                    toolbar: { show: true }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: { enabled: true, formatter: (val) => parseFloat(val).toFixed(1) },
+                xaxis: {
+                    categories: celiacStats.map(s => s.name),
+                    tickPlacement: 'on',
+                    labels: { rotate: -45, style: { fontSize: '11px' } }
+                },
+                yaxis: { title: { text: 'Birim (Adet/Kg/Lt)' } },
+                colors: ['#10b981'],
+                title: { text: 'En Çok Dağıtım Alan 15 Çölyaklı', align: 'center' }
+            });
+            chart.render();
+            chartContainer.chart = chart;
+        }
+    }
+</script>
