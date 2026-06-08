@@ -1,0 +1,350 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-external-link-alt"></i> Dış Haberler Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openNewsModal()"><i class="fas fa-plus"></i> Yeni Haber Ekle</button>
+    </div>
+
+    <!-- Filtreler -->
+    <div style="background: white; border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <input type="text" id="filterNewsTitle" placeholder="Başlık ile ara..." class="filter-select" style="width: 250px;" oninput="renderNews()">
+        <select id="filterNewsStatus" class="filter-select" style="width: 150px;" onchange="renderNews()">
+            <option value="all">Tümü</option>
+            <option value="active">Yayında</option>
+            <option value="draft">Taslak</option>
+        </select>
+        <button class="btn btn-secondary btn-small" onclick="clearNewsFilters()"><i class="fas fa-times"></i> Temizle</button>
+    </div>
+
+    <!-- Haberler Tablosu -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr style="background: var(--primary-bg);">
+                        <th>#</th>
+                        <th>Başlık</th>
+                        <th>Kaynak</th>
+                        <th>Yayın Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="newsTableBody">
+                    <tr><td colspan="6" class="empty-state">Yükleniyor...</td</span>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Haber Modal -->
+    <div id="newsModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div class="modal-title" id="newsModalTitle">Yeni Dış Haber</div>
+                <button class="modal-close" onclick="closeNewsModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="newsModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeNewsModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveNews()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Önizleme Modalı -->
+    <div id="previewNewsModal" class="modal" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title">Haber Önizleme</div>
+                <button class="modal-close" onclick="closePreviewNewsModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="previewNewsContent" style="max-height: 70vh; overflow-y: auto;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePreviewNewsModal()">Kapat</button>
+                <button class="btn btn-primary" onclick="openOriginalLink()">Kaynağa Git</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let newsData = [];
+    let editingNewsId = null;
+    let currentPreviewLink = '';
+
+    async function initNews() {
+        await loadNews();
+    }
+
+    async function loadNews() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('news')
+                .select('*')
+                .order('pubDate', { ascending: false });
+            
+            if (error) throw error;
+            newsData = data || [];
+            renderNews();
+        } catch (err) {
+            console.error('Haberler yüklenirken hata:', err);
+            window.showToast('Haberler yüklenemedi: ' + err.message, 'error');
+            document.getElementById('newsTableBody').innerHTML = '<tr><td colspan="6" class="empty-state">Haberler yüklenemedi</td></tr>';
+        }
+    }
+
+    function renderNews() {
+        const tbody = document.getElementById('newsTableBody');
+        const titleFilter = document.getElementById('filterNewsTitle')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('filterNewsStatus')?.value || 'all';
+        
+        let filtered = [...newsData];
+        if (titleFilter) filtered = filtered.filter(n => (n.title || '').toLowerCase().includes(titleFilter));
+        if (statusFilter === 'active') filtered = filtered.filter(n => n.is_active === true);
+        else if (statusFilter === 'draft') filtered = filtered.filter(n => n.is_active !== true);
+        
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Henüz dış haber eklenmemiş. İlk haberi ekleyin!</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = filtered.map((news, idx) => {
+            const statusBadge = news.is_active 
+                ? '<span class="badge badge-green"><i class="fas fa-globe"></i> Yayında</span>' 
+                : '<span class="badge badge-yellow"><i class="fas fa-edit"></i> Taslak</span>';
+            
+            // Düzenleme ve silme yetkisi (sadece admin)
+            const editButton = window.isAdmin() ? `<button class="btn btn-secondary btn-small" onclick="editNews('${news.id}')"><i class="fas fa-edit"></i> Düzenle</button>` : '';
+            const deleteButton = window.isAdmin() ? `<button class="btn btn-danger btn-small" onclick="deleteNews('${news.id}')"><i class="fas fa-trash"></i> Sil</button>` : '';
+            
+            return `
+                <tr>
+                    <td style="text-align: center; width: 50px;">${idx + 1}</td>
+                    <td><strong>${window.escapeHtml(news.title) || '-'}</strong><br><small class="text-gray-500">${window.escapeHtml(news.description)?.substring(0, 80) || ''}${(news.description?.length > 80) ? '...' : ''}</small></td>
+                    <td><span class="badge badge-info">${window.escapeHtml(news.source) || '-'}</span></td>
+                    <td><small>${news.pubDate || '-'}</small></td>
+                    <td>${statusBadge}</td>
+                    <td class="admin-only" style="white-space: nowrap;">
+                        <button class="btn btn-info btn-small" onclick="previewNews('${news.id}')"><i class="fas fa-eye"></i> Önizle</button>
+                        ${editButton}
+                        ${deleteButton}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function clearNewsFilters() {
+        document.getElementById('filterNewsTitle').value = '';
+        document.getElementById('filterNewsStatus').value = 'all';
+        renderNews();
+    }
+
+    function openNewsModal() {
+        if (!window.isAdmin()) {
+            window.showToast('Bu işlem için admin yetkisi gerekli!', 'error');
+            return;
+        }
+        editingNewsId = null;
+        document.getElementById('newsModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Yeni Dış Haber';
+        renderNewsForm({});
+        document.getElementById('newsModal').classList.add('active');
+    }
+
+    function editNews(id) {
+        if (!window.isAdmin()) {
+            window.showToast('Bu işlem için admin yetkisi gerekli!', 'error');
+            return;
+        }
+        const news = newsData.find(n => String(n.id) === String(id));
+        if (!news) {
+            window.showToast('Haber bulunamadı!', 'error');
+            return;
+        }
+        editingNewsId = id;
+        document.getElementById('newsModalTitle').innerHTML = '<i class="fas fa-edit"></i> Haber Düzenle';
+        renderNewsForm(news);
+        document.getElementById('newsModal').classList.add('active');
+    }
+
+    function renderNewsForm(data) {
+        const body = document.getElementById('newsModalBody');
+        
+        // Tarih formatı (GG.AA.YYYY SS:DD)
+        let formattedDate = data.pubDate || '';
+        if (!formattedDate && !data.id) {
+            const now = new Date();
+            formattedDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }
+        
+        body.innerHTML = `
+            <div class="form-group">
+                <label>Başlık *</label>
+                <input type="text" id="news_title" class="form-control" value="${window.escapeHtml(data.title || '')}" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kaynak (Haber Sitesi Adı) *</label>
+                    <input type="text" id="news_source" class="form-control" value="${window.escapeHtml(data.source || '')}" placeholder="Örn: Yenigün Gazetesi" required>
+                </div>
+                <div class="form-group">
+                    <label>Yayın Tarihi *</label>
+                    <input type="text" id="news_pubDate" class="form-control" value="${formattedDate}" placeholder="GG.AA.YYYY SS:DD" required>
+                    <small class="text-gray-400 text-xs">Format: 15.01.2026 15:03</small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Haber Linki (URL) *</label>
+                <input type="url" id="news_link" class="form-control" value="${window.escapeHtml(data.link || '')}" placeholder="https://..." required>
+            </div>
+            <div class="form-group">
+                <label>Açıklama / Özet *</label>
+                <textarea id="news_description" rows="4" class="form-control" placeholder="Haber özet metni..." required>${window.escapeHtml(data.description || '')}</textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Görsel URL</label>
+                    <input type="url" id="news_imageUrl" class="form-control" value="${window.escapeHtml(data.imageUrl || '')}" placeholder="https://...">
+                    <small class="text-gray-400 text-xs">Kapak görseli için resim URL'i</small>
+                </div>
+                <div class="form-group">
+                    <label>Durum</label>
+                    <select id="news_status" class="form-control">
+                        <option value="true" ${data.is_active ? 'selected' : ''}>Yayında</option>
+                        <option value="false" ${!data.is_active ? 'selected' : ''}>Taslak</option>
+                    </select>
+                </div>
+            </div>
+            ${data.imageUrl ? `<div class="form-group"><img src="${data.imageUrl}" style="max-width: 100%; max-height: 200px; border-radius: 12px;" onerror="this.style.display='none'"></div>` : ''}
+        `;
+    }
+
+    async function saveNews() {
+        if (!window.isAdmin()) return;
+        
+        const title = document.getElementById('news_title')?.value.trim();
+        const source = document.getElementById('news_source')?.value.trim();
+        const link = document.getElementById('news_link')?.value.trim();
+        const description = document.getElementById('news_description')?.value.trim();
+        
+        if (!title) {
+            window.showToast('Başlık zorunludur!', 'warning');
+            return;
+        }
+        if (!source) {
+            window.showToast('Kaynak zorunludur!', 'warning');
+            return;
+        }
+        if (!link) {
+            window.showToast('Haber linki zorunludur!', 'warning');
+            return;
+        }
+        if (!description) {
+            window.showToast('Açıklama zorunludur!', 'warning');
+            return;
+        }
+        
+        const newsData = {
+            title: title,
+            source: source,
+            link: link,
+            description: description,
+            imageUrl: document.getElementById('news_imageUrl')?.value.trim() || null,
+            pubDate: document.getElementById('news_pubDate')?.value.trim() || new Date().toLocaleString('tr-TR'),
+            is_active: document.getElementById('news_status')?.value === 'true',
+            updated_at: new Date().toISOString()
+        };
+        
+        try {
+            let result;
+            if (editingNewsId) {
+                result = await window.supabaseClient
+                    .from('news')
+                    .update(newsData)
+                    .eq('id', editingNewsId);
+            } else {
+                newsData.created_at = new Date().toISOString();
+                result = await window.supabaseClient
+                    .from('news')
+                    .insert([newsData]);
+            }
+            
+            if (result.error) throw result.error;
+            
+            window.showToast(editingNewsId ? 'Haber güncellendi!' : 'Haber eklendi!', 'success');
+            closeNewsModal();
+            await loadNews();
+            if (window.loadAppData) window.loadAppData();
+        } catch (err) {
+            console.error('Haber kaydedilirken hata:', err);
+            window.showToast('Hata: ' + err.message, 'error');
+        }
+    }
+
+    async function deleteNews(id) {
+        if (!window.isAdmin()) return;
+        
+        window.showDeleteConfirm('Bu haberi silmek istediğinizden emin misiniz?', async () => {
+            try {
+                const { error } = await window.supabaseClient
+                    .from('news')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                window.showToast('Haber silindi', 'success');
+                await loadNews();
+                if (window.loadAppData) window.loadAppData();
+            } catch (err) {
+                window.showToast('Hata: ' + err.message, 'error');
+            }
+        });
+    }
+
+    async function previewNews(id) {
+        const news = newsData.find(n => String(n.id) === String(id));
+        if (!news) {
+            window.showToast('Haber bulunamadı!', 'error');
+            return;
+        }
+        
+        currentPreviewLink = news.link;
+        
+        const content = `
+            <div style="font-family: 'Times New Roman', Times, serif; line-height: 1.8;">
+                ${news.imageUrl ? `<img src="${news.imageUrl}" style="max-width: 100%; border-radius: 12px; margin-bottom: 1rem;" onerror="this.style.display='none'">` : ''}
+                <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <small><i class="fas fa-newspaper"></i> Kaynak: <strong>${window.escapeHtml(news.source)}</strong> | ${news.pubDate || ''}</small>
+                </div>
+                <h2 style="color: #065f46; margin-bottom: 1rem;">${window.escapeHtml(news.title)}</h2>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-style: italic;">
+                    ${window.escapeHtml(news.description)}
+                </div>
+                <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 8px; text-align: center;">
+                    <i class="fas fa-external-link-alt"></i> Bu haber <strong>${window.escapeHtml(news.source)}</strong> kaynağından alınmıştır.
+                    <br>Detaylar için "Kaynağa Git" butonuna tıklayınız.
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('previewNewsContent').innerHTML = content;
+        document.getElementById('previewNewsModal').classList.add('active');
+    }
+
+    function openOriginalLink() {
+        if (currentPreviewLink) {
+            window.open(currentPreviewLink, '_blank');
+        }
+    }
+
+    function closePreviewNewsModal() {
+        document.getElementById('previewNewsModal').classList.remove('active');
+        currentPreviewLink = '';
+    }
+
+    function closeNewsModal() {
+        document.getElementById('newsModal').classList.remove('active');
+        editingNewsId = null;
+    }
+</script>
