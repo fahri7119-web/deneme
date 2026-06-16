@@ -1,63 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-    <!-- Ana Sayfa -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
 
-    <!-- Derneğimiz (Hakkımızda) -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/hakkimizda.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/hakkimizda.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
-    <!-- Yerel Rehber -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/yerel-rehber.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/yerel-rehber.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 
-    <!-- Glutensiz Yaşam Rehberi -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/glutensiz-yasam.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/glutensiz-yasam.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 
-    <!-- Bağış Yap -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/bagis.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/bagis.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
-    <!-- İletişim -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/iletisim.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/iletisim.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
-    <!-- Dinamik İçerik Detay Sayfası (Şablon) -->
-    <url>
-        <loc>https://www.kirikkalecolyak.org.tr/detay.html</loc>
-        <lastmod>2026-05-18</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?id=1</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?id=3</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?id=2</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?id=7</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?slug=gectigimiz-ayin-ardindan-26</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?slug=9-mayis-dunya-colyak-gunu-colyaklilar-icin-glutensiz-yasam-bir-tercih-degil-zorunluluktur-19</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?slug=bir-yilin-ardindan-22</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.kirikkalecolyak.org.tr/detay.html?slug=9-mayis-i-kutladik-ama-asil-soru-su-ya-sonrasi-23</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
