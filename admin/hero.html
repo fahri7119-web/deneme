@@ -1,0 +1,869 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-image"></i> Kapak (Hero) Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openHeroModal()"><i class="fas fa-plus"></i> Yeni Hero</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr style="background: var(--primary-bg);">
+                        <th>#</th>
+                        <th>Başlık</th>
+                        <th>Slug</th>
+                        <th>Alt Başlık</th>
+                        <th>Sıra</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="heroTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Hero Modal -->
+    <div id="heroModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="modal-container" style="background: white; border-radius: 12px; width: 95%; max-width: 1200px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee;">
+                <h3 id="heroModalTitle" style="margin: 0;">Yeni Hero</h3>
+                <button class="modal-close-btn" onclick="closeHeroModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body" id="heroModalBody" style="padding: 20px;"></div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px; border-top: 1px solid #eee;">
+                <button class="btn btn-secondary" onclick="closeHeroModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveHero()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-form-group {
+        margin-bottom: 20px;
+    }
+    
+    .hero-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .hero-form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    .hero-form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+    }
+    
+    textarea.hero-form-control {
+        resize: vertical;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    
+    .hero-form-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .hero-form-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .hero-col-md-6 {
+        flex: 1;
+        min-width: calc(50% - 15px);
+    }
+    
+    .hero-checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        margin-top: 32px;
+    }
+    
+    .hero-checkbox-label input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+    }
+    
+    .slug-preview {
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: monospace;
+        color: #0066cc;
+        font-size: 13px;
+        margin-top: 5px;
+        border: 1px solid #e9ecef;
+        word-break: break-all;
+    }
+    
+    .slug-preview a {
+        color: #0066cc;
+        text-decoration: none;
+    }
+    
+    .slug-preview a:hover {
+        text-decoration: underline;
+    }
+    
+    .html-editor-row {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .editor-preview-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .editor-section {
+        flex: 1;
+        min-width: 280px;
+    }
+    
+    .preview-section {
+        flex: 1;
+        min-width: 280px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+    
+    .preview-header {
+        background: #27ae60;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px 8px 0 0;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .preview-header small {
+        font-size: 11px;
+        opacity: 0.8;
+    }
+    
+    .preview-content {
+        padding: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 0 0 8px 8px;
+    }
+    
+    .preview-content h1 { font-size: 24px; margin: 0 0 10px; color: #2c3e50; }
+    .preview-content h2 { font-size: 20px; margin: 15px 0 10px; color: #2980b9; }
+    .preview-content h3 { font-size: 18px; margin: 10px 0; color: #16a085; }
+    .preview-content p { line-height: 1.6; margin: 10px 0; }
+    .preview-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 10px 0; }
+    .preview-content ul, .preview-content ol { padding-left: 20px; margin: 10px 0; }
+    .preview-content li { margin: 5px 0; }
+    .preview-content blockquote { background: #f8f9fa; border-left: 4px solid #3498db; padding: 10px 20px; margin: 10px 0; font-style: italic; }
+    .preview-content .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 15px; border-radius: 6px; margin: 10px 0; }
+    .preview-content .image-caption { font-size: 11px; color: #666; text-align: center; margin-top: -5px; margin-bottom: 10px; }
+    .preview-content a { color: #3498db; text-decoration: none; }
+    .preview-content a:hover { text-decoration: underline; }
+    
+    .html-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 10px;
+        padding: 8px;
+        background: #ecf0f1;
+        border-radius: 8px;
+    }
+    
+    .tool-btn {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+    }
+    
+    .tool-btn:hover {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th, .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .badge-green {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-red {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #0056b3;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #545b62;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+    }
+    
+    .btn-small {
+        padding: 4px 8px;
+        font-size: 12px;
+        margin: 0 2px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-col-md-6 {
+            min-width: 100%;
+        }
+        
+        .hero-checkbox-label {
+            margin-top: 0;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 8px;
+            font-size: 12px;
+        }
+        
+        .editor-preview-wrapper {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+    let heroData = [];
+    let editingHeroId = null;
+
+    // Türkçe karakter dönüşümü
+    function turkishToEnglish(text) {
+        const map = {
+            'ğ': 'g', 'Ğ': 'G',
+            'ü': 'u', 'Ü': 'U',
+            'ş': 's', 'Ş': 'S',
+            'ı': 'i', 'İ': 'I',
+            'ö': 'o', 'Ö': 'O',
+            'ç': 'c', 'Ç': 'C',
+            'â': 'a', 'Â': 'A',
+            'î': 'i', 'Î': 'I'
+        };
+        return text.replace(/[ğĞüÜşŞıİöÖçÇâÂîÎ]/g, char => map[char] || char);
+    }
+
+    // Slug oluşturma
+    function createSlug(text) {
+        if (!text) return '';
+        let slug = turkishToEnglish(text)
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+        
+        if (slug.length > 60) {
+            slug = slug.substring(0, 60).replace(/-+$/, '');
+        }
+        return slug;
+    }
+
+    // Benzersiz slug oluştur
+    async function generateUniqueSlug(baseSlug) {
+        let cleanSlug = createSlug(baseSlug);
+        if (!cleanSlug) cleanSlug = 'icerik';
+        
+        let slug = cleanSlug;
+        let counter = 1;
+        let exists = true;
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        while (exists && attempts < maxAttempts) {
+            attempts++;
+            const { data, error } = await window.supabaseClient
+                .from('hero')
+                .select('id')
+                .eq('slug', slug);
+            
+            if (error) {
+                console.error('Slug kontrol hatası:', error);
+                return cleanSlug + '-' + Date.now();
+            }
+            
+            if (!data || data.length === 0) {
+                exists = false;
+            } else {
+                if (editingHeroId && data.length === 1 && data[0].id === editingHeroId) {
+                    exists = false;
+                } else {
+                    slug = cleanSlug + '-' + counter;
+                    counter++;
+                }
+            }
+        }
+        return slug;
+    }
+
+    window.initHero = async function() {
+        await loadHero();
+    };
+
+    async function loadHero() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('hero')
+                .select('*')
+                .order('order', { ascending: true });
+            
+            if (error) { 
+                window.showToast('Hero yüklenemedi: ' + error.message, 'error'); 
+                return; 
+            }
+            
+            heroData = data || [];
+            renderHero();
+        } catch (err) {
+            console.error('Hata:', err);
+            window.showToast('Hero yüklenirken hata oluştu', 'error');
+        }
+    }
+
+    function renderHero() {
+        const tbody = document.getElementById('heroTableBody');
+        if (!tbody) return;
+        
+        if (!heroData.length) { 
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Hero kaydı yok</td></tr>'; 
+            return; 
+        }
+        
+        tbody.innerHTML = heroData.map((h, idx) => {
+            const previewUrl = `/detay.html?slug=${encodeURIComponent(h.slug || '')}`;
+            return `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><strong>${escapeHtml(h.title) || '-'}</strong></td>
+                <td>
+                    <code style="font-size:11px; background:#f1f3f5; padding:2px 6px; border-radius:4px;">${escapeHtml(h.slug) || '-'}</code>
+                    <br>
+                    <a href="${previewUrl}" target="_blank" style="font-size:10px; color:#0066cc; text-decoration:none;">
+                        <i class="fas fa-external-link-alt"></i> Görüntüle
+                    </a>
+                </td>
+                <td>${escapeHtml(h.subtitle) || '-'}</td>
+                <td>${h.order || 0}</td>
+                <td>${h.is_active ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-red">Pasif</span>'}</td>
+                <td>
+                    <button class="btn btn-secondary btn-small" onclick="editHero('${h.id}')"><i class="fas fa-edit"></i> Düzenle</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteHero('${h.id}')"><i class="fas fa-trash"></i> Sil</button>
+                </td>
+            </tr>
+        `}).join('');
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;');
+    }
+    
+    function wrapHtmlTag(tag) {
+        const textarea = document.getElementById('hero_full_description');
+        if (!textarea) return;
+        
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value.substring(start, end);
+        const before = textarea.value.substring(0, start);
+        const after = textarea.value.substring(end);
+        
+        let wrapped = '';
+        if (tag === 'ul') {
+            const lines = text.split('\n');
+            const listItems = lines.map(line => `  <li>${line}</li>`).join('\n');
+            wrapped = `\n<ul>\n${listItems}\n</ul>\n`;
+        } else if (tag === 'ol') {
+            const lines = text.split('\n');
+            const listItems = lines.map(line => `  <li>${line}</li>`).join('\n');
+            wrapped = `\n<ol>\n${listItems}\n</ol>\n`;
+        } else if (tag === 'img') {
+            const url = prompt('Resim URL girin:', 'img/');
+            const alt = prompt('Resim açıklaması:', '');
+            if (url) {
+                wrapped = `<img src="${url}" alt="${alt || ''}" style="max-width:100%; border-radius:8px;">\n${alt ? `<div class="image-caption">${alt}</div>` : ''}`;
+            } else {
+                return;
+            }
+        } else if (tag === 'a') {
+            const linkText = prompt('Link metni:', 'tıklayın');
+            const url = prompt('Link URL:', 'https://');
+            if (linkText && url) {
+                wrapped = `<a href="${url}" target="_blank">${linkText}</a>`;
+            } else {
+                return;
+            }
+        } else if (tag === 'blockquote') {
+            wrapped = `\n<blockquote>\n${text || 'Alıntı metni'}\n</blockquote>\n`;
+        } else if (tag === 'note') {
+            wrapped = `\n<div class="note">\n<strong>📌 Not:</strong> ${text || 'Not metni'}\n</div>\n`;
+        } else {
+            wrapped = `<${tag}>${text || 'metin'}</${tag}>`;
+        }
+        
+        textarea.value = before + wrapped + after;
+        updateHtmlPreview();
+        textarea.focus();
+    }
+    
+    function updateHtmlPreview() {
+        const textarea = document.getElementById('hero_full_description');
+        const preview = document.getElementById('htmlPreviewContent');
+        if (textarea && preview) {
+            let html = textarea.value;
+            if (!html.trim()) {
+                preview.innerHTML = '<div style="color: #999; text-align: center; padding: 30px;">HTML içerik yazıldıkça önizleme burada görünecek</div>';
+            } else {
+                preview.innerHTML = html;
+            }
+        }
+    }
+    
+    function updateSlugFromTitle() {
+        const titleInput = document.getElementById('hero_title');
+        const slugInput = document.getElementById('hero_slug');
+        const slugLink = document.getElementById('slugLink');
+        
+        if (titleInput && slugInput) {
+            const newSlug = createSlug(titleInput.value);
+            slugInput.value = newSlug;
+            if (slugLink) {
+                slugLink.href = '/detay.html?slug=' + encodeURIComponent(newSlug);
+                slugLink.textContent = 'detay.html?slug=' + newSlug;
+            }
+        }
+    }
+    
+    function insertSampleContent() {
+        const sample = `<h1>17. Ulusal Çocuk Gastroenteroloji Kongresi Isparta'da Gerçekleşti</h1>
+
+<p><strong>Isparta, Türkiye</strong> – Çocuk gastroenterolojisi alanında Türkiye'nin önde gelen bilimsel etkinliklerinden biri olan <strong>17. Ulusal Çocuk Gastroenteroloji Kongresi</strong>, 10-13 Haziran 2026 tarihlerinde Isparta'da düzenlendi.</p>
+
+<blockquote>
+    "Bilimin Işığında Çocukların Sağlığına Umutla"
+</blockquote>
+
+<h2>Çölyak Hastalığı Tedavisinde Yeni Ufuklar</h2>
+
+<p>Prof. Dr. Hacer Fulya Gülerman, Çölyak hastalığı tedavisinde geliştirilmekte olan yeni stratejileri anlattı:</p>
+
+<ul>
+    <li><strong>Güvenli perkütan enzimler</strong> - Glutenin parçalanması</li>
+    <li><strong>Sıkı bağlantı stabilizatörleri</strong> - Bağırsak bariyeri</li>
+    <li><strong>TG2 inhibitörleri</strong> - Doku transglutaminaz</li>
+    <li><strong>İmmün modülatörler</strong> - Bağışıklık yanıtı</li>
+</ul>
+
+<div class="note">
+    <strong>📌 Not:</strong> Bu ilaçların hiçbiri şu an kullanımda değildir; geliştirilme süreci devam etmektedir.
+</div>
+
+<p><strong>Barida Hotels, Isparta</strong><br>
+10 – 13 Haziran 2026</p>`;
+        
+        const textarea = document.getElementById('hero_full_description');
+        if (textarea) {
+            textarea.value = sample;
+            updateHtmlPreview();
+        }
+    }
+
+    window.openHeroModal = function() { 
+        editingHeroId = null; 
+        renderHeroForm({}); 
+        const modal = document.getElementById('heroModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+        document.getElementById('heroModalTitle').textContent = 'Yeni Hero';
+    };
+    
+    window.editHero = async function(id) { 
+        if (!heroData.length) await loadHero();
+        const hero = heroData.find(x => String(x.id) === String(id));
+        if (hero) { 
+            editingHeroId = id; 
+            renderHeroForm(hero); 
+            const modal = document.getElementById('heroModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+            document.getElementById('heroModalTitle').textContent = 'Hero Düzenle';
+            setTimeout(() => {
+                updateHtmlPreview();
+            }, 100);
+        } else {
+            window.showToast('Hero bulunamadı!', 'error');
+        }
+    };
+    
+    function renderHeroForm(data) {
+        const formData = data || {};
+        const slugValue = formData.slug || createSlug(formData.title || '');
+        const previewUrl = '/detay.html?slug=' + encodeURIComponent(slugValue);
+        
+        const modalBody = document.getElementById('heroModalBody');
+        if (!modalBody) return;
+        
+        modalBody.innerHTML = `
+            <div class="hero-form-group">
+                <label>Başlık *</label>
+                <input type="text" id="hero_title" class="hero-form-control" value="${escapeHtml(formData.title || '')}" required oninput="updateSlugFromTitle()">
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Slug (URL dostu) *</label>
+                <input type="text" id="hero_slug" class="hero-form-control" value="${escapeHtml(slugValue)}" placeholder="ornek-haber-basligi" oninput="updateSlugPreview()">
+                <div class="hero-form-text">URL'de görünecek adres:</div>
+                <div class="slug-preview">
+                    <i class="fas fa-link"></i> 
+                    <a href="${previewUrl}" target="_blank" id="slugLink">detay.html?slug=${slugValue}</a>
+                </div>
+                <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="tool-btn" onclick="generateSlugFromTitle()">
+                        <i class="fas fa-magic"></i> Başlıktan Oluştur
+                    </button>
+                    <button type="button" class="tool-btn" onclick="copySlugToClipboard()">
+                        <i class="fas fa-copy"></i> Kopyala
+                    </button>
+                </div>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Alt Başlık</label>
+                <input type="text" id="hero_subtitle" class="hero-form-control" value="${escapeHtml(formData.subtitle || '')}">
+                <div class="hero-form-text">Opsiyonel, boş bırakabilirsiniz</div>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Buton Metni</label>
+                <input type="text" id="hero_button_text" class="hero-form-control" value="${escapeHtml(formData.button_text || '')}">
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Buton Linki</label>
+                <input type="url" id="hero_link" class="hero-form-control" value="${escapeHtml(formData.link || '')}">
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Arka Plan Resmi (URL)</label>
+                <input type="url" id="hero_bg_image" class="hero-form-control" value="${escapeHtml(formData.bg_image || '')}">
+                <div class="hero-form-text">Hero arka planında kullanılacak resim URL'i</div>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Medya Türü</label>
+                <select id="hero_media_type" class="hero-form-control">
+                    <option value="image" ${formData.media_type === 'image' ? 'selected' : ''}>Resim</option>
+                    <option value="video" ${formData.media_type === 'video' ? 'selected' : ''}>Video</option>
+                </select>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Video URL</label>
+                <input type="url" id="hero_video_url" class="hero-form-control" value="${escapeHtml(formData.video_url || '')}">
+                <div class="hero-form-text">YouTube, Vimeo veya direkt video dosyası URL'i</div>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Video Kapak Resmi</label>
+                <input type="url" id="hero_video_poster" class="hero-form-control" value="${escapeHtml(formData.video_poster || '')}">
+                <div class="hero-form-text">Video yüklenene kadar gösterilecek kapak resmi</div>
+            </div>
+            
+            <div class="hero-form-group">
+                <label>Detaylı Açıklama (HTML Destekli)</label>
+                <div class="html-editor-row">
+                    <div class="html-toolbar">
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('h1')">H1</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('h2')">H2</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('h3')">H3</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('b')"><b>K</b></button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('i')"><i>İ</i></button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('ul')">📋 Liste</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('ol')">🔢 Sıralı</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('img')">🖼 Resim</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('a')">🔗 Link</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('blockquote')">💬 Alıntı</button>
+                        <button type="button" class="tool-btn" onclick="wrapHtmlTag('note')">📌 Not</button>
+                        <button type="button" class="tool-btn" onclick="insertSampleContent()">📰 Örnek</button>
+                        <button type="button" class="tool-btn" onclick="updateHtmlPreview()">👁 Yenile</button>
+                    </div>
+                    <div class="editor-preview-wrapper">
+                        <div class="editor-section">
+                            <textarea id="hero_full_description" rows="12" class="hero-form-control" placeholder="HTML etiketleri kullanarak içerik oluşturun...">${escapeHtml(formData.full_description || '')}</textarea>
+                        </div>
+                        <div class="preview-section">
+                            <div class="preview-header">
+                                <span><i class="fas fa-eye"></i> Canlı Önizleme</span>
+                                <small>HTML içerik yazdıkça güncellenir</small>
+                            </div>
+                            <div class="preview-content" id="htmlPreviewContent">
+                                <div style="color: #999; text-align: center; padding: 30px;">HTML içerik yazıldıkça önizleme burada görünecek</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-form-row">
+                <div class="hero-col-md-6">
+                    <div class="hero-form-group">
+                        <label>Sıralama</label>
+                        <input type="number" id="hero_order" class="hero-form-control" value="${formData.order || 0}">
+                        <div class="hero-form-text">Daha küçük sayı önce görünür</div>
+                    </div>
+                </div>
+                <div class="hero-col-md-6">
+                    <div class="hero-checkbox-label">
+                        <input type="checkbox" id="hero_is_active" ${formData.is_active ? 'checked' : ''}>
+                        <span>Aktif</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            const textarea = document.getElementById('hero_full_description');
+            if (textarea) {
+                textarea.addEventListener('input', updateHtmlPreview);
+                updateHtmlPreview();
+            }
+            const slugInput = document.getElementById('hero_slug');
+            if (slugInput) {
+                slugInput.addEventListener('input', updateSlugPreview);
+            }
+        }, 100);
+    }
+    
+    function updateSlugPreview() {
+        const slugInput = document.getElementById('hero_slug');
+        const slugLink = document.getElementById('slugLink');
+        if (slugInput && slugLink) {
+            const slug = slugInput.value || 'bos-slug';
+            slugLink.href = '/detay.html?slug=' + encodeURIComponent(slug);
+            slugLink.textContent = 'detay.html?slug=' + slug;
+        }
+    }
+    
+    function generateSlugFromTitle() {
+        const titleInput = document.getElementById('hero_title');
+        const slugInput = document.getElementById('hero_slug');
+        if (titleInput && slugInput) {
+            const newSlug = createSlug(titleInput.value);
+            slugInput.value = newSlug;
+            updateSlugPreview();
+        }
+    }
+    
+    function copySlugToClipboard() {
+        const slugInput = document.getElementById('hero_slug');
+        if (slugInput && slugInput.value) {
+            const fullUrl = '/detay.html?slug=' + slugInput.value;
+            navigator.clipboard?.writeText(fullUrl).then(() => {
+                window.showToast('URL kopyalandı!', 'success');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = fullUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                window.showToast('URL kopyalandı!', 'success');
+            });
+        }
+    }
+    
+    async function reorderHeroItems() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('hero')
+                .select('id, order')
+                .order('order', { ascending: true });
+            
+            if (error) throw error;
+            
+            for (let i = 0; i < data.length; i++) {
+                const newOrder = i + 1;
+                if (data[i].order !== newOrder) {
+                    await window.supabaseClient
+                        .from('hero')
+                        .update({ order: newOrder })
+                        .eq('id', data[i].id);
+                }
+            }
+        } catch (err) {
+            console.error('Sıralama hatası:', err);
+        }
+    }
+    
+    window.saveHero = async function() {
+        const title = document.getElementById('hero_title')?.value.trim() || '';
+        let slug = document.getElementById('hero_slug')?.value.trim() || '';
+        
+        if (!title) {
+            window.showToast('Başlık zorunludur', 'warning');
+            return;
+        }
+        
+        if (!slug) {
+            slug = createSlug(title);
+        }
+        
+        const uniqueSlug = await generateUniqueSlug(slug);
+        
+        const heroItem = {
+            title: title,
+            slug: uniqueSlug,
+            subtitle: document.getElementById('hero_subtitle')?.value.trim() || '',
+            button_text: document.getElementById('hero_button_text')?.value.trim() || null,
+            link: document.getElementById('hero_link')?.value.trim() || null,
+            bg_image: document.getElementById('hero_bg_image')?.value.trim() || null,
+            media_type: document.getElementById('hero_media_type')?.value || 'image',
+            video_url: document.getElementById('hero_video_url')?.value.trim() || null,
+            video_poster: document.getElementById('hero_video_poster')?.value.trim() || null,
+            full_description: document.getElementById('hero_full_description')?.value || null,
+            order: parseInt(document.getElementById('hero_order')?.value) || 0,
+            is_active: document.getElementById('hero_is_active')?.checked || false,
+            updated_at: new Date().toISOString()
+        };
+        
+        if (editingHeroId) {
+            const { error } = await window.supabaseClient
+                .from('hero')
+                .update(heroItem)
+                .eq('id', editingHeroId);
+            
+            if (error) { 
+                window.showToast('Hata: ' + error.message, 'error'); 
+                return; 
+            }
+            window.showToast('Hero güncellendi', 'success');
+        } else {
+            heroItem.created_at = new Date().toISOString();
+            const { error } = await window.supabaseClient
+                .from('hero')
+                .insert([heroItem]);
+            
+            if (error) { 
+                window.showToast('Hata: ' + error.message, 'error'); 
+                return; 
+            }
+            window.showToast('Hero eklendi', 'success');
+            await reorderHeroItems();
+        }
+        
+        closeHeroModal();
+        await loadHero();
+    };
+    
+    window.deleteHero = async function(id) {
+        if (confirm('Bu hero kaydını silmek istediğinizden emin misiniz?')) {
+            const { error } = await window.supabaseClient.from('hero').delete().eq('id', id);
+            if (error) { 
+                window.showToast('Hata: ' + error.message, 'error'); 
+                return; 
+            }
+            window.showToast('Hero silindi', 'success');
+            await loadHero();
+            await reorderHeroItems();
+        }
+    };
+    
+    window.closeHeroModal = function() { 
+        const modal = document.getElementById('heroModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    };
+</script>
