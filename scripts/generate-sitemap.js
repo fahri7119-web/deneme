@@ -2,28 +2,35 @@ import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'fs';
 import { config } from './config.js';
 
-const supabase = createClient(config.url, config.key);
+console.log('🚀 Sitemap oluşturma başlıyor...');
 
-function formatDate(date) {
-    if (!date) return new Date().toISOString().split('T')[0];
-    try {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
-        return d.toISOString().split('T')[0];
-    } catch {
-        return new Date().toISOString().split('T')[0];
+try {
+    // Supabase bağlantısını kontrol et
+    if (!config.url || !config.key) {
+        console.error('❌ Supabase bağlantı bilgileri eksik!');
+        process.exit(1);
     }
-}
 
-function buildUrl(path) {
-    if (path.startsWith('http')) return path;
-    if (path.startsWith('/')) return `${config.site}${path}`;
-    return `${config.site}/${path}`;
-}
+    const supabase = createClient(config.url, config.key);
+    console.log('✅ Supabase bağlantısı kuruldu');
 
-async function generateSitemap() {
-    console.log('🚀 Sitemap oluşturma başlıyor...');
-    
+    function formatDate(date) {
+        if (!date) return new Date().toISOString().split('T')[0];
+        try {
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+            return d.toISOString().split('T')[0];
+        } catch {
+            return new Date().toISOString().split('T')[0];
+        }
+    }
+
+    function buildUrl(path) {
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/')) return `${config.site}${path}`;
+        return `${config.site}/${path}`;
+    }
+
     const urls = [];
     const now = new Date().toISOString().split('T')[0];
 
@@ -143,24 +150,15 @@ async function generateSitemap() {
         console.log(`📄 Dosya: sitemap.xml`);
         console.log(`🔗 URL sayısı: ${uniqueUrls.length}`);
         console.log(`📦 Boyut: ${(xml.length / 1024).toFixed(2)} KB`);
-        return true;
     } catch (error) {
         console.error('❌ Dosya yazma hatası:', error.message);
-        return false;
-    }
-}
-
-generateSitemap()
-    .then(success => {
-        if (success) {
-            console.log('🎉 Başarılı!');
-            process.exit(0);
-        } else {
-            console.error('❌ Başarısız!');
-            process.exit(1);
-        }
-    })
-    .catch(error => {
-        console.error('❌ Hata:', error);
         process.exit(1);
-    });
+    }
+
+    console.log('🎉 Başarılı!');
+    process.exit(0);
+
+} catch (error) {
+    console.error('❌ Beklenmeyen hata:', error.message);
+    process.exit(1);
+}
