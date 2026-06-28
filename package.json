@@ -1,0 +1,12 @@
+{
+  "name": "kirikkale-colyak-seo",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "sitemap": "node scripts/generate-sitemap.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0",
+    "dotenv": "^16.4.5"
+  }
+}
