@@ -1,1 +1,39 @@
+name: Update Sitemap
 
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Her gün 03:00'te çalışır
+  workflow_dispatch:      # Manuel çalıştırmak için
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "SITE=${{ secrets.SITE }}" >> .env
+          
+      - name: Generate sitemap
+        run: npm run sitemap
+        
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add sitemap.xml
+          git diff --staged --quiet || git commit -m "Update sitemap [skip ci]"
+          git push
