@@ -1,0 +1,408 @@
+<div class="page-content">
+    <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="color: var(--primary-dark);"><i class="fas fa-video"></i> Videolar Yönetimi</h2>
+        <button class="btn btn-primary" onclick="openVideoModal()"><i class="fas fa-plus"></i> Yeni Video</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr style="background: var(--primary-bg);">
+                        <th>#</th>
+                        <th>Başlık</th>
+                        <th>Açıklama</th>
+                        <th>Video URL</th>
+                        <th>Kapak Resmi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="videosTableBody">
+                    <tr><td colspan="6" class="empty-state">Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal" style="z-index: 4000; display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 600px; background: white; border-radius: 8px; padding: 0; max-height: 90vh; overflow-y: auto; position: relative; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb;">
+                <div class="modal-title" id="videoModalTitle" style="font-size: 1.25rem; font-weight: 600;">Yeni Video</div>
+                <button class="modal-close" onclick="closeVideoModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">&times;</button>
+            </div>
+            <div class="modal-body" id="videoModalBody" style="padding: 1.5rem;"></div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-secondary" onclick="closeVideoModal()" style="padding: 0.5rem 1rem; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer;">İptal</button>
+                <button class="btn btn-primary" onclick="saveVideo()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // 1. YARDIMCI FONKSİYONLAR
+    // ============================================
+    
+    if (typeof window.escapeHtml !== 'function') {
+        window.escapeHtml = function(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+    }
+
+    if (typeof window.showToast !== 'function') {
+        window.showToast = function(message, type = 'info') {
+            alert(message);
+            console.log(`[${type}] ${message}`);
+        };
+    }
+
+    // ============================================
+    // 2. VİDEO YÖNETİMİ
+    // ============================================
+    
+    let videosData = [];
+    let editingVideoId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📹 Video sayfası yüklendi');
+        initVideos();
+    });
+
+    function initVideos() { 
+        console.log('🔄 Videolar başlatılıyor...');
+        loadVideos(); 
+    }
+
+    async function loadVideos() {
+        try {
+            if (!window.supabaseClient) {
+                console.error('❌ Supabase client bulunamadı!');
+                document.getElementById('videosTableBody').innerHTML = 
+                    `<tr><td colspan="6" class="empty-state" style="color: red;">❌ Supabase bağlantısı yok</td></tr>`;
+                return;
+            }
+
+            console.log('📥 Videolar yükleniyor...');
+            const { data, error } = await window.supabaseClient
+                .from('videos')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('❌ Supabase hatası:', error);
+                throw error;
+            }
+            
+            console.log(`✅ ${data?.length || 0} video yüklendi`);
+            videosData = data || [];
+            renderVideos();
+            
+        } catch (err) {
+            console.error('❌ Videolar yüklenirken hata:', err);
+            document.getElementById('videosTableBody').innerHTML = 
+                `<tr><td colspan="6" class="empty-state" style="color: red;">❌ Hata: ${err.message}</td></tr>`;
+        }
+    }
+
+    function renderVideos() {
+        const tbody = document.getElementById('videosTableBody');
+        
+        if (!videosData || !videosData.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">📹 Henüz video yok. İlk videonuzu ekleyin!</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = videosData.map((video, idx) => {
+            let descriptionDisplay = video.description || '';
+            if (descriptionDisplay.length > 60) {
+                descriptionDisplay = descriptionDisplay.substring(0, 60) + '...';
+            }
+            
+            // Poster görselini göster - göreceli yol için base URL ekle
+            let posterHtml = '-';
+            if (video.poster) {
+                let posterUrl = video.poster;
+                // Eğer göreceli yol ise base URL ekle
+                if (!posterUrl.startsWith('http://') && !posterUrl.startsWith('https://')) {
+                    posterUrl = window.location.origin + '/' + posterUrl;
+                }
+                posterHtml = `<img src="${posterUrl}" alt="Kapak" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">`;
+            }
+            
+            return `
+                <tr>
+                    <td style="text-align: center; width: 50px;">${idx + 1}</td>
+                    <td><strong>${window.escapeHtml(video.title) || '-'}</strong></td>
+                    <td><small>${window.escapeHtml(descriptionDisplay) || '-'}</small></td>
+                    <td>
+                        ${video.video_url ? 
+                            `<a href="${video.video_url}" target="_blank" style="color: var(--primary);">
+                                <i class="fas fa-external-link-alt"></i> İzle
+                            </a>` 
+                            : '-'}
+                    </td>
+                    <td style="text-align: center;">${posterHtml}</td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn btn-secondary btn-small" onclick="editVideo(${video.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteVideo(${video.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // ============================================
+    // 3. MODAL İŞLEMLERİ
+    // ============================================
+
+    function openVideoModal() { 
+        console.log('➕ Yeni video modalı açılıyor');
+        editingVideoId = null; 
+        document.getElementById('videoModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Yeni Video';
+        renderVideoForm({}); 
+        showModal();
+    }
+    
+    function editVideo(id) { 
+        console.log('✏️ Video düzenleniyor, ID:', id);
+        
+        const video = videosData.find(v => v.id === id); 
+        if (!video) {
+            console.error('❌ Video bulunamadı! ID:', id);
+            alert('Video bulunamadı!');
+            return;
+        }
+        
+        console.log('📝 Düzenlenecek video:', video);
+        editingVideoId = id; 
+        document.getElementById('videoModalTitle').innerHTML = '<i class="fas fa-edit"></i> Video Düzenle';
+        renderVideoForm(video); 
+        showModal();
+    }
+    
+    function showModal() {
+        const modal = document.getElementById('videoModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function renderVideoForm(data) {
+        const body = document.getElementById('videoModalBody');
+        
+        // Verileri güvenli bir şekilde al
+        const title = data.title || '';
+        const description = data.description || '';
+        const videoUrl = data.video_url || '';
+        const poster = data.poster || '';
+        
+        console.log('📝 Forma doldurulacak veriler:', { title, description, videoUrl, poster });
+        
+        body.innerHTML = `
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.25rem; font-weight: 500;">Başlık *</label>
+                <input type="text" id="video_title" class="form-control" 
+                       value="${window.escapeHtml(title)}" 
+                       placeholder="Video başlığını girin" required
+                       style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.25rem; font-weight: 500;">Açıklama</label>
+                <textarea id="video_description" rows="3" class="form-control" 
+                          placeholder="Video açıklaması (opsiyonel)"
+                          style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">${window.escapeHtml(description)}</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.25rem; font-weight: 500;">Video URL *</label>
+                <input type="url" id="video_url" class="form-control" 
+                       value="${window.escapeHtml(videoUrl)}" 
+                       placeholder="https://www.youtube.com/watch?v=..." required
+                       style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                <small style="color: #6b7280; display: block; margin-top: 4px;">
+                    YouTube, Vimeo veya diğer video platformları için tam URL
+                </small>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.25rem; font-weight: 500;">Kapak Resmi URL</label>
+                <input type="text" id="video_poster" class="form-control" 
+                       value="${window.escapeHtml(poster)}" 
+                       placeholder="img/cly.jpg veya https://example.com/poster.jpg"
+                       style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                <small style="color: #6b7280; display: block; margin-top: 4px;">
+                    Göreceli yol (img/cly.jpg) veya tam URL (https://...) girebilirsiniz
+                </small>
+            </div>
+        `;
+    }
+
+    // ============================================
+    // 4. KAYDETME İŞLEMİ (DÜZELTİLDİ)
+    // ============================================
+
+    async function saveVideo() {
+        console.log('💾 Video kaydediliyor...');
+        console.log('📝 Düzenleme ID:', editingVideoId);
+        
+        try {
+            const titleInput = document.getElementById('video_title');
+            const descriptionInput = document.getElementById('video_description');
+            const videoUrlInput = document.getElementById('video_url');
+            const posterInput = document.getElementById('video_poster');
+            
+            if (!titleInput || !videoUrlInput) {
+                alert('Form alanları bulunamadı!');
+                return;
+            }
+            
+            const title = titleInput.value.trim();
+            const videoUrl = videoUrlInput.value.trim();
+            const poster = posterInput ? posterInput.value.trim() : '';
+            
+            if (!title) {
+                alert('Başlık zorunludur!');
+                titleInput.focus();
+                return;
+            }
+            if (!videoUrl) {
+                alert('Video URL zorunludur!');
+                videoUrlInput.focus();
+                return;
+            }
+            
+            // Video URL'ini kontrol et
+            try {
+                new URL(videoUrl);
+            } catch (e) {
+                // Eğer geçerli bir URL değilse ama http:// veya https:// ile başlıyorsa uyar
+                if (videoUrl.startsWith('http://') || videoUrl.startsWith('https://')) {
+                    alert('Geçerli bir URL girin!');
+                    videoUrlInput.focus();
+                    return;
+                } else {
+                    // Belki göreceli bir yoldur, başına http:// ekleme
+                    console.warn('⚠️ Video URL göreceli olabilir:', videoUrl);
+                }
+            }
+            
+            // Poster URL'ini kontrol et - GÖRECELİ YOLLARA İZİN VER
+            let posterUrl = null;
+            if (poster) {
+                // Göreceli yol veya tam URL olabilir
+                posterUrl = poster;
+                console.log('📸 Poster kaydediliyor:', posterUrl);
+            }
+            
+            // Video verilerini hazırla
+            const videoData = {
+                title: title,
+                description: descriptionInput ? descriptionInput.value.trim() || null : null,
+                video_url: videoUrl,
+                poster: posterUrl
+            };
+            
+            console.log('📤 Gönderilecek veri:', videoData);
+            
+            let result;
+            
+            if (editingVideoId) {
+                // ===== GÜNCELLEME =====
+                console.log('🔄 Video güncelleniyor, ID:', editingVideoId);
+                result = await window.supabaseClient
+                    .from('videos')
+                    .update(videoData)
+                    .eq('id', editingVideoId);
+            } else {
+                // ===== YENİ EKLEME =====
+                console.log('➕ Yeni video ekleniyor...');
+                result = await window.supabaseClient
+                    .from('videos')
+                    .insert([videoData]);
+            }
+            
+            console.log('📊 Supabase sonucu:', result);
+            
+            if (result.error) {
+                console.error('❌ Supabase hatası:', result.error);
+                throw new Error(result.error.message);
+            }
+            
+            alert(editingVideoId ? 'Video güncellendi ✅' : 'Video eklendi ✅');
+            closeVideoModal();
+            await loadVideos();
+            
+        } catch (err) {
+            console.error('❌ Video kaydedilirken hata:', err);
+            alert('Kaydetme hatası: ' + err.message);
+        }
+    }
+
+    // ============================================
+    // 5. SİLME İŞLEMİ
+    // ============================================
+
+    async function deleteVideo(id) {
+        console.log('🗑️ Video siliniyor, ID:', id);
+        
+        const video = videosData.find(v => v.id === id);
+        const title = video ? video.title : 'bu video';
+        
+        if (!confirm(`"${title}" silmek istediğinizden emin misiniz?`)) {
+            console.log('❌ Silme iptal edildi');
+            return;
+        }
+        
+        try {
+            const { error } = await window.supabaseClient
+                .from('videos')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
+            
+            console.log('✅ Video silindi');
+            alert('Video silindi 🗑️');
+            await loadVideos();
+        } catch (err) {
+            console.error('❌ Video silinirken hata:', err);
+            alert('Hata: ' + err.message);
+        }
+    }
+
+    // ============================================
+    // 6. MODAL KAPATMA
+    // ============================================
+
+    function closeVideoModal() { 
+        console.log('❌ Video modalı kapatılıyor');
+        const modal = document.getElementById('videoModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        editingVideoId = null;
+    }
+
+    // ============================================
+    // 7. MODAL DIŞINA TIKLAMA
+    // ============================================
+
+    document.getElementById('videoModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeVideoModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeVideoModal();
+        }
+    });
+</script>
