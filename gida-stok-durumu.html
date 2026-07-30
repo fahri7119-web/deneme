@@ -2892,7 +2892,7 @@
                             <h2><i class="fas fa-boxes"></i> Stok Durumu</h2>
                             <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                                 <span class="badge-count" id="stockCountBadge">0 ürün</span>
-                                <button class="view-all-btn" data-modal="stock-cards"><i class="fas fa-arrow-right"></i> Tüm Stokları Gör</button>
+                                <button class="view-all-btn" data-modal="stock-cards"><i class="fas fa-arrow-right"></i> Ürün Bazlı Stok Durumunu Gör</button>
                                 <!-- CANLI VERİ GÖSTERGESİ - tarih yerine -->
                                 <span class="live-indicator"><span class="live-dot"></span> CANLI</span>
                             </div>
@@ -2925,7 +2925,7 @@
                     <h2><i class="fas fa-table"></i> Stok Detay Tablosu</h2>
                     <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                         <span class="badge-count" id="stockDetailCount">0 ürün</span>
-                        <button class="view-all-btn" data-modal="stock-detail"><i class="fas fa-arrow-right"></i> Tüm Stok Durumunu Gör</button>
+                        <button class="view-all-btn" data-modal="stock-detail"><i class="fas fa-arrow-right"></i> Stok Giriş Detayını Gör </button>
                         <!-- CANLI VERİ GÖSTERGESİ - tarih yerine -->
                         <span class="live-indicator"><span class="live-dot"></span> CANLI</span>
                     </div>
@@ -3568,7 +3568,7 @@
                         content = renderAllDonors();
                         break;
                     case 'stock-cards':
-                        title = '<i class="fas fa-boxes"></i> Tüm Stoklar';
+                        title = '<i class="fas fa-boxes"></i> Ürün Bazlı Stok Durumumuz';
                         content = renderAllStockCards();
                         break;
                     case 'distributions':
@@ -3577,7 +3577,7 @@
                         content = renderAllDistributions();
                         break;
                     case 'stock-detail':
-                        title = '<i class="fas fa-table"></i> Tüm Stok Durumu';
+                        title = '<i class="fas fa-table"></i> Stokdaki Ürünlerin Alınma Tarihleri';
                         content = renderAllStockDetail();
                         break;
                     case 'iletisim':
