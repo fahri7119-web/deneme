@@ -1080,7 +1080,6 @@
             padding: 2rem 2rem 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(0, 0, 0, 0.04);
             scroll-margin-top: calc(var(--header-height) + 20px);
             transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
             display: block;
@@ -1089,11 +1088,7 @@
         .content-section.hidden {
             display: none;
         }
-        .content-section:target {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(232, 133, 12, 0.1), var(--shadow);
-        }
-        body.dark-mode .content-section {
+            body.dark-mode .content-section {
             background: #2a2a2a;
             border-color: #3a3a3a;
         }
@@ -2465,14 +2460,6 @@
                     </div>
                 </nav>
             </header>
-
-            <!-- ===== BREADCRUMB ===== -->
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
-                <i class="fas fa-chevron-right"></i>
-                <span>Glutensiz Yaşam Bilgi Merkezi</span>
-            </nav>
-
             <!-- ===== HERO - Birebir gida-stok-durumu.html'den alındı ===== -->
             <div class="bagis-hero">
                 <div class="hero-content">
@@ -2495,15 +2482,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ===== SEARCH BOX ===== -->
-            <div class="search-box" role="search">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Konu, başlık veya kelime ara..." aria-label="Sayfa içinde ara">
-                <button class="search-clear" id="searchClear" aria-label="Aramayı temizle"><i class="fas fa-times"></i></button>
-            </div>
-
-            <!-- ===== CONTENT WRAPPER ===== -->
+             <!-- ===== CONTENT WRAPPER ===== -->
             <div class="content-wrapper">
 
                 <!-- ===== SIDEBAR TOC ===== -->
