@@ -659,7 +659,21 @@
                 font-size: 1.4rem;
             }
         }
-
+ /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 1.2rem 2rem 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .breadcrumb a { color: var(--primary); font-weight: 500; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb i { font-size: 0.55rem; }
+        @media (max-width: 768px) { .breadcrumb { padding: 1rem 1rem 0; } }
         /* ===== STATS ROW ===== */
         .stats-row {
             display: grid;
