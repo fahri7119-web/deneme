@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>Gizlilik Politikası | Kırıkkale Çölyak Derneği</title>
+    <meta name="description" content="Kırıkkale Çölyak Derneği Gizlilik Politikası - Kişisel verilerinizin korunması ve gizlilik haklarınız hakkında bilgi.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.kirikkalecolyak.org/gizlilik-politikasi.html">
+    <link rel="icon" href="img/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #1A7A5A;
+            --primary-light: #2A9A7A;
+            --primary-dark: #0F5A3E;
+            --accent: #E8850C;
+            --bg: #F6F8F7;
+            --text: #1A2626;
+            --text-light: #3A4E4E;
+            --white: #FFFFFF;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --radius: 18px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font);
+            background: #e8eeeb;
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .site-wrapper {
+            background: #ffffff;
+            max-width: 960px;
+            margin: 1.5rem auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 0 1rem;
+            min-height: calc(100vh - 3rem);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 640px) {
+            .site-wrapper {
+                margin: 0 !important;
+                border-radius: 0 !important;
+                min-height: 100vh;
+                padding: 0 0 !important;
+                box-shadow: none;
+                border: none;
+            }
+            body {
+                background: #ffffff;
+            }
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 0.5rem !important;
+            }
+        }
+
+        img { max-width: 100%; height: auto; display: block; }
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            padding: 0.5rem 1rem;
+            margin: 0 -1rem;
+            border-radius: 28px 28px 0 0;
+        }
+
+        @media (max-width: 640px) {
+            header {
+                margin: 0 -0.5rem !important;
+                border-radius: 0 !important;
+                padding: 0.4rem 0.5rem !important;
+            }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-shrink: 0;
+        }
+        .logo img {
+            height: 56px;
+            width: auto;
+            border-radius: 8px;
+        }
+        .logo-text .city {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        .logo-text .sub {
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+        }
+
+        .header-divider {
+            width: 100%;
+            height: 2px;
+            background: var(--primary-light);
+            margin: 0.4rem 0;
+            display: block;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 0.2rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .main-nav a {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: clamp(0.75rem, 1.1vw, 0.85rem);
+            padding: 0.4rem 0.8rem;
+            border-radius: 40px;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .main-nav a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 40px;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+        .main-nav a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .main-nav a:hover { 
+            color: #fff; 
+            background: var(--primary);
+        }
+        .main-nav a.active { 
+            background: var(--primary); 
+            color: #fff; 
+            box-shadow: 0 2px 8px rgba(26,122,90,0.25);
+        }
+        .nav-cta {
+            background: var(--accent) !important;
+            color: #fff !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(232,133,12,0.25);
+            margin-left: 0.2rem;
+            display: inline-block;
+        }
+        .nav-cta:hover { 
+            background: var(--primary-dark) !important; 
+            box-shadow: 0 4px 12px rgba(15,90,62,0.3);
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .hamburger:hover { 
+            background: rgba(26,122,90,0.08); 
+            color: var(--primary);
+        }
+        .hamburger .hamburger-line {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background: currentColor;
+            border-radius: 2px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hamburger .hamburger-line:nth-child(1) { top: 14px; }
+        .hamburger .hamburger-line:nth-child(2) { top: 21px; }
+        .hamburger .hamburger-line:nth-child(3) { top: 28px; }
+        .hamburger.active .hamburger-line:nth-child(1) {
+            top: 21px;
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-50%) scaleX(0);
+        }
+        .hamburger.active .hamburger-line:nth-child(3) {
+            top: 21px;
+            transform: translateX(-50%) rotate(-45deg);
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 98;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .header-top {
+                flex-wrap: nowrap;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--white);
+                padding: 0 1rem;
+                border-radius: 0 0 var(--radius) var(--radius);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+                gap: 0.3rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 99;
+                transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                opacity: 0;
+                visibility: hidden;
+            }
+            .main-nav.open { 
+                display: flex; 
+                max-height: 80vh;
+                padding: 1rem;
+                opacity: 1;
+                visibility: visible;
+                overflow-y: auto;
+            }
+            .main-nav a { 
+                width: 100%; 
+                text-align: left; 
+                padding: 0.7rem 1rem; 
+                border-radius: 12px;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+            .main-nav a::before { display: none; }
+            .main-nav a i { 
+                width: 24px; 
+                text-align: center; 
+                color: var(--primary);
+            }
+            .main-nav a:hover { 
+                background: rgba(26,122,90,0.08); 
+                color: var(--primary);
+            }
+            .main-nav a.active { 
+                background: var(--primary); 
+                color: #fff;
+            }
+            .main-nav a.active i { color: #fff; }
+            .nav-cta { 
+                margin-top: 0.5rem;
+                justify-content: center !important;
+                margin-left: 0;
+            }
+            .nav-overlay {
+                display: none !important;
+            }
+            .logo img {
+                height: 42px;
+            }
+            .logo-text .city {
+                font-size: 0.95rem;
+            }
+            .logo-text .sub {
+                font-size: 0.6rem;
+            }
+        }
+
+        /* İÇERİK */
+        .page-content {
+            padding: 2rem 0 3rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 0.3rem;
+        }
+        .page-header .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .page-header .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .page-header .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .page-header .breadcrumb .sep {
+            margin: 0 0.4rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 640px) {
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .policy-section {
+            margin-bottom: 2.5rem;
+        }
+        .policy-section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.8rem;
+            padding-left: 0.8rem;
+            border-left: 4px solid var(--accent);
+        }
+        .policy-section p {
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+        .policy-section ul {
+            list-style: none;
+            padding-left: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .policy-section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+        .policy-section ul li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .policy-section .last-updated {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 3rem;
+            padding: 2.5rem 2rem 1.5rem;
+            background: #F0F5F2;
+            border-radius: 0 0 28px 28px;
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.04);
+            display: grid;
+            grid-template-columns: 1.2fr repeat(3, 1fr) 1fr;
+            gap: 2rem;
+            position: relative;
+            text-align: center;
+            margin: 0 -1rem -1rem;
+        }
+
+        @media (max-width: 640px) {
+            footer {
+                margin: 0 -0.5rem -0.5rem !important;
+                border-radius: 0 !important;
+                padding: 1.8rem 1rem 1rem !important;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            footer .footer-col:first-child {
+                padding-right: 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(0,0,0,0.06);
+                padding-bottom: 1.2rem;
+            }
+            footer .footer-col {
+                align-items: center;
+                text-align: center;
+            }
+            footer .footer-col h4::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            footer .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.8rem;
+            }
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            right: 2rem;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        footer .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        footer .footer-col:first-child {
+            padding-right: 1rem;
+            border-right: 1px solid rgba(0,0,0,0.06);
+        }
+        footer .footer-col h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-bottom: 0.4rem;
+        }
+        footer .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        footer .footer-col a {
+            color: #2A5A4A;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+            padding: 0.15rem 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        footer .footer-col a::before {
+            content: '›';
+            color: var(--primary-light);
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+        footer .footer-col a:hover { 
+            color: var(--primary); 
+            padding-left: 0.3rem;
+        }
+        footer .footer-col a:hover::before {
+            transform: translateX(3px);
+        }
+        footer .footer-logo img { 
+            height: 56px; 
+            width: auto;
+            margin: 0 auto 0.5rem;
+        }
+        footer .footer-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-top: 0.3rem;
+            text-align: center;
+        }
+        footer .footer-social {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+        footer .footer-social a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--text-light);
+            transition: all 0.25s ease;
+            font-size: 0.9rem;
+        }
+        footer .footer-social a:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(26,122,90,0.3);
+        }
+        footer .footer-bottom {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding-top: 1.2rem;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        footer .footer-bottom .footer-legal {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        footer .footer-bottom .footer-legal a {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            transition: color 0.2s;
+        }
+        footer .footer-bottom .footer-legal a:hover {
+            color: var(--primary);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="site-wrapper">
+        <div class="container">
+                        <header>
+                <div class="header-top">
+                    <a href="index.html" class="logo" aria-label="Kırıkkale Çölyak Derneği Ana Sayfa">
+                        <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo">
+                        <div class="logo-text">
+                            <span class="city">Kırıkkale</span>
+                            <span class="sub">Çölyak Derneği</span>
+                        </div>
+                    </a>
+                    <div class="header-info">
+                        <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
+                        <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
+                    </div>
+                    <button class="hamburger" id="hamburgerBtn" aria-label="Menüyü aç/kapat" aria-expanded="false">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+                <div class="header-divider"></div>
+                <div class="nav-overlay" id="navOverlay"></div>
+                <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
+                    <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                    <a href="haberler.html"><i class="fas fa-newspaper"></i> Basında Biz</a>
+                    <a href="glutensiz-yasam.html"><i class="fas fa-leaf"></i> Glutensiz Yaşam</a>
+                    <a href="isletmeler.html"><i class="fas fa-utensils"></i> Glutensiz İşletmeler</a>
+                    <a href="bagis.html"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                    <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                    <a href="uyelik.html" class="nav-cta"><i class="fas fa-user-plus"></i> Üye Ol</a>
+                </nav>
+            </header>
+
+            <main class="page-content">
+                <div class="page-header">
+                    <h1>Gizlilik Politikası</h1>
+                    <div class="breadcrumb">
+                        <a href="index.html">Ana Sayfa</a>
+                        <span class="sep">›</span>
+                        <span>Gizlilik Politikası</span>
+                    </div>
+                </div>
+
+                <div class="policy-section">
+                    <p><strong>Kırıkkale Çölyak Derneği</strong> olarak, kişisel verilerinizin gizliliğine ve güvenliğine büyük önem veriyoruz. Bu Gizlilik Politikası, web sitemizi ziyaret ettiğinizde veya hizmetlerimizi kullandığınızda kişisel verilerinizin nasıl toplandığını, kullanıldığını, paylaşıldığını ve korunduğunu açıklamaktadır.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h2>1. Toplanan Veriler</h2>
+                    <p>Web sitemizi ziyaret ettiğinizde aşağıdaki bilgiler otomatik olarak toplanabilir:</p>
+                    <ul>
+                        <li>IP adresiniz</li>
+                        <li>Tarayıcı türü ve sürümü</li>
+                        <li>İşletim sistemi</li>
+                        <li>Ziyaret ettiğiniz sayfalar ve süreleri</li>
+                        <li>Referans URL (hangi siteden geldiğiniz)</li>
+                        <li>Tarih ve saat bilgileri</li>
+                    </ul>
+                    <p>Ayrıca, aşağıdaki durumlarda sizden kişisel bilgiler talep edebiliriz:</p>
+                    <ul>
+                        <li>Üyelik başvurusu yaparken (ad, soyad, e-posta, telefon)</li>
+                        <li>Bağış yaparken (ad, soyad, e-posta, telefon, adres)</li>
+                        <li>İletişim formunu doldururken (ad, soyad, e-posta, mesaj)</li>
+                        <li>Haber bültenine abone olurken (e-posta adresi)</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>2. Verilerin Kullanım Amacı</h2>
+                    <p>Topladığımız kişisel veriler aşağıdaki amaçlarla kullanılır:</p>
+                    <ul>
+                        <li>Dernek faaliyetlerimiz hakkında sizi bilgilendirmek</li>
+                        <li>Üyelik işlemlerinizi yürütmek</li>
+                        <li>Bağış işlemlerinizi gerçekleştirmek ve size teşekkür etmek</li>
+                        <li>İletişim taleplerinize yanıt vermek</li>
+                        <li>Web sitemizi geliştirmek ve kullanıcı deneyimini iyileştirmek</li>
+                        <li>Yasal yükümlülüklerimizi yerine getirmek</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>3. Verilerin Paylaşımı</h2>
+                    <p>Kişisel verileriniz, aşağıdaki durumlar haricinde üçüncü taraflarla paylaşılmaz:</p>
+                    <ul>
+                        <li>Açık rızanız olduğunda</li>
+                        <li>Yasal zorunluluk halinde (mahkeme kararı, kanuni düzenleme vb.)</li>
+                        <li>Hizmet sağlayıcılarımızla (barındırma, e-posta gönderimi vb.) gizlilik anlaşmaları çerçevesinde</li>
+                    </ul>
+                    <p>Kişisel verileriniz, hiçbir şekilde ticari amaçla üçüncü taraflara satılmaz veya kiralanmaz.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h2>4. Veri Güvenliği</h2>
+                    <p>Kişisel verilerinizin güvenliği için aşağıdaki önlemleri alıyoruz:</p>
+                    <ul>
+                        <li>SSL sertifikası ile veri aktarımını şifreliyoruz</li>
+                        <li>Veritabanlarımızı güvenlik duvarları ve şifreleme ile koruyoruz</li>
+                        <li>Yetkisiz erişimlere karşı düzenli güvenlik kontrolleri yapıyoruz</li>
+                        <li>Çalışanlarımız veri gizliliği konusunda eğitiliyor</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>5. Çerezler (Cookies)</h2>
+                    <p>Web sitemiz, kullanıcı deneyimini geliştirmek için çerezler kullanmaktadır. Çerezler, tarayıcınız aracılığıyla cihazınıza kaydedilen küçük metin dosyalarıdır. Çerezler hakkında detaylı bilgi için <a href="cerezler.html" style="color:var(--primary);font-weight:600;">Çerez Politikası</a> sayfamızı ziyaret edebilirsiniz.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h2>6. Haklarınız</h2>
+                    <p>Kişisel verilerinizle ilgili olarak aşağıdaki haklara sahipsiniz:</p>
+                    <ul>
+                        <li>Verilerinizin işlenip işlenmediğini öğrenme</li>
+                        <li>Verilerinize erişim talep etme</li>
+                        <li>Eksik veya yanlış verilerin düzeltilmesini isteme</li>
+                        <li>Verilerinizin silinmesini talep etme</li>
+                        <li>Veri işlemeye itiraz etme</li>
+                        <li>Verilerinizin taşınmasını talep etme</li>
+                    </ul>
+                    <p>Bu haklarınızı kullanmak için bizimle <a href="iletisim.html" style="color:var(--primary);font-weight:600;">iletişim</a> sayfasından iletişime geçebilirsiniz.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h2>7. Değişiklikler</h2>
+                    <p>Bu Gizlilik Politikası, ihtiyaç duyulması halinde güncellenebilir. Değişiklikler web sitemizde yayınlandığı tarihten itibaren geçerlidir. Önemli değişiklikler olması durumunda sizi e-posta yoluyla bilgilendirebiliriz.</p>
+                    <div class="last-updated">
+                        <i class="far fa-calendar-alt"></i> Son Güncelleme: 9 Temmuz 2026
+                    </div>
+                </div>
+
+                <div class="policy-section">
+                    <h2>8. İletişim</h2>
+                    <p>Gizlilik politikamız hakkında sorularınız veya talepleriniz için bizimle iletişime geçebilirsiniz:</p>
+                    <p style="margin-top:0.5rem;">
+                        <strong>Kırıkkale Çölyak Derneği</strong><br>
+                        <i class="fas fa-envelope" style="color:var(--primary);"></i> <a href="mailto:info@kirikkalecolyak.org" style="color:var(--primary);">info@kirikkalecolyak.org</a><br>
+                        <i class="fas fa-phone" style="color:var(--primary);"></i> <a href="tel:+905551234567" style="color:var(--primary);">+90 555 123 45 67</a>
+                    </p>
+                </div>
+            </main>
+
+                        <footer>
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="img/logo.png" alt="Kırıkkale Çölyak Derneği Logo">
+                    </div>
+                    <p class="footer-desc">Kırıkkale Çölyak Derneği olarak çölyak hastalarına ve ailelerine destek olmayı, farkındalık yaratmayı ve glütensiz yaşamı kolaylaştırmayı amaçlıyoruz.</p>
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/share/1Xp3XcfJwX/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/kirikkalecolyak" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Kurumsal</h4>
+                    <div class="footer-links">
+                        <a href="dernegimiz.html">Hakkımızda</a>
+                        <a href="kunye.html">Künye</a>
+                        <a href="iletisim.html">İletişim</a>
+                        <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Hızlı Bağlantılar</h4>
+                    <div class="footer-links">
+                        <a href="index.html">Ana Sayfa</a>
+                        <a href="isletmeler.html">Glutensiz İşletmeler</a>
+                        <a href="glutensiz-yasam.html">Glutensiz Yaşam</a>
+                        <a href="haberler.html">Basında Biz</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Topluluk</h4>
+                    <div class="footer-links">
+                        <a href="#">Sık Sorulan Sorular</a>
+                        <a href="uyelik.html">Üye Ol</a>
+                        <a href="#">Giriş Yap</a>
+                        <a href="#">Yardım</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Bizi Takip Edin</h4>
+                    <div class="footer-links">
+                        <a href="https://www.facebook.com/share/1Xp3XcfJwX/" target="_blank"><i class="fab fa-facebook-f" style="width:16px;"></i> Facebook</a>
+                        <a href="https://www.instagram.com/kirikkalecolyak" target="_blank"><i class="fab fa-instagram" style="width:16px;"></i> Instagram</a>
+                        <a href="#"><i class="fab fa-youtube" style="width:16px;"></i> YouTube</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <span>© 2026 Kırıkkale Çölyak Derneği · Tüm hakları saklıdır.</span>
+                    <div class="footer-legal">
+                        <a href="gizlilik-politikasi.html">Gizlilik</a>
+                        <a href="kullanim-kosullari.html">Kullanım Koşulları</a>
+                        <a href="cerezler.html">Çerezler</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            var nav = document.getElementById('mainNav');
+            var btn = this;
+            nav.classList.toggle('open');
+            btn.classList.toggle('active');
+            var expanded = nav.classList.contains('open');
+            btn.setAttribute('aria-expanded', expanded);
+        });
+    </script>
+</body>
+</html>

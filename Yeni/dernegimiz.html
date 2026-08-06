@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>Derneğimiz | Kırıkkale Çölyak Derneği</title>
+    <meta name="description" content="Kırıkkale Çölyak Derneği - Kuruluş hikayemiz, yönetim kurulumuz, faaliyetlerimiz ve çağrılarımız.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.kirikkalecolyak.org/dernegimiz.html">
+    <link rel="icon" href="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --primary: #1A7A5A;
+            --primary-light: #2A9A7A;
+            --primary-dark: #0F5A3E;
+            --accent: #E8850C;
+            --bg: #F6F8F7;
+            --text: #1A2626;
+            --text-light: #3A4E4E;
+            --white: #FFFFFF;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --radius: 18px;
+            --transition: 0.25s ease;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font);
+            background: #e8eeeb;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .site-wrapper {
+            background: #ffffff;
+            max-width: 960px;
+            margin: 1.5rem auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 0 1rem;
+            min-height: calc(100vh - 3rem);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 640px) {
+            .site-wrapper {
+                margin: 0 !important;
+                border-radius: 0 !important;
+                min-height: 100vh;
+                padding: 0 0 !important;
+                box-shadow: none;
+                border: none;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            body { background: #ffffff; overflow-x: hidden !important; }
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 0.5rem !important;
+                overflow: hidden !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+
+        img { max-width: 100%; height: auto; display: block; }
+        a { text-decoration: none; color: inherit; }
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 0 0 8px 8px;
+            z-index: 1000;
+            font-weight: 600;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* HEADER */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            padding: 0.5rem 1rem;
+            margin: 0 -1rem;
+            border-radius: 28px 28px 0 0;
+            transition: background var(--transition);
+        }
+        body.dark-mode header {
+            background: rgba(30, 30, 30, 0.92);
+            border-bottom-color: #333;
+        }
+        @media (max-width: 640px) {
+            header {
+                margin: 0 -0.5rem !important;
+                border-radius: 0 !important;
+                padding: 0.4rem 0.5rem !important;
+            }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-shrink: 0;
+        }
+        .logo img {
+            height: 56px;
+            width: auto;
+            border-radius: 8px;
+        }
+        .logo-text .city {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        .logo-text .sub {
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+        }
+        body.dark-mode .logo-text .city { color: var(--primary-light); }
+        body.dark-mode .logo-text .sub { color: var(--primary-light); }
+
+        .header-info {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            align-items: center;
+        }
+        .header-info i {
+            margin-right: 0.2rem;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+        .header-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(26, 122, 90, 0.05);
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        body.dark-mode .header-info span {
+            background: rgba(26, 122, 90, 0.15);
+            color: #ccc;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .header-actions button {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0.3rem 0.5rem;
+            border-radius: 8px;
+            transition: background var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .header-actions button:hover {
+            background: rgba(26, 122, 90, 0.08);
+        }
+        body.dark-mode .header-actions button { color: #ccc; }
+        body.dark-mode .header-actions button:hover { background: rgba(26, 122, 90, 0.2); }
+        .header-actions .font-size-btn {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        @media (max-width: 640px) {
+            .header-actions .header-actions-label { display: none; }
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .hamburger:hover {
+            background: rgba(26, 122, 90, 0.08);
+            color: var(--primary);
+        }
+        body.dark-mode .hamburger { color: #ddd; }
+        body.dark-mode .hamburger:hover {
+            background: rgba(26, 122, 90, 0.2);
+            color: var(--primary-light);
+        }
+        .hamburger .hamburger-line {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background: currentColor;
+            border-radius: 2px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hamburger .hamburger-line:nth-child(1) { top: 14px; }
+        .hamburger .hamburger-line:nth-child(2) { top: 21px; }
+        .hamburger .hamburger-line:nth-child(3) { top: 28px; }
+        .hamburger.active .hamburger-line:nth-child(1) { top: 21px; transform: translateX(-50%) rotate(45deg); }
+        .hamburger.active .hamburger-line:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
+        .hamburger.active .hamburger-line:nth-child(3) { top: 21px; transform: translateX(-50%) rotate(-45deg); }
+
+        .header-divider {
+            width: 100%;
+            height: 2px;
+            background: var(--primary-light);
+            margin: 0.4rem 0;
+            display: block;
+            opacity: 0.3;
+        }
+
+        .main-nav {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.1rem;
+            width: 100%;
+            overflow-x: visible;
+        }
+        .main-nav .nav-left {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.1rem;
+        }
+        .main-nav .nav-right {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.1rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .main-nav a {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+            padding: 0.4rem 0.6rem;
+            border-radius: 40px;
+            transition: all var(--transition);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .main-nav a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 40px;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+        .main-nav a:hover::before,
+        .main-nav a:focus::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .main-nav a:hover,
+        .main-nav a:focus {
+            color: #fff;
+            background: var(--primary);
+        }
+        .main-nav a.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(26, 122, 90, 0.25);
+        }
+        body.dark-mode .main-nav a { color: #bbb; }
+        body.dark-mode .main-nav a.active { background: var(--primary); color: #fff; }
+        body.dark-mode .main-nav a:hover,
+        body.dark-mode .main-nav a:focus { color: #fff; background: var(--primary); }
+
+        .nav-cta {
+            background: var(--accent) !important;
+            color: #fff !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(232, 133, 12, 0.25);
+            margin-left: 0.2rem;
+            display: inline-block;
+        }
+        .nav-cta:hover {
+            background: var(--primary-dark) !important;
+            box-shadow: 0 4px 12px rgba(15, 90, 62, 0.3);
+        }
+        body.dark-mode .nav-cta { background: var(--accent) !important; color: #fff !important; }
+        body.dark-mode .nav-cta:hover { background: #d97706 !important; }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 98;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .header-top { flex-wrap: nowrap; }
+            .hamburger { display: flex; }
+            .header-info { display: none; }
+            .header-actions .header-actions-label { display: none; }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--white);
+                padding: 0 1rem;
+                border-radius: 0 0 var(--radius) var(--radius);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+                gap: 0.3rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 99;
+                transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                opacity: 0;
+                visibility: hidden;
+            }
+            body.dark-mode .main-nav { background: #2a2a2a; }
+            .main-nav.open {
+                display: flex;
+                max-height: 80vh;
+                padding: 1rem;
+                opacity: 1;
+                visibility: visible;
+                overflow-y: auto;
+            }
+            .main-nav a {
+                width: 100%;
+                text-align: left;
+                padding: 0.7rem 1rem;
+                border-radius: 12px;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+            .main-nav a::before { display: none; }
+            .main-nav a i {
+                width: 24px;
+                text-align: center;
+                color: var(--primary);
+            }
+            .main-nav a:hover,
+            .main-nav a:focus { background: rgba(26, 122, 90, 0.08); color: var(--primary); }
+            .main-nav a.active { background: var(--primary); color: #fff; }
+            .main-nav a.active i { color: #fff; }
+            .nav-cta { margin-top: 0.5rem; justify-content: center !important; margin-left: 0; }
+            .nav-overlay { display: none !important; }
+            .header-divider { margin: 0.2rem 0; }
+            .logo img { height: 42px; }
+            .logo-text .city { font-size: 0.95rem; }
+            .logo-text .sub { font-size: 0.6rem; }
+            .main-nav .nav-left,
+            .main-nav .nav-right {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.1rem;
+            }
+            .main-nav .nav-right { margin-left: 0; }
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 1rem 0 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a { color: var(--primary); font-weight: 500; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb i { font-size: 0.6rem; color: #aaa; }
+        body.dark-mode .breadcrumb { color: #999; }
+        body.dark-mode .breadcrumb a { color: var(--primary-light); }
+
+        /* ===== HERO SECTION (haberler.html'den bire bir) ===== */
+        .hero-section {
+            position: relative;
+            margin: 1.5rem auto;
+            max-width: 960px;
+            padding: 0 0rem;
+        }
+        @media (max-width: 768px) { .hero-section { padding: 0 0rem; } }
+
+        .hero-banner {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F5A3E 0%, #1A7A5A 40%, #22a37a 100%);
+            padding: 2.5rem 2rem;
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(232,133,12,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(34,163,122,0.2) 0%, transparent 50%);
+            z-index: 0;
+        }
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        @media (max-width: 640px) {
+            .hero-banner {
+                padding: 1.8rem 1.2rem;
+                min-height: 200px;
+                border-radius: 12px;
+            }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            width: 100%;
+        }
+        .hero-text { flex: 1; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .hero-badge i { font-size: 0.5rem; color: var(--accent); }
+        .hero-title {
+            font-family: var(--font);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+        .hero-title .accent { color: var(--accent); }
+        .hero-desc {
+            font-size: clamp(0.85rem, 1.3vw, 0.95rem);
+            color: rgba(255,255,255,0.85);
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .hero-btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(232,133,12,0.3);
+        }
+        .hero-btn-primary:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232,133,12,0.4);
+        }
+        .hero-btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.4);
+        }
+        .hero-btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .hero-visual {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .hero-icon-main {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--accent);
+            animation: float 4s ease-in-out infinite;
+        }
+        .hero-micro-icons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .hero-micro-icons i {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.4);
+            transition: all 0.3s;
+        }
+        .hero-micro-icons i:hover { color: #fff; transform: scale(1.15); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(2deg); }
+        }
+        @media (max-width: 640px) {
+            .hero-content { flex-direction: column; text-align: center; }
+            .hero-desc { margin-left: auto; margin-right: auto; max-width: 100%; }
+            .hero-actions { justify-content: center; }
+            .hero-visual { display: none; }
+        }
+
+        /* Grid */
+        .grid-2 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 2rem; margin: 1.5rem 0; }
+        @media (max-width: 850px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            margin-left: 1rem;
+        }
+
+        .history-text p { margin-bottom: 1rem; font-size: 0.95rem; color: #2d3748; line-height: 1.7; }
+        .history-quote {
+            background: var(--bg);
+            border-left: 4px solid var(--accent);
+            padding: 1.2rem 1.5rem;
+            font-style: italic;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-top: 1.5rem;
+        }
+
+        /* Sidebar */
+        .sidebar-card {
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            box-shadow: var(--shadow);
+        }
+        .sidebar-card .section-title { font-size: 1rem; margin-bottom: 0.8rem; }
+        .sidebar-card .section-title::after { display: none; }
+
+        .foundation-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .stat-box { text-align: center; padding: 1rem; background: var(--bg); border-radius: 10px; }
+        .stat-box i { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.3rem; display: block; }
+        .stat-box .label { font-size: 0.65rem; color: #888; text-transform: uppercase; font-weight: 700; }
+        .stat-box .value { font-size: 1rem; font-weight: 800; color: var(--text); }
+
+        .founder-list { list-style: none; }
+        .founder-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .founder-list li:last-child { border-bottom: none; }
+        .founder-list li i { color: var(--primary-light); width: 18px; font-size: 0.8rem; }
+
+        /* Purpose */
+        .purpose-box {
+            background: #f0fdf4;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            border: 1px solid rgba(26,122,90,0.1);
+        }
+        .purpose-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .purpose-icon i { color: #fff; font-size: 1.4rem; }
+        .purpose-content h3 { font-size: 1.1rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 0.5rem; }
+        .purpose-content p { font-size: 0.9rem; color: #2d3748; line-height: 1.6; }
+        .purpose-content .principle { font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; display: block; }
+
+        @media (max-width: 640px) {
+            .purpose-box { flex-direction: column; align-items: center; text-align: center; padding: 1.5rem; }
+        }
+
+        /* Timeline */
+        .timeline-section { margin: 2.5rem 0; }
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 1.5rem;
+            padding-bottom: 1rem;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0 1.5rem;
+            scrollbar-width: thin;
+        }
+        .timeline-container::-webkit-scrollbar { height: 4px; }
+        .timeline-container::-webkit-scrollbar-track { background: #e0e8e4; border-radius: 10px; }
+        .timeline-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        .timeline-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 0 0 150px;
+            min-width: 120px;
+        }
+        .timeline-dot {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .timeline-dot i { color: #fff; font-size: 0.8rem; }
+        .timeline-date { font-size: 0.6rem; font-weight: 700; color: #888; margin-bottom: 0.2rem; }
+        .timeline-title { font-size: 0.75rem; font-weight: 800; color: var(--text); line-height: 1.3; }
+        .timeline-desc { font-size: 0.65rem; color: #888; line-height: 1.3; margin-top: 0.2rem; display: none; }
+
+        @media (max-width: 850px) {
+            .timeline-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                padding-left: 2rem;
+                overflow: visible;
+            }
+            .timeline-container::before {
+                width: 2px;
+                height: 100%;
+                top: 0;
+                left: 18px;
+                bottom: 0;
+            }
+            .timeline-item {
+                flex: none;
+                width: 100%;
+                text-align: left;
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                min-width: unset;
+            }
+            .timeline-dot { margin: 0; flex-shrink: 0; width: 32px; height: 32px; }
+            .timeline-dot i { font-size: 0.7rem; }
+            .timeline-title { font-size: 0.85rem; }
+            .timeline-desc { display: block; font-size: 0.75rem; }
+        }
+
+        /* Requests */
+        .requests-section { margin: 2.5rem 0; }
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+        .request-card {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 12px;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+        .request-card:hover { border-color: var(--primary); background: #f0fdf4; transform: translateY(-2px); }
+        .request-card i { font-size: 1.3rem; color: var(--primary); margin-bottom: 0.4rem; display: block; }
+        .request-card span { font-size: 0.7rem; font-weight: 600; color: var(--text-light); line-height: 1.3; display: block; }
+
+        .request-note {
+            background: #fffcf0;
+            border: 1px solid #feebc8;
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .request-note .note-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .request-note .note-item span { color: var(--accent); font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
+        .request-note .note-item p { font-size: 0.85rem; color: #744210; line-height: 1.5; margin: 0; }
+
+        @media (max-width: 700px) {
+            .requests-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .requests-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Boards */
+        .boards-section { display: grid; grid-template-columns: 1.8fr 1fr; gap: 2rem; margin: 2.5rem 0; }
+        @media (max-width: 850px) { .boards-section { grid-template-columns: 1fr; } }
+
+        .board-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .board-member {
+            text-align: center;
+            width: 80px;
+        }
+        .member-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.4rem;
+            font-weight: 800;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(26,122,90,0.15);
+        }
+        .board-member .name { font-size: 0.7rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+        .board-member .role { font-size: 0.6rem; color: #888; }
+
+        /* Announcements */
+        .announcements-section { margin: 2.5rem 0 1.5rem; }
+        .announcement-card {
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: var(--radius);
+            padding: 1.5rem 2rem;
+            margin-top: 1.2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .announcement-content { flex: 1; }
+        .announcement-content h4 { font-size: 1rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 0.4rem; }
+        .announcement-content p { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; margin-bottom: 0.5rem; }
+        .announcement-content .quote {
+            font-style: italic;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .announcement-content .call { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+        .announcement-img {
+            width: 160px;
+            height: 110px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .warning-card {
+            background: #fff;
+            border: 1px solid #fee2e2;
+            border-radius: var(--radius);
+            padding: 1.5rem 2rem;
+            margin-top: 1.2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .warning-icon {
+            width: 48px;
+            height: 48px;
+            background: #fee2e2;
+            color: #ef4444;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .warning-content h4 { font-size: 1rem; font-weight: 800; color: #b91c1c; margin-bottom: 0.2rem; }
+        .warning-content p { font-size: 0.85rem; color: #7f1d1d; line-height: 1.5; margin: 0; }
+
+        @media (max-width: 640px) {
+            .announcement-card { flex-direction: column; text-align: center; padding: 1.2rem; }
+            .announcement-img { width: 100%; height: 150px; order: -1; }
+            .warning-card { flex-direction: column; text-align: center; padding: 1.2rem; }
+        }
+
+        /* Join CTA */
+        .join-cta {
+            background: var(--bg);
+            padding: 2rem 2.5rem;
+            border-radius: var(--radius);
+            margin: 2rem 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .join-cta-text h3 { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); }
+        .join-cta-text p { font-size: 0.9rem; color: var(--text-light); }
+        .join-btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.7rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.3s;
+            border: none;
+            font-size: 0.9rem;
+        }
+        .join-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26,122,90,0.3); }
+
+        @media (max-width: 640px) {
+            .join-cta { flex-direction: column; text-align: center; gap: 1.2rem; padding: 1.5rem; }
+        }
+
+        /* ===== FOOTER (haberler.html'den bire bir) ===== */
+        .footer {
+            background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/web-footer.png') center/cover no-repeat;
+            color: #fff;
+            margin-top: 60px;
+            border-radius: 28px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+        .footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 90, 62, 0.5);
+            z-index: 1;
+            border-radius: 28px;
+        }
+        .footer-container {
+            position: relative;
+            z-index: 2;
+            max-width: 960px;
+            margin: auto;
+            padding: 35px 25px;
+            text-align: center;
+        }
+        .footer-logo {
+            width: 120px;
+            margin: 0 auto 15px;
+            display: block;
+        }
+        .footer-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .footer-desc {
+            max-width: 620px;
+            margin: auto;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .footer-menu {
+            margin: 28px 0 22px;
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .footer-menu a {
+            text-decoration: none;
+            color: #fff;
+            background: rgba(255,255,255,.15);
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: .30s;
+            font-size: 0.95rem;
+        }
+        .footer-menu a:hover { background: var(--accent); }
+        .footer-menu .footer-bagis-btn { background: rgba(255,255,255,.15); }
+        .footer-menu .footer-bagis-btn:hover { background: var(--accent); }
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .footer-social a {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,.15);
+            color: white;
+            text-decoration: none;
+            transition: .30s;
+            font-size: 1.1rem;
+        }
+        .footer-social a:hover {
+            background: var(--accent);
+            transform: translateY(-4px);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,.20);
+            padding-top: 18px;
+        }
+        .footer-bottom p {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer-links {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            transition: .30s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 768px) {
+            .footer {
+                margin-top: 35px;
+                border-radius: 28px !important;
+                background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/mobil-footer.png') center/cover no-repeat;
+            }
+            .footer::before { border-radius: 28px; }
+            .footer-container { padding: 28px 18px; }
+            .footer-logo { width: 100px; }
+            .footer-title { font-size: 20px; }
+            .footer-desc { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.85); }
+            .footer-menu { gap: 10px; }
+            .footer-menu a { padding: 8px 14px; font-size: 14px; }
+            .footer-social a { width: 38px; height: 38px; font-size: 1rem; }
+            .footer-links { gap: 8px; }
+            .footer-links a { font-size: 12px; }
+        }
+
+        a:focus-visible, button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+        @media (max-width: 640px) {
+            .hero-right, .manset-wrapper, .gida-card, .rehber-card, .video-card, .card, .yazar-card, .action-card {
+                border-radius: 12px !important;
+                overflow: hidden !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-wrapper">
+        <div class="container">
+            <a class="skip-link" href="#main">İçeriğe geç</a>
+
+            <!-- HEADER -->
+            <header>
+                <div class="header-top">
+                    <a href="index.html" class="logo" aria-label="Kırıkkale Çölyak Derneği Ana Sayfa">
+                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği Logo">
+                        <div class="logo-text">
+                            <span class="city">Kırıkkale</span>
+                            <span class="sub">Çölyak Derneği</span>
+                        </div>
+                    </a>
+                    <div class="header-actions">
+                        <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
+                        <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
+                            <i class="fas fa-font"></i>
+                            <span class="header-actions-label font-size-btn">A</span>
+                        </button>
+                        <div class="header-info">
+                            <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
+                            <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
+                        </div>
+                        <button class="hamburger" id="hamburgerBtn" aria-label="Menüyü aç/kapat" aria-expanded="false">
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="header-divider"></div>
+                <div class="nav-overlay" id="navOverlay"></div>
+                <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
+                    <div class="nav-left">
+                        <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                        <a href="dernegimiz.html" class="active"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="haberler.html"><i class="fas fa-newspaper"></i> Haberler</a>
+                        <a href="colyak-rehberi.html"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
+                        <a href="isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
+                    </div>
+                    <div class="nav-right">
+                        <a href="gida-stok-durumu.html"><i class="fas fa-boxes"></i> Gıda Stok Durumu</a>
+                        <a href="uyelik.html" class="nav-cta"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Derneğimiz</span>
+            </div>
+
+            <main id="main">
+                <!-- ===== HERO (haberler.html'den bire bir) ===== -->
+                <div class="hero-section">
+                    <div class="hero-banner">
+                        <div class="hero-content">
+                            <div class="hero-text">
+                                <div class="hero-badge"><i class="fas fa-circle"></i> Biz Kimiz?</div>
+                                <h1 class="hero-title">
+                                    Derneğimiz <span class="accent">Hakkında</span>
+                                </h1>
+                                <p class="hero-desc">Kırıkkale Çölyak Derneği olarak kuruluş hikayemiz, yönetim kurulumuz, faaliyetlerimiz ve çağrılarımız.</p>
+                                <div class="hero-actions">
+                                    <a href="#hikaye" class="hero-btn hero-btn-primary"><i class="fas fa-heart"></i> Hikayemiz</a>
+                                    <a href="#iletisim" class="hero-btn hero-btn-outline"><i class="fas fa-envelope"></i> İletişim</a>
+                                </div>
+                            </div>
+                            <div class="hero-visual">
+                                <div class="hero-icon-main"><i class="fas fa-building"></i></div>
+                                <div class="hero-micro-icons">
+                                    <i class="fas fa-users"></i>
+                                    <i class="fas fa-handshake"></i>
+                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid: Hikaye + Sidebar -->
+                <div class="grid-2">
+                    <div class="history-section">
+                        <h2 class="section-title" id="hikaye">Kuruluş Hikayemiz</h2>
+                        <div class="history-text">
+                            <p>Kırıkkale'de çölyak hastalığı ile mücadele eden bireylerin ve ailelerin sesi olmak, dayanışmayı güçlendirmek ve yaşam kalitesini artırmak amacıyla çıktığımız bu yolda, temellerimiz aslında <strong>2023 yılında kurulan bir WhatsApp grubu</strong> ile atıldı.</p>
+                            <p>Birbirimizi tanıma, glutensiz ürün bulma zorluğunda yardımlaşma ve deneyimlerimizi paylaşma ihtiyacı, bizi daha güçlü bir yapılanmaya yöneltti.</p>
+                            <p>Bu samimi dayanışma ortamı, resmî bir çatı altında birleşme fikrini doğurdu. Yaklaşık bir yıl süren hazırlık ve çalışmaların ardından, değerli hocamız <strong>Prof. Dr. Fulya Gülerman</strong>'ın destekleriyle derneğimiz <strong>24 Nisan 2025</strong> tarihinde resmen kuruldu. <strong>03 Mayıs 2026</strong> tarihinde de yapılan Olağanüstü Genel Kurul ile Prof. Dr. Fulya Gülerman'a Onursal Başkanlık ünvanı verilmiştir.</p>
+                            <p>Kuruluş sürecinde özellikle <strong>Belediye Meclis Üyesi Eray Yılmaz</strong> beyin katkıları büyük önem taşımaktadır.</p>
+                            
+                            <div class="history-quote">
+                                Bugün, derneğimiz yalnızca bir dayanışma noktası değil; aynı zamanda çölyakla yaşayan bireylerin haklarını savunan, farkındalık oluşturan güçlü bir topluluk haline gelmiştir.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <div class="sidebar-card foundation-stats">
+                            <div class="stat-box">
+                                <i class="fas fa-calendar-check"></i>
+                                <div class="label">Resmi Kuruluş</div>
+                                <div class="value">24 Nisan 2025</div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-file-signature"></i>
+                                <div class="label">Kütük Numarası</div>
+                                <div class="value">71-009-102</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-card">
+                            <h2 class="section-title" style="font-size: 1rem;">Kurucu Üyelerimiz</h2>
+                            <ul class="founder-list">
+                                <li><i class="fas fa-user"></i> Fahri Türkoğlu</li>
+                                <li><i class="fas fa-user"></i> Birgül Türkoğlu</li>
+                                <li><i class="fas fa-user"></i> Nuray Uçarsu</li>
+                                <li><i class="fas fa-user"></i> Feyza Nur Özdemir</li>
+                                <li><i class="fas fa-user"></i> Miraç Ateş Gökçe</li>
+                                <li><i class="fas fa-user"></i> Bahar Tekel</li>
+                                <li><i class="fas fa-user"></i> Demet Şahiner</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purpose -->
+                <div class="purpose-box">
+                    <div class="purpose-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="purpose-content">
+                        <h3>Amacımız</h3>
+                        <p>Çölyak hastalığı hakkında toplumu bilinçlendirmek, ihtiyaç sahibi bireyleri tespit ederek yaşam kalitelerini artırmaya yönelik faaliyetlerde bulunmak.</p>
+                        <span class="principle">Temel İlkemiz: Derneğimiz hiçbir zaman ticari faaliyette bulunmayacak, etkinliklerden ücret talep etmeyecektir.</span>
+                    </div>
+                </div>
+
+                <!-- Timeline / Faaliyetler -->
+                <section class="timeline-section">
+                    <h2 class="section-title">Faaliyetlerimiz</h2>
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-handshake"></i></div>
+                            <div>
+                                <div class="timeline-date">29 Nisan 2025</div>
+                                <div class="timeline-title">Belediye ile İlk Resmî Görüşme</div>
+                                <div class="timeline-desc">Ahmet Ünal ile mevcut yardımlar değerlendirildi.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-gavel"></i></div>
+                            <div>
+                                <div class="timeline-date">8 Mayıs 2025</div>
+                                <div class="timeline-title">Meclis Araştırma Önergesi</div>
+                                <div class="timeline-desc">Eray Yılmaz tarafından araştırma önergesi verildi.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-file-alt"></i></div>
+                            <div>
+                                <div class="timeline-date">3 Haziran 2025</div>
+                                <div class="timeline-title">Araştırma Raporu Tamamlandı</div>
+                                <div class="timeline-desc">Gıda, burs ve su indirimi gibi talepler belirtildi.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-box-open"></i></div>
+                            <div>
+                                <div class="timeline-date">5 Haziran 2025</div>
+                                <div class="timeline-title">İlk Glutensiz Ürün Dağıtımı</div>
+                                <div class="timeline-desc">60'tan fazla aileye elden teslimat yapıldı.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-users"></i></div>
+                            <div>
+                                <div class="timeline-date">23 Ekim 2025</div>
+                                <div class="timeline-title">İlk Olağan Genel Kurul</div>
+                                <div class="timeline-desc">Yeni yönetim ve denetim kurulları seçildi.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-award"></i></div>
+                            <div>
+                                <div class="timeline-date">03 Mayıs 2026</div>
+                                <div class="timeline-title">Onursal Başkanlık</div>
+                                <div class="timeline-desc">Prof. Dr. Fulya Gülerman'a Onursal Başkanlık ünvanı verildi.</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="fas fa-globe"></i></div>
+                            <div>
+                                <div class="timeline-date">09 Mayıs 2026</div>
+                                <div class="timeline-title">Dünya Çölyak Günü</div>
+                                <div class="timeline-desc">Farkındalık etkinlikleri düzenlendi.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Requests -->
+                <section class="requests-section">
+                    <h2 class="section-title">Belediyemize İlettiğimiz Talepler</h2>
+                    <div class="requests-grid">
+                        <div class="request-card"><i class="fas fa-shopping-basket"></i><span>Düzenli gıda desteği</span></div>
+                        <div class="request-card"><i class="fas fa-tint"></i><span>%30 su indirimi</span></div>
+                        <div class="request-card"><i class="fas fa-bus"></i><span>Ücretsiz ulaşım</span></div>
+                        <div class="request-card"><i class="fas fa-graduation-cap"></i><span>Çölyak bursu</span></div>
+                        <div class="request-card"><i class="fas fa-calendar-alt"></i><span>Etkinlik desteği</span></div>
+                        <div class="request-card"><i class="fas fa-home"></i><span>Dernek merkezi</span></div>
+                    </div>
+                    <div class="request-note">
+                        <div class="note-item">
+                            <span>Not 1:</span>
+                            <p>Belediye meclisince düzenlenen Araştırma raporunda taleplerimiz uygun görülmesine rağmen, 2025 sonu itibarıyla taleplerimizin hayata geçirilmesi için Kırıkkale Belediyemizce somut adımlar atılmamıştır.</p>
+                        </div>
+                        <div class="note-item">
+                            <span>Not 2:</span>
+                            <p>Derneğimiz kendi imkanları ile ilimizdeki çölyaklılara glutensiz gıda desteği yapmaktadır.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Boards -->
+                <div class="boards-section">
+                    <div class="board-column">
+                        <h2 class="section-title">Yönetim Kurulumuz</h2>
+                        <div class="board-grid">
+                            <div class="board-member">
+                                <div class="member-avatar">FT</div>
+                                <div class="name">Fahri Türkoğlu</div>
+                                <div class="role">Başkan</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar">AU</div>
+                                <div class="name">Ahmet Uçarsu</div>
+                                <div class="role">Yön. Kur. Ü.</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar">BT</div>
+                                <div class="name">Birgül Türkoğlu</div>
+                                <div class="role">Yön. Kur. Ü.</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar">NU</div>
+                                <div class="name">Nuray Uçarsu</div>
+                                <div class="role">Yön. Kur. Ü.</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar">MG</div>
+                                <div class="name">Miraç Ateş Gökçe</div>
+                                <div class="role">Yön. Kur. Ü.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="board-column">
+                        <h2 class="section-title">Denetim Kurulu</h2>
+                        <div class="board-grid">
+                            <div class="board-member">
+                                <div class="member-avatar" style="background:#e5e7eb;color:#666;">DS</div>
+                                <div class="name">Demet Şahiner</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar" style="background:#e5e7eb;color:#666;">SEG</div>
+                                <div class="name">Şamil Emre Gökçe</div>
+                            </div>
+                            <div class="board-member">
+                                <div class="member-avatar" style="background:#e5e7eb;color:#666;">MT</div>
+                                <div class="name">Mehmet Tutar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcements -->
+                <section class="announcements-section">
+                    <h2 class="section-title">Çağrılarımız ve Duyurular</h2>
+                    
+                    <div class="announcement-card">
+                        <div class="announcement-content">
+                            <h4>Günlük Taze Glutensiz Ekmek Çağrısı</h4>
+                            <p>İlimizde glutensiz ekmek üretimi bulunmadığından, çölyaklı bireyler ekmek ihtiyaçlarını ya internetten ya da Ankara Büyükşehir Belediyesi'nden haftada bir gün temin edebilmektedir.</p>
+                            <div class="quote">"Çölyaklılar ayrıcalık değil, eşit ve erişilebilir bir yaşam talep etmektedir."</div>
+                            <div class="call">İş insanlarına ve fırın işletmecilerine çağrımız: İlimizde günlük taze glutensiz ekmek üretimi için destek olun.</div>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=400" class="announcement-img" alt="Ekmek">
+                    </div>
+
+                    <div class="warning-card">
+                        <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="warning-content">
+                            <h4>Yanıltıcı Tedavi İddialarına Karşı Uyarı</h4>
+                            <p>Son dönemde bazı kliniklerin çölyak hastalığını "tedavi ettiğine" dair iddiaları üzerine hatırlatıyoruz: <strong>Çölyak hastalığının bilinen tek tedavisi ömür boyu sıkı glutensiz diyettir.</strong></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Join CTA -->
+                <div class="join-cta">
+                    <div class="join-cta-text">
+                        <h3>Siz de aramıza katılın!</h3>
+                        <p>Çölyakla mücadelede daha güçlü olmak için bize ulaşın.</p>
+                    </div>
+                    <a href="iletisim.html" class="join-btn">İletişime Geç <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </main>
+
+            <!-- ===== FOOTER (haberler.html'den bire bir) ===== -->
+            <footer class="footer">
+                <div class="footer-container">
+                    <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" class="footer-logo" alt="Kırıkkale Çölyak Derneği Logo">
+                    <h2 class="footer-title">Kırıkkale Çölyak Derneği</h2>
+                    <p class="footer-desc">
+                        Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
+                    </p>
+                    <div class="footer-menu">
+                        <a href="index.html"><i class="fas fa-house"></i> Ana Sayfa</a>
+                        <a href="gida-stok-durumu.html" class="footer-bagis-btn"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                        <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                        <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                    </div>
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/kirikkalecolyak?igsh=MXI0eDhsbTB4bGp4aw==" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz?s=cl&p=a&ilr=4" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>© 2026 Kırıkkale Çölyak Derneği<br>Tüm hakları saklıdır.</p>
+                        <div class="footer-links">
+                            <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+                            <a href="cerezler.html">Çerezler</a>
+                            <a href="kvkk.html">KVKK</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Tarih
+            function updateDate() {
+                const now = new Date();
+                const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+                const day = now.getDate();
+                const month = months[now.getMonth()];
+                $('#currentDate').text(day + ' ' + month);
+            }
+            updateDate();
+
+            // Hamburger
+            $('#hamburgerBtn').on('click', function() {
+                var nav = $('#mainNav');
+                var btn = $(this);
+                nav.toggleClass('open');
+                btn.toggleClass('active');
+                var expanded = nav.hasClass('open');
+                btn.attr('aria-expanded', expanded);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+    <title>Haber Detayı | Kırıkkale Çölyak Derneği</title>
+    <meta name="description" content="Kırıkkale Çölyak Derneği haber detay sayfası.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.kirikkalecolyak.org/detay.html">
+    <link rel="icon" href="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <style>
+        :root {
+            --primary: #1A7A5A;
+            --primary-light: #22a37a;
+            --primary-dark: #0F5A3E;
+            --primary-glow: rgba(26, 122, 90, 0.15);
+            --accent: #E8850C;
+            --accent-glow: rgba(232, 133, 12, 0.25);
+            --bg: #e8eeeb;
+            --bg-card: #FFFFFF;
+            --bg-elevated: #FAFBFB;
+            --text: #1A2626;
+            --text-secondary: #3A4E4E;
+            --text-muted: #9CA3AF;
+            --border: rgba(0,0,0,0.06);
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06);
+            --radius-sm: 8px;
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== SITE WRAPPER - 960px ===== */
+        .site-wrapper {
+            background: #ffffff;
+            max-width: 960px;
+            margin: 1.5rem auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+            padding: 0 1rem;
+            min-height: calc(100vh - 3rem);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        @media (max-width: 640px) {
+            .site-wrapper {
+                margin: 0 !important;
+                border-radius: 0 !important;
+                min-height: 100vh;
+                padding: 0 0 !important;
+                box-shadow: none;
+                border: none;
+                overflow: hidden !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            body { background: #ffffff; }
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 0 0 8px 8px;
+            z-index: 1000;
+            font-weight: 600;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* ===== HEADER (haberler.html ile aynı) ===== */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            padding: 0.5rem 1rem;
+            margin: 0 -1rem;
+            border-radius: 28px 28px 0 0;
+            transition: all var(--transition);
+        }
+        body.dark-mode header {
+            background: rgba(30,30,30,0.92);
+            border-bottom-color: #333;
+        }
+        @media (max-width: 640px) {
+            header { margin: 0 -0.5rem !important; border-radius: 0 !important; padding: 0.4rem 0.5rem !important; }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+        .logo img {
+            height: 56px;
+            width: auto;
+            border-radius: 8px;
+            transition: transform var(--transition);
+        }
+        .logo:hover img { transform: scale(1.05); }
+        .logo-text .city {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            display: block;
+        }
+        .logo-text .sub {
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+            display: block;
+        }
+        body.dark-mode .logo-text .city { color: #4ade80; }
+        body.dark-mode .logo-text .sub { color: var(--primary-light); }
+
+        .header-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .header-actions button {
+            background: none;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.4rem 0.6rem;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .header-actions button:hover {
+            background: var(--primary-glow);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        body.dark-mode .header-actions button {
+            border-color: rgba(255,255,255,0.1);
+            color: #d1d5db;
+        }
+        body.dark-mode .header-actions button:hover {
+            background: var(--primary-glow);
+            color: #4ade80;
+        }
+        .header-info {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            align-items: center;
+        }
+        .header-info i { margin-right: 0.2rem; color: var(--primary); font-size: 0.8rem; }
+        .header-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(26, 122, 90, 0.05);
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        body.dark-mode .header-info span { background: rgba(26, 122, 90, 0.15); color: #ccc; }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .hamburger:hover { background: var(--primary-glow); color: var(--primary); }
+        body.dark-mode .hamburger { color: #ddd; }
+        body.dark-mode .hamburger:hover { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+        .hamburger .hamburger-line {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background: currentColor;
+            border-radius: 2px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hamburger .hamburger-line:nth-child(1) { top: 14px; }
+        .hamburger .hamburger-line:nth-child(2) { top: 21px; }
+        .hamburger .hamburger-line:nth-child(3) { top: 28px; }
+        .hamburger.active .hamburger-line:nth-child(1) { top: 21px; transform: translateX(-50%) rotate(45deg); }
+        .hamburger.active .hamburger-line:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
+        .hamburger.active .hamburger-line:nth-child(3) { top: 21px; transform: translateX(-50%) rotate(-45deg); }
+
+        .header-divider {
+            width: 100%;
+            height: 2px;
+            background: var(--primary-light);
+            margin: 0.4rem 0;
+            display: block;
+            opacity: 0.3;
+        }
+
+        .main-nav {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.1rem;
+            width: 100%;
+        }
+        .main-nav .nav-left { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.1rem; }
+        .main-nav .nav-right { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.1rem; margin-left: auto; flex-shrink: 0; }
+        .main-nav a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+            padding: 0.4rem 0.6rem;
+            border-radius: 40px;
+            transition: all var(--transition);
+            white-space: nowrap;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .main-nav a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 40px;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+        .main-nav a:hover::before, .main-nav a:focus::before { transform: scaleX(1); transform-origin: left; }
+        .main-nav a:hover, .main-nav a:focus { color: #fff; background: var(--primary); }
+        .main-nav a.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(26, 122, 90, 0.25); }
+        body.dark-mode .main-nav a { color: #bbb; }
+        body.dark-mode .main-nav a.active { background: var(--primary); color: #fff; }
+        body.dark-mode .main-nav a:hover, body.dark-mode .main-nav a:focus { color: #fff; background: var(--primary); }
+        .nav-cta {
+            background: var(--accent) !important;
+            color: #fff !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(232, 133, 12, 0.25);
+            margin-left: 0.2rem;
+            display: inline-block;
+        }
+        .nav-cta:hover { background: var(--primary-dark) !important; box-shadow: 0 4px 12px rgba(15, 90, 62, 0.3); }
+        body.dark-mode .nav-cta { background: var(--accent) !important; color: #fff !important; }
+        body.dark-mode .nav-cta:hover { background: #d97706 !important; }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 98;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .nav-overlay.active { display: block; opacity: 1; }
+
+        @media (max-width: 640px) {
+            .header-top { flex-wrap: nowrap; }
+            .hamburger { display: flex; }
+            .header-info { display: none; }
+            .header-actions .header-actions-label { display: none; }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                background: var(--white);
+                padding: 0 1rem;
+                border-radius: 0 0 var(--radius) var(--radius);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+                gap: 0.3rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 99;
+                transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                opacity: 0;
+                visibility: hidden;
+            }
+            body.dark-mode .main-nav { background: #2a2a2a; }
+            .main-nav.open { display: flex; max-height: 80vh; padding: 1rem; opacity: 1; visibility: visible; overflow-y: auto; }
+            .main-nav a { width: 100%; text-align: left; padding: 0.7rem 1rem; border-radius: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 0.6rem; }
+            .main-nav a::before { display: none; }
+            .main-nav a i { width: 24px; text-align: center; color: var(--primary); }
+            .main-nav a:hover, .main-nav a:focus { background: rgba(26, 122, 90, 0.08); color: var(--primary); }
+            .main-nav a.active { background: var(--primary); color: #fff; }
+            .main-nav a.active i { color: #fff; }
+            .nav-cta { margin-top: 0.5rem; justify-content: center !important; margin-left: 0; }
+            .nav-overlay { display: none !important; }
+            .header-divider { margin: 0.2rem 0; }
+            .logo img { height: 42px; }
+            .logo-text .city { font-size: 0.95rem; }
+            .logo-text .sub { font-size: 0.6rem; }
+            .main-nav .nav-left, .main-nav .nav-right { flex-direction: column; width: 100%; gap: 0.1rem; }
+            .main-nav .nav-right { margin-left: 0; }
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 1.2rem 0 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .breadcrumb a { color: var(--primary); font-weight: 500; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb i { font-size: 0.55rem; }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            padding: 1.5rem 0 3rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* ===== DETAIL HERO ===== */
+        .detail-hero {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+        body.dark-mode .detail-hero {
+            background: #1e293b;
+            border-color: rgba(255,255,255,0.08);
+        }
+        @media (max-width: 640px) {
+            .detail-hero { padding: 1.2rem; }
+        }
+
+        .detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 1.2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        body.dark-mode .detail-meta {
+            color: #9ca3af;
+        }
+
+        .detail-meta .tag {
+            background: var(--primary-light);
+            color: #fff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .detail-meta .tag-dernek {
+            background: var(--accent);
+        }
+        .detail-meta .tag-hero {
+            background: var(--primary);
+        }
+
+        .detail-title {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--primary-dark);
+            margin: 0 0 1rem 0;
+            font-family: var(--font-display);
+        }
+        body.dark-mode .detail-title {
+            color: #f3f4f6;
+        }
+
+        .float-element {
+            float: left;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+        .detail-float-img {
+            max-width: 40%;
+            height: auto;
+            background: #dce8e4;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        .author-float {
+            max-width: 180px;
+            text-align: center;
+            background: var(--bg-elevated);
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        body.dark-mode .author-float {
+            background: #0f172a;
+            border-color: rgba(255,255,255,0.08);
+        }
+        .author-float .author-photo {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f0f4f2;
+        }
+        .author-float .author-name {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1.3;
+        }
+        body.dark-mode .author-float .author-name {
+            color: #f3f4f6;
+        }
+        .author-float .author-title-small {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+        body.dark-mode .author-float .author-title-small {
+            color: #9ca3af;
+        }
+
+        .detail-body {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text);
+            max-width: 100%;
+            overflow: hidden;
+        }
+        body.dark-mode .detail-body {
+            color: #e5e7eb;
+        }
+        .detail-body p {
+            text-align: justify;
+            margin-bottom: 1.2rem;
+        }
+        .detail-body img:not(.detail-float-img):not(.author-photo) {
+            margin: 1.2rem 0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 640px) {
+            .float-element {
+                float: none;
+                max-width: 100%;
+                width: 100%;
+                margin: 0 0 20px 0;
+            }
+            .detail-float-img {
+                max-width: 100%;
+                width: 100%;
+            }
+            .author-float {
+                max-width: 100%;
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto 20px auto;
+            }
+            .detail-body p {
+                text-align: left;
+            }
+        }
+
+        /* ===== EXTRA SECTIONS ===== */
+        .extra-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ===== YAZARIN DİĞER YAZILARI - SADECE BAŞLIK ===== */
+        .author-posts-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        body.dark-mode .author-posts-section {
+            background: #1e293b;
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .author-posts-section .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-glow);
+        }
+        .author-posts-section .section-head h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        body.dark-mode .author-posts-section .section-head h2 {
+            color: #f3f4f6;
+        }
+        .author-posts-section .section-head h2 i {
+            color: var(--accent);
+        }
+        .author-posts-section .section-head .author-name-badge {
+            font-size: 0.8rem;
+            background: var(--primary-glow);
+            color: var(--primary);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .author-posts-section .section-head a {
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .author-posts-section .section-head a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .author-post-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .author-post-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        body.dark-mode .author-post-list li {
+            border-bottom-color: rgba(255,255,255,0.06);
+        }
+        .author-post-list li:last-child {
+            border-bottom: none;
+        }
+        .author-post-list li:hover {
+            padding-left: 0.5rem;
+        }
+        .author-post-list li .post-index {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 24px;
+            text-align: center;
+            background: var(--bg-elevated);
+            padding: 0.1rem 0.4rem;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        body.dark-mode .author-post-list li .post-index {
+            background: #0f172a;
+            color: #6b7280;
+        }
+        .author-post-list li .post-date {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .author-post-list li a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.92rem;
+            transition: color 0.2s;
+            flex: 1;
+        }
+        body.dark-mode .author-post-list li a {
+            color: #e5e7eb;
+        }
+        .author-post-list li a:hover {
+            color: var(--primary);
+        }
+        body.dark-mode .author-post-list li a:hover {
+            color: #4ade80;
+        }
+        .author-post-list li .post-arrow {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .author-post-list li:hover .post-arrow {
+            color: var(--primary);
+            transform: translateX(3px);
+        }
+        body.dark-mode .author-post-list li:hover .post-arrow {
+            color: #4ade80;
+        }
+
+        .no-posts-msg {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        /* ===== DİĞER BÖLÜMLER (Haberler, Manşet vs) ===== */
+        .extra-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        body.dark-mode .extra-section {
+            background: #1e293b;
+            border-color: rgba(255,255,255,0.08);
+        }
+        .extra-section .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+        }
+        .extra-section .section-head h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        body.dark-mode .extra-section .section-head h2 {
+            color: #f3f4f6;
+        }
+        .extra-section .section-head a {
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .extra-section .section-head a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .extra-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .extra-item {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+        body.dark-mode .extra-item {
+            background: #0f172a;
+            border-color: rgba(255,255,255,0.08);
+        }
+        .extra-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        .extra-item img {
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            width: 100%;
+            background: #dce8e4;
+        }
+        .extra-item .body {
+            padding: 0.8rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .extra-item .body .tag {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-glow);
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+            margin-bottom: 0.3rem;
+        }
+        body.dark-mode .extra-item .body .tag {
+            background: rgba(26, 122, 90, 0.2);
+        }
+        .extra-item .body h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
+        }
+        body.dark-mode .extra-item .body h4 {
+            color: #f3f4f6;
+        }
+        .extra-item .body .date {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: auto;
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .extra-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem;
+            }
+            .author-posts-section { padding: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .extra-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LOADING & ERROR ===== */
+        .loading-placeholder {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .loading-placeholder i {
+            color: var(--primary);
+        }
+        .error-placeholder {
+            padding: 3rem 1rem;
+            text-align: center;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        body.dark-mode .error-placeholder {
+            background: #1e293b;
+            border-color: rgba(255,255,255,0.08);
+        }
+        .error-placeholder i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .error-placeholder h3 {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        body.dark-mode .error-placeholder h3 {
+            color: #9ca3af;
+        }
+        .error-placeholder .btn-home {
+            display: inline-block;
+            margin-top: 1rem;
+            background: var(--primary);
+            color: #fff;
+            padding: 0.6rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .error-placeholder .btn-home:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/web-footer.png') center/cover no-repeat;
+            color: #fff;
+            margin-top: 3rem;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 90, 62, 0.5);
+            z-index: 1;
+        }
+        .footer-container {
+            position: relative;
+            z-index: 2;
+            max-width: 960px;
+            margin: auto;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+        .footer-logo {
+            width: 100px;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        .footer-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #fff;
+        }
+        .footer-desc {
+            max-width: 600px;
+            margin: auto;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+            font-size: 0.9rem;
+        }
+        .footer-menu {
+            margin: 2rem 0 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .footer-menu a {
+            text-decoration: none;
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-menu a:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-social a:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.15);
+            padding-top: 1.2rem;
+        }
+        .footer-bottom p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+        }
+        .footer-links {
+            margin-top: 0.75rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.78rem;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        @media (max-width: 768px) {
+            .footer {
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/mobil-footer.png') center/cover no-repeat;
+            }
+            .footer-container {
+                padding: 2rem 1.2rem 1.5rem;
+            }
+            .footer-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* ===== SCROLL TOP ===== */
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 16px rgba(26, 122, 90, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        body.dark-mode {
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+        body.dark-mode .site-wrapper {
+            background: #111827;
+        }
+        body.dark-mode .bg-card {
+            background: #1e293b;
+        }
+
+        html.font-large .detail-body {
+            font-size: 1.15rem;
+        }
+        html.font-large .detail-title {
+            font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+        }
+
+        html.font-xlarge .detail-body {
+            font-size: 1.3rem;
+        }
+        html.font-xlarge .detail-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+        }
+    </style>
+</head>
+<body>
+    <div class="site-wrapper">
+        <a class="skip-link" href="#main">İçeriğe geç</a>
+
+        <!-- ===== HEADER (haberler.html ile aynı) ===== -->
+        <header>
+            <div class="header-top">
+                <a href="index.html" class="logo" aria-label="Kırıkkale Çölyak Derneği Ana Sayfa">
+                    <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği Logo">
+                    <div class="logo-text">
+                        <span class="city">Kırıkkale</span>
+                        <span class="sub">Çölyak Derneği</span>
+                    </div>
+                </a>
+                <div class="header-actions">
+                    <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
+                    <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
+                        <i class="fas fa-font"></i>
+                        <span class="header-actions-label font-size-btn">A</span>
+                    </button>
+                    <div class="header-info">
+                        <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
+                        <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
+                    </div>
+                    <button class="hamburger" id="hamburgerBtn" aria-label="Menüyü aç/kapat" aria-expanded="false">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="header-divider"></div>
+            <div class="nav-overlay" id="navOverlay"></div>
+            <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
+                <div class="nav-left">
+                    <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                    <a href="haberler.html" class="active"><i class="fas fa-newspaper"></i> Haberler</a>
+                    <a href="colyak-rehberi.html"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
+                    <a href="isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
+                </div>
+                <div class="nav-right">
+                    <a href="gida-stok-durumu.html"><i class="fas fa-boxes"></i> Gıda Stok Durumu</a>
+                    <a href="uyelik.html" class="nav-cta"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main">
+            <!-- ===== BREADCRUMB ===== -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="haberler.html">Haberler</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbTitle">Haber Detayı</span>
+            </nav>
+
+            <!-- ===== İÇERİK ===== -->
+            <div class="page-content">
+                <div id="detailContent">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p style="margin-top:1rem;">İçerik yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="footer-container">
+                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" class="footer-logo" alt="Kırıkkale Çölyak Derneği Logo">
+                <h2 class="footer-title">Kırıkkale Çölyak Derneği</h2>
+                <p class="footer-desc">
+                    Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
+                </p>
+                <div class="footer-menu">
+                    <a href="index.html"><i class="fas fa-house"></i> Ana Sayfa</a>
+                    <a href="gida-stok-durumu.html"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                    <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                    <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                </div>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/kirikkalecolyak?igsh=MXI0eDhsbTB4bGp4aw==" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz?s=cl&p=a&ilr=4" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Kırıkkale Çölyak Derneği<br>Tüm hakları saklıdır.</p>
+                    <div class="footer-links">
+                        <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+                        <a href="cerezler.html">Çerezler</a>
+                        <a href="kvkk.html">KVKK</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ===== SCROLL TO TOP ===== -->
+    <button class="scroll-top" id="scrollTop" aria-label="Yukarı çık">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
+        // ============================================================
+        // SUPABASE BAĞLANTISI
+        // ============================================================
+        const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+
+        let supabaseClient;
+        try {
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                const { createClient } = supabase;
+                supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (error) {
+            console.error('❌ Supabase bağlantı hatası:', error);
+        }
+
+        // ============================================================
+        // DOM ELEMENTLERİ
+        // ============================================================
+        const container = $('#detailContent');
+        const breadcrumbTitle = $('#breadcrumbTitle');
+
+        // ============================================================
+        // 1. TARİH
+        // ============================================================
+        function updateDate() {
+            const now = new Date();
+            const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım',
+                'Aralık'
+            ];
+            document.getElementById('currentDate').textContent = now.getDate() + ' ' + months[now.getMonth()];
+        }
+        updateDate();
+
+        // ============================================================
+        // 2. HAMBURGER MENU (haberler.html ile aynı)
+        // ============================================================
+        // Dark mode
+        $('#darkModeToggle').on('click', function() {
+            $('body').toggleClass('dark-mode');
+            var isDark = $('body').hasClass('dark-mode');
+            $(this).find('i').toggleClass('fa-moon', !isDark).toggleClass('fa-sun', isDark);
+            localStorage.setItem('darkMode', isDark);
+        });
+        if (localStorage.getItem('darkMode') === 'true') {
+            $('body').addClass('dark-mode');
+            $('#darkModeToggle i').removeClass('fa-moon').addClass('fa-sun');
+        }
+
+        // Font size
+        var fontSizes = ['normal', 'large', 'xlarge'];
+        var currentFontIdx = 0;
+        $('#fontSizeToggle').on('click', function() {
+            $('html').removeClass('font-large font-xlarge');
+            currentFontIdx = (currentFontIdx + 1) % fontSizes.length;
+            if (fontSizes[currentFontIdx] === 'large') $('html').addClass('font-large');
+            if (fontSizes[currentFontIdx] === 'xlarge') $('html').addClass('font-xlarge');
+        });
+
+        // Hamburger
+        $('#hamburgerBtn').on('click', function() {
+            var nav = $('#mainNav');
+            var btn = $(this);
+            nav.toggleClass('open');
+            btn.toggleClass('active');
+            var expanded = nav.hasClass('open');
+            btn.attr('aria-expanded', expanded);
+        });
+
+        // ============================================================
+        // 3. SCROLL TOP
+        // ============================================================
+        $(window).on('scroll', function() {
+            if ($(this).scrollTop() > 400) {
+                $('#scrollTop').addClass('visible');
+            } else {
+                $('#scrollTop').removeClass('visible');
+            }
+        });
+        $('#scrollTop').on('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ============================================================
+        // 4. YARDIMCI FONKSİYONLAR
+        // ============================================================
+        function formatDate(d) {
+            if (!d) return 'Tarih yok';
+            try {
+                const date = new Date(d);
+                return date.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch { return d; }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getSlugFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('slug') || null;
+        }
+
+        function getIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            return id ? parseInt(id, 10) : null;
+        }
+
+        // ============================================================
+        // 5. ANA YÜKLEME
+        // ============================================================
+        async function loadDetail() {
+            const slug = getSlugFromUrl();
+            const id = getIdFromUrl();
+
+            console.log('🔍 === DETAY SAYFASI BAŞLATILDI ===');
+            console.log('📌 Slug:', slug);
+            console.log('📌 ID:', id);
+
+            let article = null;
+            let sourceTable = null;
+
+            try {
+                // ===== 1) ARTICLES =====
+                console.log('🔍 1. ARTICLES tablosu aranıyor...');
+                let q = supabaseClient.from('articles').select('*');
+                if (slug) q = q.eq('slug', slug);
+                else if (id) q = q.eq('id', id);
+                const { data: aData, error: aError } = await q.maybeSingle();
+                if (!aError && aData) {
+                    article = aData;
+                    sourceTable = 'articles';
+                    console.log('✅ ARTICLES\'tan bulundu! ID:', article.id);
+                }
+
+                // ===== 2) DERNEK HABERLERİ =====
+                if (!article) {
+                    console.log('🔍 2. DERNEK_HABERLERİ tablosu aranıyor...');
+                    let q2 = supabaseClient.from('dernek_haberleri').select('*');
+                    if (slug) q2 = q2.eq('slug', slug);
+                    else if (id) q2 = q2.eq('id', id);
+                    const { data: dData, error: dError } = await q2.maybeSingle();
+                    if (!dError && dData) {
+                        article = dData;
+                        sourceTable = 'dernek_haberleri';
+                        console.log('✅ DERNEK_HABERLERİ\'nden bulundu! ID:', article.id);
+                    }
+                }
+
+                // ===== 3) HERO =====
+                if (!article) {
+                    console.log('🔍 3. HERO tablosu aranıyor...');
+                    let q3 = supabaseClient.from('hero').select('*');
+                    if (slug) q3 = q3.eq('slug', slug);
+                    else if (id) q3 = q3.eq('id', id);
+                    const { data: hData, error: hError } = await q3.maybeSingle();
+                    if (!hError && hData) {
+                        article = hData;
+                        sourceTable = 'hero';
+                        console.log('✅ HERO\'dan bulundu! ID:', article.id);
+                    }
+                }
+
+                // ===== 4) HİÇBİR YERDE YOKSA =====
+                if (!article) {
+                    console.log('❌ Hiçbir tabloda bulunamadı, en son haber alınıyor...');
+                    const { data: lastData, error: lastError } = await supabaseClient
+                        .from('dernek_haberleri')
+                        .select('*')
+                        .eq('is_active', true)
+                        .order('pub_date', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (!lastError && lastData) {
+                        article = lastData;
+                        sourceTable = 'dernek_haberleri';
+                        console.log('✅ En son dernek haberi alındı. ID:', article.id);
+                    } else {
+                        throw new Error('Hiç içerik bulunamadı.');
+                    }
+                }
+
+                // ============================================================
+                // YAZAR BİLGİLERİ - SADECE ARTICLES İÇİN
+                // ============================================================
+                let author = null;
+                let otherPosts = [];
+
+                if (sourceTable === 'articles') {
+                    const authorName = article.author_name || null;
+                    const authorEmail = article.author_email || null;
+
+                    console.log('👤 === YAZAR BİLGİLERİ ===');
+                    console.log('📌 author_name:', authorName);
+                    console.log('📌 author_email:', authorEmail);
+
+                    if (authorName || authorEmail) {
+                        // 1. authors tablosunda ara (name ile)
+                        if (authorName) {
+                            console.log('🔍 authors tablosunda name ile aranıyor:', authorName);
+                            const { data: authorData, error: authorError } = await supabaseClient
+                                .from('authors')
+                                .select('*')
+                                .eq('name', authorName)
+                                .maybeSingle();
+
+                            if (!authorError && authorData) {
+                                author = authorData;
+                                console.log('✅ Yazar bulundu (authors.name):', author.name);
+                            } else {
+                                console.log('❌ authors.name ile bulunamadı');
+                            }
+                        }
+
+                        // 2. name ile bulunamadıysa email ile dene
+                        if (!author && authorEmail) {
+                            console.log('🔍 authors tablosunda email ile aranıyor:', authorEmail);
+                            const { data: authorData, error: authorError } = await supabaseClient
+                                .from('authors')
+                                .select('*')
+                                .eq('email', authorEmail)
+                                .maybeSingle();
+
+                            if (!authorError && authorData) {
+                                author = authorData;
+                                console.log('✅ Yazar bulundu (authors.email):', author.name);
+                            } else {
+                                console.log('❌ authors.email ile bulunamadı');
+                            }
+                        }
+
+                        // 3. Hala bulunamadıysa article'dan bilgileri kullan
+                        if (!author) {
+                            console.log('ℹ️ Yazar authors tablosunda bulunamadı, article bilgileri kullanılıyor.');
+                            author = {
+                                name: authorName || (authorEmail ? authorEmail.split('@')[0] : 'Yazar'),
+                                title: article.author_title || 'Köşe Yazarı',
+                                avatar: article.author_avatar || 'img/yazar.jpg',
+                                email: authorEmail || null
+                            };
+                        }
+
+                        // ===== YAZARIN DİĞER YAZILARI (SADECE BAŞLIK) =====
+                        console.log('📚 === DİĞER YAZILAR ARANIYOR ===');
+
+                        if (authorName) {
+                            console.log('🔍 author_name ile diğer yazılar aranıyor:', authorName);
+                            const { data: otherData, error: otherError } = await supabaseClient
+                                .from('articles')
+                                .select('id, title, slug, pubDate')
+                                .eq('author_name', authorName)
+                                .neq('id', article.id)
+                                .order('pubDate', { ascending: false })
+                                .limit(10);
+
+                            if (!otherError && otherData && otherData.length > 0) {
+                                otherPosts = otherData;
+                                console.log('✅ Diğer yazılar bulundu (author_name):', otherPosts.length + ' adet');
+                            } else {
+                                console.log('❌ author_name ile diğer yazı bulunamadı');
+                            }
+                        }
+
+                        // author_name ile bulunamadıysa email ile dene
+                        if (otherPosts.length === 0 && authorEmail) {
+                            console.log('🔍 author_email ile diğer yazılar aranıyor:', authorEmail);
+                            const { data: otherData, error: otherError } = await supabaseClient
+                                .from('articles')
+                                .select('id, title, slug, pubDate')
+                                .eq('author_email', authorEmail)
+                                .neq('id', article.id)
+                                .order('pubDate', { ascending: false })
+                                .limit(10);
+
+                            if (!otherError && otherData && otherData.length > 0) {
+                                otherPosts = otherData;
+                                console.log('✅ Diğer yazılar bulundu (author_email):', otherPosts.length + ' adet');
+                            } else {
+                                console.log('❌ author_email ile diğer yazı bulunamadı');
+                            }
+                        }
+
+                        if (otherPosts.length === 0) {
+                            console.log('ℹ️ Bu yazara ait başka yazı bulunamadı.');
+                        }
+
+                    } else {
+                        console.log('⚠️ article\'da author_name veya author_email yok!');
+                    }
+                } else {
+                    console.log('ℹ️ Kaynak tablo "' + sourceTable + '", yazar bilgileri sadece articles içindir.');
+                }
+
+                // ===== ANA HABER =====
+                const title = article.title || 'Başlıksız';
+                const pubDate = article.pubDate || article.pub_date || article.created_at || new Date();
+                const formattedDate = formatDate(pubDate);
+
+                let newsImage = null;
+                if (sourceTable === 'dernek_haberleri') {
+                    newsImage = article.image_url || null;
+                } else if (sourceTable === 'hero') {
+                    newsImage = article.bg_image || null;
+                } else if (sourceTable === 'articles') {
+                    newsImage = article.featured_image || null;
+                }
+
+                let category = 'Haber';
+                if (sourceTable === 'dernek_haberleri') category = 'Dernek Haberi';
+                else if (sourceTable === 'hero') category = 'Öne Çıkan';
+                else if (article.tags && Array.isArray(article.tags) && article.tags.length > 0) {
+                    category = article.tags[0];
+                }
+
+                let content = article.fullContent || article.content || article.full_description || article.description ||
+                    article.summary || '';
+                if (sourceTable === 'hero' && !content) {
+                    content = '<p><strong>' + escapeHtml(article.title || 'Manşet') +
+                        '</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>';
+                    content += '<p><a href="' + (article.link || 'index.html') +
+                        '" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>';
+                }
+
+                // ===== FLOAT ELEMANLARI =====
+                let floatElements = '';
+
+                if (author) {
+                    floatElements += '<div class="float-element author-float">';
+                    floatElements += '<img src="' + (author.avatar || 'img/yazar.jpg') + '" alt="' + escapeHtml(author
+                        .name) + '" class="author-photo" onerror="this.src=\'img/yazar.jpg\'">';
+                    floatElements += '<div class="author-name">' + escapeHtml(author.name);
+                    floatElements += '<div class="author-title-small">' + escapeHtml(author.title || 'Köşe Yazarı') +
+                        '</div>';
+                    floatElements += '</div>';
+                    if (author.email) {
+                        floatElements +=
+                            '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.2rem;">' + escapeHtml(
+                                author.email) + '</div>';
+                    }
+                    floatElements += '</div>';
+                }
+
+                if (newsImage) {
+                    floatElements += '<img src="' + newsImage + '" alt="' + escapeHtml(title) +
+                        '" class="float-element detail-float-img" loading="lazy" onerror="this.style.display=\'none\'">';
+                }
+
+                if (floatElements) {
+                    content = floatElements + content;
+                }
+
+                let tagClass = 'tag';
+                if (sourceTable === 'dernek_haberleri') tagClass += ' tag-dernek';
+                else if (sourceTable === 'hero') tagClass += ' tag-hero';
+
+                // ============================================================
+                // YAZARIN DİĞER YAZILARI - SADECE BAŞLIK LİSTESİ
+                // ============================================================
+                let authorPostsHTML = '';
+
+                if (otherPosts.length > 0 && author) {
+                    let postList = '';
+                    otherPosts.forEach(function(p, index) {
+                        const link = p.slug ? 'detay.html?slug=' + encodeURIComponent(p.slug) : 'detay.html?id=' +
+                            p.id;
+                        postList += `
+                            <li>
+                                <span class="post-index">${String(index + 1).padStart(2, '0')}</span>
+                                <span class="post-date">${formatDate(p.pubDate)}</span>
+                                <a href="${link}">${escapeHtml(p.title)}</a>
+                                <span class="post-arrow"><i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        `;
+                    });
+
+                    authorPostsHTML = `
+                        <div class="author-posts-section">
+                            <div class="section-head">
+                                <h2>
+                                    <i class="fas fa-feather-alt"></i>
+                                    ${escapeHtml(author.name)}'ın Diğer Yazıları
+                                    <span class="author-name-badge">${otherPosts.length} yazı</span>
+                                </h2>
+                                <a href="haberler.html">Tümü →</a>
+                            </div>
+                            <ul class="author-post-list">
+                                ${postList}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                // ============================================================
+                // DİĞER BÖLÜMLER (Haberler, Manşet vs)
+                // ============================================================
+
+                // 1) HERO HABERLERİ
+                const { data: heroData, error: heroError } = await supabaseClient
+                    .from('hero')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('order', { ascending: true });
+
+                let heroItems = [];
+                if (!heroError && heroData && heroData.length > 0) {
+                    heroItems = heroData;
+                }
+
+                // 2) DERNEK HABERLERİ
+                const { data: dernekData, error: dernekError } = await supabaseClient
+                    .from('dernek_haberleri')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('order', { ascending: true })
+                    .order('pub_date', { ascending: false });
+
+                let dernekItems = [];
+                if (!dernekError && dernekData && dernekData.length > 0) {
+                    dernekItems = dernekData;
+                }
+
+                // 3) KÖŞE YAZILARI
+                const { data: articlesData, error: articlesError } = await supabaseClient
+                    .from('articles')
+                    .select('id, title, slug, pubDate, featured_image, summary, author_name')
+                    .eq('is_published', true)
+                    .order('pubDate', { ascending: false })
+                    .limit(3);
+
+                let articlesItems = [];
+                if (!articlesError && articlesData && articlesData.length > 0) {
+                    articlesItems = articlesData;
+                }
+
+                // ===== EXTRA HTML =====
+                let extraHTML = '';
+
+                // Önce yazarın diğer yazıları (en üstte)
+                if (authorPostsHTML) {
+                    extraHTML += authorPostsHTML;
+                }
+
+                // Hero manşetler
+                if (heroItems.length > 0) {
+                    let heroCards = '';
+                    heroItems.slice(0, 3).forEach(function(item) {
+                        const img = item.bg_image || 'img/arka.jpg';
+                        const linkParam = item.slug ? 'slug=' + encodeURIComponent(item.slug) : 'id=' + item.id;
+                        const link = 'detay.html?' + linkParam;
+                        const date = item.created_at || new Date();
+                        heroCards += '<a href="' + link + '" class="extra-item">';
+                        heroCards += '<img src="' + img + '" alt="' + escapeHtml(item.title) +
+                            '" loading="lazy" onerror="this.src=\'img/arka.jpg\'">';
+                        heroCards += '<div class="body">';
+                        heroCards += '<span class="tag">Öne Çıkan</span>';
+                        heroCards += '<h4>' + escapeHtml(item.title) + '</h4>';
+                        heroCards += '<span class="date">' + formatDate(date) + '</span>';
+                        heroCards += '</div></a>';
+                    });
+
+                    extraHTML += '<div class="extra-section">';
+                    extraHTML += '<div class="section-head">';
+                    extraHTML +=
+                        '<h2><i class="fas fa-star" style="color:var(--accent);"></i> Öne Çıkan Haberler</h2>';
+                    extraHTML += '<a href="index.html">Tümü →</a>';
+                    extraHTML += '</div>';
+                    extraHTML += '<div class="extra-grid">' + heroCards + '</div>';
+                    extraHTML += '</div>';
+                }
+
+                // Dernek haberleri
+                if (dernekItems.length > 0) {
+                    let dernekCards = '';
+                    dernekItems.slice(0, 3).forEach(function(item) {
+                        const img = item.image_url || 'img/dernek-haber-placeholder.jpg';
+                        const linkParam = item.slug ? 'slug=' + encodeURIComponent(item.slug) : 'id=' + item.id;
+                        const link = 'detay.html?' + linkParam;
+                        const date = item.pub_date || item.created_at || new Date();
+                        dernekCards += '<a href="' + link + '" class="extra-item">';
+                        dernekCards += '<img src="' + img + '" alt="' + escapeHtml(item.title) +
+                            '" loading="lazy" onerror="this.src=\'img/dernek-haber-placeholder.jpg\'">';
+                        dernekCards += '<div class="body">';
+                        dernekCards += '<span class="tag">Dernek Haberi</span>';
+                        dernekCards += '<h4>' + escapeHtml(item.title) + '</h4>';
+                        dernekCards += '<span class="date">' + formatDate(date) + '</span>';
+                        dernekCards += '</div></a>';
+                    });
+
+                    extraHTML += '<div class="extra-section">';
+                    extraHTML += '<div class="section-head">';
+                    extraHTML +=
+                        '<h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>';
+                    extraHTML += '<a href="dernekhaber.html">Tümü →</a>';
+                    extraHTML += '</div>';
+                    extraHTML += '<div class="extra-grid">' + dernekCards + '</div>';
+                    extraHTML += '</div>';
+                }
+
+                // Köşe yazıları
+                if (articlesItems.length > 0) {
+                    let articlesCards = '';
+                    articlesItems.forEach(function(item) {
+                        const img = item.featured_image || 'img/haber-placeholder.jpg';
+                        const link = item.slug ? 'detay.html?slug=' + encodeURIComponent(item.slug) : 'detay.html?id=' +
+                            item.id;
+                        const authorName2 = item.author_name || 'Yazar';
+                        articlesCards += '<a href="' + link + '" class="extra-item">';
+                        articlesCards += '<img src="' + img + '" alt="' + escapeHtml(item.title) +
+                            '" loading="lazy" onerror="this.src=\'img/haber-placeholder.jpg\'">';
+                        articlesCards += '<div class="body">';
+                        articlesCards += '<span class="tag">' + escapeHtml(authorName2) + '</span>';
+                        articlesCards += '<h4>' + escapeHtml(item.title) + '</h4>';
+                        if (item.summary) {
+                            articlesCards += '<div class="description" style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.2rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' +
+                                escapeHtml(item.summary) + '</div>';
+                        }
+                        articlesCards += '<span class="date">' + formatDate(item.pubDate) + '</span>';
+                        articlesCards += '</div></a>';
+                    });
+
+                    extraHTML += '<div class="extra-section">';
+                    extraHTML += '<div class="section-head">';
+                    extraHTML +=
+                        '<h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>';
+                    extraHTML += '<a href="haberler.html">Tümü →</a>';
+                    extraHTML += '</div>';
+                    extraHTML += '<div class="extra-grid">' + articlesCards + '</div>';
+                    extraHTML += '</div>';
+                }
+
+                if (!extraHTML) {
+                    extraHTML = '<div style="text-align:center; padding:2rem 0; color:var(--text-muted);">';
+                    extraHTML += '<p>Diğer içerikler bulunmuyor.</p>';
+                    extraHTML +=
+                        '<a href="index.html" style="display:inline-block; margin-top:1rem; background:var(--primary); color:#fff; padding:0.5rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none;">Ana Sayfa</a>';
+                    extraHTML += '</div>';
+                }
+
+                // ===== SAYFAYI OLUŞTUR =====
+                let html = '<article class="detail-hero">';
+                html += '<div class="detail-meta">';
+                html += '<span class="' + tagClass + '">' + escapeHtml(category) + '</span>';
+                html += '<span><i class="far fa-calendar-alt"></i> ' + formattedDate + '</span>';
+                if (article.source) {
+                    html += '<span><i class="fas fa-newspaper"></i> ' + escapeHtml(article.source) + '</span>';
+                }
+                html += '</div>';
+                html += '<h1 class="detail-title">' + escapeHtml(title) + '</h1>';
+                html += '<div class="detail-body">' + content + '</div>';
+                html += '</article>';
+
+                html += '<div class="extra-sections">' + extraHTML + '</div>';
+
+                container.html(html);
+
+                // Breadcrumb güncelle
+                breadcrumbTitle.text(title.length > 40 ? title.substring(0, 40) + '...' : title);
+
+                console.log('✅ === SAYFA OLUŞTURULDU ===');
+                console.log('📌 Kaynak tablo:', sourceTable);
+                console.log('👤 Yazar:', author ? author.name : 'Yok');
+                console.log('📚 Diğer yazı sayısı:', otherPosts.length);
+
+            } catch (err) {
+                console.error('❌ Detay yüklenirken hata:', err);
+                container.html('<div class="error-placeholder">' +
+                    '<i class="fas fa-exclamation-triangle"></i>' +
+                    '<h3>İçerik bulunamadı veya yüklenemedi.</h3>' +
+                    '<p style="color:var(--text-muted);">Lütfen ana sayfaya dönerek diğer içeriklere göz atın.</p>' +
+                    '<a href="index.html" class="btn-home">Ana Sayfa</a>' +
+                    '</div>');
+            }
+        }
+
+        loadDetail();
+    </script>
+</body>
+</html>
