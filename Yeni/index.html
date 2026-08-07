@@ -3271,6 +3271,222 @@ body.dark-mode .footer::before {
     }
 }
 
+        /* ===== MODAL STILLERI ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            max-width: 800px;
+            width: 100%;
+            border-radius: var(--radius);
+            padding: 1.5rem 1.5rem 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            animation: modalFade 0.3s ease;
+            transition: background 0.3s ease;
+        }
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            margin-bottom: 0.8rem;
+            flex-shrink: 0;
+            transition: border-color 0.3s ease;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-dark);
+            transition: color 0.3s ease;
+        }
+        .modal-header h3 i {
+            color: var(--accent);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: 0.2s;
+            padding: 0 0.3rem;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 0.2rem;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .modal-iban-box {
+            background: linear-gradient(135deg, #f8fafc, #eef2f1);
+            border-radius: var(--radius);
+            padding: 1.5rem 1.8rem;
+            border: 2px solid var(--accent);
+            border-left: 6px solid var(--accent);
+            box-shadow: 0 4px 20px rgba(232, 133, 12, 0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .modal-iban-box .modal-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 0.8rem;
+            display: block;
+            border: 3px solid var(--primary-light);
+            padding: 4px;
+            background: #fff;
+        }
+        .modal-iban-box .modal-iban-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-number {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+            background: rgba(255,255,255,0.6);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-detail {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+        }
+        .modal-iban-box .modal-iban-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.4rem 1.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-iban-box .modal-iban-copy-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 122, 90, 0.25);
+        }
+        .modal-iban-box .modal-iban-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0.5rem auto;
+            border-radius: 4px;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            pointer-events: none;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-msg i {
+            margin-right: 0.4rem;
+        }
+
+        /* Dark mode modal */
+        body.dark-mode .modal-box {
+            background: #2a2a2a;
+        }
+        body.dark-mode .modal-header {
+            border-bottom-color: #3a3a3a;
+        }
+        body.dark-mode .modal-header h3 {
+            color: var(--primary-light);
+        }
+        body.dark-mode .modal-close {
+            color: #aaa;
+        }
+        body.dark-mode .modal-close:hover {
+            color: #fff;
+        }
+        body.dark-mode .modal-iban-box {
+            background: linear-gradient(135deg, #1e2e2e, #2a3a3a);
+            border-color: var(--accent);
+        }
+        body.dark-mode .modal-iban-box .modal-iban-number {
+            color: var(--primary-light);
+            background: rgba(255,255,255,0.05);
+        }
+
     </style>
 </head>
 <body>
@@ -3355,28 +3571,28 @@ body.dark-mode .footer::before {
                                 <h3 class="green-text">Üye Ol</h3>
                                 <div class="card-divider green"></div>
                                 <p>Birlikte daha güçlüyüz. Siz de aramıza katılın, çölyakla yaşamda dayanışmayı büyütelim.</p>
-                                <a href="üyelik.html" class="card-btn green">Üyelik Başvurusu →</a>
+                                <a href="uyelik.html" class="card-btn green">Üyelik Başvurusu →</a>
                             </div>
                             <div class="action-card">
                                 <div class="card-icon orange"><i class="fas fa-box-open"></i></div>
                                 <h3 class="orange-text">Gıda Desteği</h3>
                                 <div class="card-divider orange"></div>
                                 <p>Glutensiz gıdaya erişimde zorlanan ailelere destek oluyor, ihtiyaç sahiplerine ulaşıyoruz.</p>
-                                <a href="üyelik.html" class="card-btn orange">Destek Talebi →</a>
+                                <a href="uyelik.html" class="card-btn orange">Destek Talebi →</a>
                             </div>
                             <div class="action-card">
                                 <div class="card-icon blue"><i class="fas fa-map-marker-alt"></i></div>
                                 <h3 class="blue-text">Glutensiz Rehber</h3>
                                 <div class="card-divider blue"></div>
                                 <p>Kırıkkale'deki işletmelere, marketlere ve mekanlara kolayca ulaşın.</p>
-                                <a href="glutensiz-rehber.html" class="card-btn blue">Rehberi Keşfet →</a>
+                                <a href="isletmeler.html" class="card-btn blue">Rehberi Keşfet →</a>
                             </div>
                             <div class="action-card">
                                 <div class="card-icon red"><i class="fas fa-hand-holding-heart"></i></div>
                                 <h3 class="red-text">Bağış Yap</h3>
                                 <div class="card-divider red"></div>
                                 <p>Bağışlarınızla daha fazla ihtiyaç sahibine ulaşmamıza destek olun.</p>
-                                <a href="bagıs.html" class="card-btn red">Hemen Bağış Yap →</a>
+                                <a href="gida-stok-durumu.html#iban-card" class="card-btn red">Hemen Bağış Yap →</a>
                             </div>
                         </div>
                     </div>
@@ -3630,9 +3846,9 @@ body.dark-mode .footer::before {
                     </p>
                     <div class="footer-menu">
                         <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
-                        <a href="gida-stok-durumu.html"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                        <a href="#" data-modal="bagis"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
                         <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
-                        <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                        <a href="#" data-modal="iletisim"><i class="fas fa-envelope"></i> İletişim</a>
                     </div>
                     <div class="footer-social">
                         <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -3664,6 +3880,22 @@ body.dark-mode .footer::before {
             </div>
         </div>
     </div>
+
+    <!-- ===== GENEL MODAL (Bağış & İletişim) ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-list"></i> Liste</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- dinamik içerik -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST MESAJI ===== -->
+    <div class="toast-msg" id="toastMsg"><i class="fas fa-check-circle"></i> <span id="toastText">Kopyalandı!</span></div>
 
     <script>
         const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
@@ -4320,7 +4552,7 @@ body.dark-mode .footer::before {
                                         <div class="name" style="font-size: 0.9rem;">${escapeHtml(donor.name)}</div>
                                         <div class="date" style="font-size: 0.6rem; color: #0F5A3E; font-weight: 700;">🏆 En Büyük Destekçi</div>
                                     </div>
-                                    <div class="gida-donor-amount" style="font-size: 1.1rem; color: ${index === 0 ? '#B8860B' : index === 1 ? '#555' : '#8B4513'};">
+                                    <div class="gida-donor-amount" style="font-size: 1.1rem; color: ${index === 0 ? '#B8860B' : index === 1 ? '#555' : index === 2 ? '#8B4513' : ''};">
                                         ${formatMoney(donor.totalAmount)}
                                     </div>
                                 </div>
@@ -4592,6 +4824,136 @@ body.dark-mode .footer::before {
                 }
             }
 
+            // ============================================================
+            // MODAL (Bağış & İletişim) - gida-stok-durumu.html'den alındı
+            // ============================================================
+            function openModal(title, contentHtml) {
+                $('#modalTitle').html(title);
+                $('#modalBody').html(contentHtml);
+                $('#modalOverlay').addClass('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                $('#modalOverlay').removeClass('active');
+                document.body.style.overflow = '';
+            }
+
+            $('#modalCloseBtn').on('click', closeModal);
+            $('#modalOverlay').on('click', function(e) {
+                if ($(e.target).is('#modalOverlay')) closeModal();
+            });
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // Toast mesajı
+            function showToast(msg) {
+                $('#toastText').text(msg);
+                $('#toastMsg').addClass('show');
+                setTimeout(() => $('#toastMsg').removeClass('show'), 2800);
+            }
+
+            function copyIban(iban) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(iban).then(() => {
+                        showToast('IBAN kopyalandı!');
+                    }).catch(() => {
+                        fallbackCopy(iban);
+                    });
+                } else {
+                    fallbackCopy(iban);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('IBAN kopyalandı!');
+                } catch (e) {
+                    showToast('Kopyalama başarısız, lütfen manuel kopyalayın.');
+                }
+                document.body.removeChild(input);
+            }
+
+            // Modal içi IBAN kopyalama (delegasyon ile)
+            $(document).on('click', '.modal-iban-copy-btn', function() {
+                const iban = $(this).data('iban') || 'TR33 0001 0003 1698 0774 5750 01';
+                copyIban(iban);
+            });
+
+            // Footer butonları için data-modal
+            $(document).on('click', '[data-modal]', function(e) {
+                e.preventDefault();
+                const type = $(this).data('modal');
+
+                let title = '';
+                let content = '';
+
+                switch (type) {
+                    case 'bagis':
+                        title = '<i class="fas fa-hand-holding-heart"></i> Bağış Yap';
+                        content = `
+                            <div class="modal-iban-box">
+                                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği" class="modal-logo">
+                                <div class="modal-iban-title">Banka Havalesi / EFT ile Bağış</div>
+                                <div class="modal-iban-divider"></div>
+                                <div class="modal-iban-number">TR33 0001 0003 1698 0774 5750 01</div>
+                                <div class="modal-iban-detail">🏦 Ziraat Bankası · Kırıkkale Şubesi<br>Alıcı: Kırıkkale Çölyak Derneği</div>
+                                <button class="modal-iban-copy-btn" data-iban="TR33 0001 0003 1698 0774 5750 01">
+                                    <i class="fas fa-copy"></i> IBAN Kopyala
+                                </button>
+                            </div>
+                        `;
+                        break;
+                    case 'iletisim':
+                        title = '<i class="fas fa-envelope"></i> İletişim';
+                        content = `
+                            <div style="text-align:center;padding:0.5rem 0;">
+                                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği Logo" style="width:100px;height:auto;margin:0 auto 1rem;display:block;border-radius:12px;">
+                                <h3 style="color:var(--primary-dark);font-size:1.1rem;margin-bottom:1.2rem;">Kırıkkale Çölyak Derneği</h3>
+                                <div style="display:flex;flex-direction:column;gap:0.6rem;max-width:420px;margin:0 auto;text-align:left;">
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--primary);">
+                                        <i class="fas fa-map-marker-alt" style="color:var(--primary);font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;">Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--accent);">
+                                        <i class="fas fa-phone" style="color:var(--accent);font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;">0543 295 46 71</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #1d4ed8;">
+                                        <i class="fas fa-envelope" style="color:#1d4ed8;font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;word-break:break-all;">kirikkalecolyak@gmail.com</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #8b5cf6;">
+                                        <i class="fas fa-globe" style="color:#8b5cf6;font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;word-break:break-all;">www.kirikkalecolyak.org.tr</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(0,0,0,0.06);display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+                                    <a href="tel:05432954671" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--primary);color:#fff;padding:0.4rem 1.4rem;border-radius:30px;font-weight:600;font-size:0.8rem;text-decoration:none;transition:all 0.2s ease;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                                        <i class="fas fa-phone" style="font-size:0.7rem;"></i> Ara
+                                    </a>
+                                    <a href="mailto:kirikkalecolyak@gmail.com" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--accent);color:#fff;padding:0.4rem 1.4rem;border-radius:30px;font-weight:600;font-size:0.8rem;text-decoration:none;transition:all 0.2s ease;" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='var(--accent)'">
+                                        <i class="fas fa-envelope" style="font-size:0.7rem;"></i> E-posta Gönder
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (content) {
+                    openModal(title, content);
+                }
+            });
+
             // ===== TÜM FONKSİYONLARI BAŞLAT =====
             fetchHeroData();
             fetchDernekHaberleri();
@@ -4606,7 +4968,7 @@ body.dark-mode .footer::before {
                 $(this).toggleClass('active');
             });
 
-            // ===== MODAL KAPAT =====
+            // ===== VİDEO MODAL KAPAT =====
             $('#modalClose, #videoModal').on('click', function(e) {
                 if (e.target !== this && e.target.id !== 'modalClose' && !$(e.target).closest('#modalClose').length) return;
                 $('#videoModal').removeClass('active');

@@ -137,9 +137,9 @@
         body.dark-mode .breadcrumb a {
             color: var(--primary-light);
         }
-        body.dark-mode .toc-mobile-toggle {
-            background: #333;
-            color: #ddd;
+        body.dark-mode .toc-drawer-toggle {
+            background: var(--primary);
+            color: #fff;
         }
         body.dark-mode .search-box input {
             background: #333;
@@ -913,6 +913,57 @@
             align-items: flex-start;
         }
 
+        /* ===== TOC DRAWER TOGGLE (Mobile) ===== */
+        .toc-drawer-toggle {
+            display: none;
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 0.5rem 0 1rem;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: var(--font);
+            box-shadow: var(--shadow);
+            transition: background 0.2s ease;
+        }
+        .toc-drawer-toggle:hover {
+            background: var(--primary-dark);
+        }
+        body.dark-mode .toc-drawer-toggle {
+            background: var(--primary-light);
+        }
+        .toc-drawer-toggle i {
+            font-size: 1rem;
+        }
+        @media (max-width: 900px) {
+            .toc-drawer-toggle {
+                display: flex;
+            }
+        }
+
+        /* TOC Overlay */
+        .toc-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 199;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .toc-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
         /* Sidebar TOC */
         .sidebar-toc {
             flex: 0 0 270px;
@@ -943,6 +994,33 @@
         }
         body.dark-mode .sidebar-toc::-webkit-scrollbar-thumb {
             background: var(--primary-light);
+        }
+
+        .toc-close-btn {
+            display: none;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.08);
+            border: none;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text);
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+        .toc-close-btn:hover {
+            background: rgba(0,0,0,0.15);
+            transform: rotate(90deg);
+        }
+        body.dark-mode .toc-close-btn {
+            background: rgba(255,255,255,0.1);
+            color: #ddd;
         }
 
         .sidebar-toc h4 {
@@ -1005,65 +1083,38 @@
             color: var(--primary-light);
         }
 
-        .toc-mobile-toggle {
-            display: none;
-            width: 100%;
-            padding: 0.6rem;
-            background: var(--bg);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text);
-            cursor: pointer;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            font-family: var(--font);
-            transition: background var(--transition);
-        }
-        .toc-mobile-toggle:hover {
-            background: #e0e8e4;
-        }
-        body.dark-mode .toc-mobile-toggle {
-            background: #333;
-            color: #ddd;
-        }
-        body.dark-mode .toc-mobile-toggle:hover {
-            background: #444;
-        }
-
         @media (max-width: 900px) {
             .content-wrapper {
                 flex-direction: column;
             }
+            .toc-drawer-toggle {
+                display: flex;
+            }
             .sidebar-toc {
-                flex: none;
-                width: 100%;
-                position: relative;
+                position: fixed;
                 top: 0;
-                max-height: none;
-                padding: 1rem;
+                left: -100%;
+                width: min(300px, 85vw);
+                height: 100vh;
+                z-index: 200;
+                border-radius: 0;
+                margin: 0;
+                padding: 1.5rem 1.2rem;
+                max-height: 100vh;
+                transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .sidebar-toc.open {
+                left: 0;
+            }
+            .toc-close-btn {
+                display: flex;
             }
             .toc-mobile-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
+                display: none !important;
             }
-            .sidebar-toc ul {
-                display: flex;
-                max-height: 350px;
-                overflow-y: auto;
-            }
-            .sidebar-toc ul:not(.open) {
-                display: none;
-            }
-            .sidebar-toc ul.open {
-                display: flex;
-            }
-            .sidebar-toc ul li a {
-                font-size: 0.85rem;
-                padding: 0.5rem 0.8rem;
+            /* TOC başlığını gizle, kapat butonu görünsün */
+            .sidebar-toc h4 {
+                padding-right: 2.5rem;
             }
         }
 
@@ -1928,39 +1979,7 @@
             }
         }
 
-        /* Kırıkkale haritası */
-        .kirikkale-map {
-            background: var(--bg);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            margin: 1rem 0;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        body.dark-mode .kirikkale-map {
-            background: #333;
-        }
-        .kirikkale-map svg {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            display: block;
-            margin: 0 auto;
-        }
-        @media (max-width: 640px) {
-            .kirikkale-map {
-                padding: 0.5rem;
-            }
-            .kirikkale-map svg text {
-                font-size: 9px !important;
-            }
-            .kirikkale-map svg text[font-size="14"] {
-                font-size: 11px !important;
-            }
-        }
-
-        /* YEREL REHBER KARTI */
+        /* YEREL REHBER KARTI (Örnek olarak eklendi) */
         .rehber-card {
             background: #fff;
             border-radius: 20px;
@@ -2033,12 +2052,12 @@
         .rehber-card .gida-last-update strong {
             font-weight: 700;
         }
-.rehber-card .rehber-content {
-    display: grid;
-    grid-template-columns: 1fr;            /* tek sütun → harita üstte, liste altta */
-    gap: 1.2rem;
-    align-items: start;
-}
+        .rehber-card .rehber-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            align-items: start;
+        }
         .rehber-card .rehber-map-container {
             background: #f0f4f2;
             border-radius: 14px;
@@ -2183,7 +2202,7 @@
             }
         }
 
-        /* Footer - referans ile aynı (görsel arka planlı) */
+        /* FOOTER */
         .footer {
             background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/web-footer.png') center/cover no-repeat;
             color: #fff;
@@ -2385,27 +2404,221 @@
             }
         }
 
-        body.font-large {
+        /* ============================================================
+           MODAL STILLERI
+           ============================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            max-width: 800px;
+            width: 100%;
+            border-radius: var(--radius);
+            padding: 1.5rem 1.5rem 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            animation: modalFade 0.3s ease;
+            transition: background 0.3s ease;
+        }
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            margin-bottom: 0.8rem;
+            flex-shrink: 0;
+            transition: border-color 0.3s ease;
+        }
+        .modal-header h3 {
             font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-dark);
+            transition: color 0.3s ease;
         }
-        body.font-xlarge {
-            font-size: 1.25rem;
+        .modal-header h3 i {
+            color: var(--accent);
         }
-        body.font-large .content-section,
-        body.font-xlarge .content-section {
-            font-size: 1.05em;
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: 0.2s;
+            padding: 0 0.3rem;
+            line-height: 1;
         }
-        body.font-large .section-body,
-        body.font-xlarge .section-body {
-            font-size: 1.05em;
+        .modal-close:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
         }
-        @media (max-width: 640px) {
-            body.font-large {
-                font-size: 1.05rem;
-            }
-            body.font-xlarge {
-                font-size: 1.15rem;
-            }
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 0.2rem;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .modal-iban-box {
+            background: linear-gradient(135deg, #f8fafc, #eef2f1);
+            border-radius: var(--radius);
+            padding: 1.5rem 1.8rem;
+            border: 2px solid var(--accent);
+            border-left: 6px solid var(--accent);
+            box-shadow: 0 4px 20px rgba(232, 133, 12, 0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .modal-iban-box .modal-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 0.8rem;
+            display: block;
+            border: 3px solid var(--primary-light);
+            padding: 4px;
+            background: #fff;
+        }
+        .modal-iban-box .modal-iban-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-number {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+            background: rgba(255,255,255,0.6);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-detail {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+        }
+        .modal-iban-box .modal-iban-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.4rem 1.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-iban-box .modal-iban-copy-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 122, 90, 0.25);
+        }
+        .modal-iban-box .modal-iban-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0.5rem auto;
+            border-radius: 4px;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            pointer-events: none;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-msg i {
+            margin-right: 0.4rem;
+        }
+
+        body.dark-mode .modal-box {
+            background: #2a2a2a;
+        }
+        body.dark-mode .modal-header {
+            border-bottom-color: #3a3a3a;
+        }
+        body.dark-mode .modal-header h3 {
+            color: var(--primary-light);
+        }
+        body.dark-mode .modal-close {
+            color: #aaa;
+        }
+        body.dark-mode .modal-close:hover {
+            color: #fff;
+        }
+        body.dark-mode .modal-iban-box {
+            background: linear-gradient(135deg, #1e2e2e, #2a3a3a);
+            border-color: var(--accent);
+        }
+        body.dark-mode .modal-iban-box .modal-iban-number {
+            color: var(--primary-light);
+            background: rgba(255,255,255,0.05);
         }
     </style>
 </head>
@@ -2434,10 +2647,7 @@
                     </a>
                     <div class="header-actions">
                         <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
-                        <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
-                            <i class="fas fa-font"></i>
-                            <span class="header-actions-label font-size-btn">A</span>
-                        </button>
+                        <button class="font-size-btn" aria-label="Yazı boyutunu büyüt/küçült" title="Yazı Boyutu"><i class="fas fa-font"></i></button>
                         <div class="header-info">
                             <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
                             <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
@@ -2503,16 +2713,24 @@
                 <button class="search-clear" id="searchClear" aria-label="Aramayı temizle"><i class="fas fa-times"></i></button>
             </div>
 
+            <!-- ===== TOC DRAWER TOGGLE (Mobile) ===== -->
+            <button class="toc-drawer-toggle" id="tocDrawerToggle" aria-label="İçindekileri aç">
+                <i class="fas fa-bars"></i> İçindekileri Göster
+            </button>
+
+            <!-- ===== TOC OVERLAY (Mobile) ===== -->
+            <div class="toc-overlay" id="tocOverlay"></div>
+
             <!-- ===== CONTENT WRAPPER ===== -->
             <div class="content-wrapper">
 
                 <!-- ===== SIDEBAR TOC ===== -->
                 <aside class="sidebar-toc" id="sidebarToc" aria-label="İçindekiler">
-                    <button class="toc-mobile-toggle" id="tocToggle" aria-expanded="true">
-                        <i class="fas fa-list"></i> İçindekiler <i class="fas fa-chevron-up"></i>
+                    <button class="toc-close-btn" id="tocCloseBtn" aria-label="İçindekileri kapat">
+                        <i class="fas fa-times"></i>
                     </button>
                     <h4><i class="fas fa-bars"></i> İçindekiler</h4>
-                    <ul id="tocList" class="open" role="navigation" aria-label="Sayfa içi navigasyon">
+                    <ul id="tocList" role="navigation" aria-label="Sayfa içi navigasyon">
                         <li><a data-section="section-1">🩺 Çölyak Hastalığı Nedir?</a></li>
                         <li><a data-section="section-2">📊 Türkiye ve Dünyada İstatistikler</a></li>
                         <li><a data-section="section-3">🔍 Çölyak Belirtileri</a></li>
@@ -2919,7 +3137,7 @@
                     </section>
 
                     <!-- SECTION 8: Etiket Okuma -->
-                    <section class="content-section" id="section-8" data-search="Etiket okuma logo glutensiz 20 ppm içindekiler">
+                    <section class="content-section hidden" id="section-8" data-search="Etiket okuma logo glutensiz 20 ppm içindekiler">
                         <div class="section-header">
                             <div class="section-icon"><i class="fas fa-tags"></i></div>
                             <h2>Etiket Okuma Rehberi</h2>
@@ -3149,7 +3367,8 @@
                                 <li>Bazı belediyelerin glutensiz gıda destekleri (her ilde farklı, araştırılmalı).</li>
                                 <li>Askerlik muafiyeti (askerliğe elverişli olmayan raporu).</li>
                                 <li>Bazı üniversite yemekhanelerinde glutensiz menü (örneğin, Ege Üniversitesi, Hacettepe vb.).</li>
-                                <li>Özel dernek ve vakıfların burs ve yardım programları.<li>"Çocuklar İçin Özel Gereksinim Raporu" (ÇÖZGER) </li></li>
+                                <li>Özel dernek ve vakıfların burs ve yardım programları.</li>
+                                <li>"Çocuklar İçin Özel Gereksinim Raporu" (ÇÖZGER).</li>
                             </ul>
                             <!-- VIDEO -->
                             <div class="video-inline" data-video="https://www.youtube-nocookie.com/embed/5fHs2DICiLI" data-title="Devlet Destekleri - Uzman Anlatıyor">
@@ -3193,51 +3412,47 @@
                                     </div>
                                 </div>
                                 <div class="rehber-content">
-                                    <div class="rehber-map-container"><div id="rehberMap" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(97.8969px, 243px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://b.basemaps.cartocdn.com/light_all/16/38863/24846.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-85px, -127px, 0px); opacity: 1;"><img alt="" src="https://a.basemaps.cartocdn.com/light_all/16/38863/24845.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-85px, -383px, 0px); opacity: 1;"><img alt="" src="https://c.basemaps.cartocdn.com/light_all/16/38862/24845.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-341px, -383px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%2322c55e%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EE%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(1303px, 500px, 0px); z-index: 500;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%233b82f6%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EF%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(0px, 0px, 0px); z-index: 0;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%233b82f6%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EK%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(851px, 484px, 0px); z-index: 484;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%233b82f6%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3E%C3%87%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(1272px, -22px, 0px); z-index: -22;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%233b82f6%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EC%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(1311px, 493px, 0px); z-index: 493;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%233b82f6%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EG%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(8px, -59px, 0px); z-index: -59;"><img src="data:image/svg+xml,%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%2216%22%20fill%3D%22%23166534%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2220%22%20font-family%3D%22Arial%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EH%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -16px; margin-top: -32px; width: 32px; height: 32px; transform: translate3d(1162px, 324px, 0px); z-index: 324;"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(9.94892e+06px, 6.36046e+06px, 0px) scale(32768);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © CartoDB</div></div></div></div></div>
+                                    <div class="rehber-map-container">
+                                        <div id="rehberMap" style="width:100%; height:320px; background:#e8f0ec;"></div>
+                                    </div>
                                     <div>
                                         <div class="rehber-list" id="rehberList">
-                            <div class="rehber-item" data-id="1">
-                                <div class="r-name"><i class="fas fa-utensils" style="color:#1A7A5A;margin-right:0.3rem;"></i>Elit Ekmek</div>
-                                <span class="r-type">Şarküteri</span>
-                                <span class="r-address">İsmet İnönü Cad., No:22</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="2">
-                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>File Market</div>
-                                <span class="r-type">Market</span>
-                                <span class="r-address">File Market, Seyrantepe, Oktay Kırlangıç Sk No:11, Yahşihan/Kırıkkale.</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="3">
-                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>Kırıkkale Belediyesi Marketi</div>
-                                <span class="r-type">Market</span>
-                                <span class="r-address">Atatürk Bulvarı.</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="4">
-                                <div class="r-name"><i class="fas fa-seedling" style="color:#1A7A5A;margin-right:0.3rem;"></i>Çerez Tabağı</div>
-                                <span class="r-type">Kuruyemiş</span>
-                                <span class="r-address">Alparslan Pehlivanlı Blv.</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="5">
-                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>CarrefourSa</div>
-                                <span class="r-type">Market</span>
-                                <span class="r-address"> İnönü Cad.</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="6">
-                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>Gülenler Market</div>
-                                <span class="r-type">Market</span>
-                                <span class="r-address">Kayseri Yolu Üzeri</span>
-                            </div>
-                        
-                            <div class="rehber-item" data-id="7">
-                                <div class="r-name"><i class="fas fa-utensils" style="color:#1A7A5A;margin-right:0.3rem;"></i>Helal Market</div>
-                                <span class="r-type">Şarküteri</span>
-                                <span class="r-address">Hüseyin Kahya Mah.</span>
-                            </div>
-                        </div>
+                                            <div class="rehber-item" data-id="1">
+                                                <div class="r-name"><i class="fas fa-utensils" style="color:#1A7A5A;margin-right:0.3rem;"></i>Elit Ekmek</div>
+                                                <span class="r-type">Şarküteri</span>
+                                                <span class="r-address">İsmet İnönü Cad., No:22</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="2">
+                                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>File Market</div>
+                                                <span class="r-type">Market</span>
+                                                <span class="r-address">File Market, Seyrantepe, Oktay Kırlangıç Sk No:11, Yahşihan/Kırıkkale.</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="3">
+                                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>Kırıkkale Belediyesi Marketi</div>
+                                                <span class="r-type">Market</span>
+                                                <span class="r-address">Atatürk Bulvarı.</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="4">
+                                                <div class="r-name"><i class="fas fa-seedling" style="color:#1A7A5A;margin-right:0.3rem;"></i>Çerez Tabağı</div>
+                                                <span class="r-type">Kuruyemiş</span>
+                                                <span class="r-address">Alparslan Pehlivanlı Blv.</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="5">
+                                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>CarrefourSa</div>
+                                                <span class="r-type">Market</span>
+                                                <span class="r-address"> İnönü Cad.</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="6">
+                                                <div class="r-name"><i class="fas fa-store" style="color:#1A7A5A;margin-right:0.3rem;"></i>Gülenler Market</div>
+                                                <span class="r-type">Market</span>
+                                                <span class="r-address">Kayseri Yolu Üzeri</span>
+                                            </div>
+                                            <div class="rehber-item" data-id="7">
+                                                <div class="r-name"><i class="fas fa-utensils" style="color:#1A7A5A;margin-right:0.3rem;"></i>Helal Market</div>
+                                                <span class="r-type">Şarküteri</span>
+                                                <span class="r-address">Hüseyin Kahya Mah.</span>
+                                            </div>
+                                        </div>
                                         <div class="rehber-buttons">
                                             <a href="yerel-rehber.html" class="primary-btn"><i class="fas fa-arrow-right"></i> Tüm Mekanları Gör</a>
                                             <a href="iletisim.html" class="secondary-btn"><i class="fas fa-plus-circle"></i> Mekan Öner</a>
@@ -3505,10 +3720,10 @@
                         Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
                     </p>
                     <div class="footer-menu">
-                        <a href="index.html"><i class="fas fa-house"></i> Ana Sayfa</a>
-                        <a href="gida-stok-durumu.html" class="footer-bagis-btn"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                        <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="#" data-modal="bagis"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
                         <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
-                        <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                        <a href="#" data-modal="iletisim"><i class="fas fa-envelope"></i> İletişim</a>
                     </div>
                     <div class="footer-social">
                         <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -3536,7 +3751,7 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <!-- ===== VIDEO MODAL ===== -->
+    <!-- ===== VİDEO MODAL ===== -->
     <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <button class="modal-close" id="modalClose" aria-label="Videoyu kapat"><i class="fas fa-times"></i></button>
@@ -3544,510 +3759,635 @@
             <div class="modal-footer">
                 <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği" class="modal-footer-logo-img">
                 <span class="modal-footer-brand">Kırıkkale <span>Çölyak Derneği</span></span>
-                <span class="modal-footer-title" id="modalTitle">Çölyak Tanı Süreci - Uzman Anlatıyor</span>
+                <span class="modal-footer-title" id="modalTitle">Video Başlığı</span>
             </div>
         </div>
     </div>
 
-    <!-- ===== GÖRSEL MODAL ===== -->
-    <div class="video-modal" id="imageModal" role="dialog" aria-modal="true" aria-labelledby="imageModalTitle">
-        <div class="modal-content">
-            <button class="modal-close" id="imageModalClose" aria-label="Görseli kapat"><i class="fas fa-times"></i></button>
-            <img id="modalImage" src="" alt="Büyük görünüm" style="width:100%; height:auto; max-height:70vh; object-fit:contain; background:#0a0a0a; display:block;">
-            <div class="modal-footer">
-                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği" class="modal-footer-logo-img">
-                <span class="modal-footer-brand">Kırıkkale <span>Çölyak Derneği</span></span>
-                <span class="modal-footer-title" id="imageModalTitle">Kırıkkale Glutensiz Yaşam Haritası</span>
+    <!-- ===== GENEL MODAL (Bağış & İletişim) ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-list"></i> Liste</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- dinamik içerik -->
             </div>
         </div>
     </div>
+
+    <!-- ===== TOAST MESAJI ===== -->
+    <div class="toast-msg" id="toastMsg"><i class="fas fa-check-circle"></i> <span id="toastText">Kopyalandı!</span></div>
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-    (function() {
-        'use strict';
+        (function() {
+            'use strict';
 
-        // DOM REFS
-        const $ = (sel) => document.querySelector(sel);
-        const $$ = (sel) => document.querySelectorAll(sel);
+            // DOM REFS
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
 
-        const hamburgerBtn = $('#hamburgerBtn');
-        const mainNav = $('#mainNav');
-        const navOverlay = $('#navOverlay');
-        const tocToggle = $('#tocToggle');
-        const tocList = $('#tocList');
-        const tocLinks = $$('.sidebar-toc ul li a');
-        const sections = $$('.content-section');
-        const searchInput = $('#searchInput');
-        const searchClear = $('#searchClear');
-        const progressFill = $('#progressFill');
-        const scrollTopBtn = $('#scrollTopBtn');
-        const darkModeToggle = $('#darkModeToggle');
-        const fontSizeToggle = $('#fontSizeToggle');
-        const videoItems = $$('.video-inline');
-        const videoModal = $('#videoModal');
-        const modalIframe = $('#modalIframe');
-        const modalClose = $('#modalClose');
-        const modalTitle = $('#modalTitle');
-        const favoriteBtns = $$('.favorite-btn');
-        const accordionHeaders = $$('.accordion-header');
-        const relatedCards = $$('.related-card');
-        const imageModal = $('#imageModal');
-        const modalImage = $('#modalImage');
-        const imageModalTitle = $('#imageModalTitle');
-        const imageModalClose = $('#imageModalClose');
+            const hamburgerBtn = $('#hamburgerBtn');
+            const mainNav = $('#mainNav');
+            const navOverlay = $('#navOverlay');
+            const tocDrawerToggle = $('#tocDrawerToggle');
+            const sidebarToc = $('#sidebarToc');
+            const tocOverlay = $('#tocOverlay');
+            const tocCloseBtn = $('#tocCloseBtn');
+            const tocLinks = $$('.sidebar-toc ul li a');
+            const sections = $$('.content-section');
+            const searchInput = $('#searchInput');
+            const searchClear = $('#searchClear');
+            const progressFill = $('#progressFill');
+            const scrollTopBtn = $('#scrollTopBtn');
+            const darkModeToggle = $('#darkModeToggle');
+            const videoItems = $$('.video-inline');
+            const videoModal = $('#videoModal');
+            const modalIframe = $('#modalIframe');
+            const modalClose = $('#modalClose');
+            const modalTitle = $('#modalTitle');
+            const favoriteBtns = $$('.favorite-btn');
+            const accordionHeaders = $$('.accordion-header');
+            const relatedCards = $$('.related-card');
 
-        let currentSection = 'section-1';
-        let fontSizeLevel = 0;
-        let favorites = JSON.parse(localStorage.getItem('celiacFavorites') || '[]');
+            let currentSection = 'section-1';
+            let favorites = JSON.parse(localStorage.getItem('celiacFavorites') || '[]');
 
-        // Toast mesajı
-        function showToast(msg) {
-            const toast = document.getElementById('toastMsg') || (function() {
-                const t = document.createElement('div');
-                t.id = 'toastMsg';
-                t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#0F5A3E;color:#fff;padding:0.6rem 1.5rem;border-radius:30px;font-size:0.85rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.2);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);z-index:999;pointer-events:none;';
-                document.body.appendChild(t);
-                return t;
-            })();
-            toast.textContent = msg;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(-50%) translateY(80px)';
-            }, 3000);
-        }
-
-        function updateFavoritesUI() {
-            favoriteBtns.forEach(btn => {
-                const section = btn.closest('.content-section');
-                if (!section) return;
-                const id = section.id;
-                const isFavorite = favorites.includes(id);
-                btn.innerHTML = isFavorite ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-                btn.classList.toggle('active', isFavorite);
-            });
-        }
-
-        function toggleFavorite(sectionId) {
-            const idx = favorites.indexOf(sectionId);
-            if (idx > -1) favorites.splice(idx, 1);
-            else favorites.push(sectionId);
-            localStorage.setItem('celiacFavorites', JSON.stringify(favorites));
-            updateFavoritesUI();
-        }
-
-        function showSection(sectionId) {
-            sections.forEach(sec => sec.classList.add('hidden'));
-            const target = document.getElementById(sectionId);
-            if (target) {
-                target.classList.remove('hidden');
-                currentSection = sectionId;
-                tocLinks.forEach(link => link.classList.toggle('active', link.dataset.section === sectionId));
-                history.pushState(null, '', '#' + sectionId);
-                updateFavoritesUI();
-                localStorage.setItem('lastCeliacSection', sectionId);
+            // Toast mesajı
+            function showToast(msg) {
+                const toast = document.getElementById('toastMsg') || (function() {
+                    const t = document.createElement('div');
+                    t.id = 'toastMsg';
+                    t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#0F5A3E;color:#fff;padding:0.6rem 1.5rem;border-radius:30px;font-size:0.85rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.2);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);z-index:999;pointer-events:none;';
+                    document.body.appendChild(t);
+                    return t;
+                })();
+                toast.textContent = msg;
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(80px)';
+                }, 3000);
             }
-        }
 
-        tocLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.dataset.section;
-                if (sectionId) {
-                    showSection(sectionId);
-                    setTimeout(() => {
-                        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
-            });
-        });
-
-        tocToggle.addEventListener('click', function() {
-            const isOpen = tocList.classList.toggle('open');
-            this.setAttribute('aria-expanded', isOpen);
-            const icon = this.querySelector('i:last-child');
-            icon.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-        });
-
-        hamburgerBtn.addEventListener('click', function() {
-            const isOpen = mainNav.classList.toggle('open');
-            this.classList.toggle('active');
-            this.setAttribute('aria-expanded', isOpen);
-            navOverlay.classList.toggle('active', isOpen);
-        });
-        navOverlay.addEventListener('click', function() {
-            mainNav.classList.remove('open');
-            hamburgerBtn.classList.remove('active');
-            hamburgerBtn.setAttribute('aria-expanded', 'false');
-            this.classList.remove('active');
-        });
-
-        function performSearch(query) {
-            const q = query.toLowerCase().trim();
-            let hasResults = false;
-            sections.forEach(section => {
-                const searchData = section.dataset.search || '';
-                const headerText = section.querySelector('.section-header h2')?.textContent || '';
-                const bodyText = section.textContent || '';
-                const match = q === '' || searchData.toLowerCase().includes(q) ||
-                    headerText.toLowerCase().includes(q) ||
-                    bodyText.toLowerCase().includes(q);
-                section.classList.toggle('hidden', q !== '' && !match);
-                if (match) hasResults = true;
-            });
-            const noResultMsg = document.getElementById('noResultMsg');
-            if (!hasResults && q !== '') {
-                if (!noResultMsg) {
-                    const msg = document.createElement('div');
-                    msg.id = 'noResultMsg';
-                    msg.style.cssText = 'text-align:center;padding:2rem;color:var(--text-light);background:var(--bg);border-radius:12px;margin:1rem 0;';
-                    msg.innerHTML = '<i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.5;"></i> <strong>Sonuç bulunamadı.</strong><br>Farklı bir kelime deneyin.';
-                    document.querySelector('.main-content').prepend(msg);
-                }
-            } else {
-                document.getElementById('noResultMsg')?.remove();
-            }
-            searchClear.classList.toggle('visible', q.length > 0);
-        }
-
-        searchInput.addEventListener('input', function() { performSearch(this.value); });
-        searchClear.addEventListener('click', function() {
-            searchInput.value = '';
-            performSearch('');
-            searchInput.focus();
-        });
-
-        window.addEventListener('scroll', function() {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            progressFill.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
-            scrollTopBtn.classList.toggle('visible', scrollTop > 300);
-        });
-
-        scrollTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('celiacDarkMode', isDark);
-            darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            darkModeToggle.setAttribute('aria-label', isDark ? 'Aydınlık moda geç' : 'Karanlık moda geç');
-        }
-        if (localStorage.getItem('celiacDarkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-
-        function toggleFontSize() {
-            fontSizeLevel = (fontSizeLevel + 1) % 3;
-            document.body.classList.remove('font-large', 'font-xlarge');
-            if (fontSizeLevel === 1) document.body.classList.add('font-large');
-            if (fontSizeLevel === 2) document.body.classList.add('font-xlarge');
-            localStorage.setItem('celiacFontSize', fontSizeLevel);
-            fontSizeToggle.querySelector('.font-size-btn').textContent = fontSizeLevel === 0 ? 'A' : fontSizeLevel === 1 ? 'A+' : 'A++';
-        }
-        const savedFontSize = parseInt(localStorage.getItem('celiacFontSize') || '0');
-        fontSizeLevel = savedFontSize;
-        if (savedFontSize === 1) document.body.classList.add('font-large');
-        if (savedFontSize === 2) document.body.classList.add('font-xlarge');
-        fontSizeToggle.querySelector('.font-size-btn').textContent = savedFontSize === 0 ? 'A' : savedFontSize === 1 ? 'A+' : 'A++';
-        fontSizeToggle.addEventListener('click', toggleFontSize);
-
-        // ===== VİDEO MODAL =====
-        videoItems.forEach(item => {
-            const openVideo = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const url = this.dataset.video;
-                const title = this.dataset.title || 'Video';
-                if (url) {
-                    let finalUrl = url;
-                    if (url.includes('youtube.com/watch?v=')) {
-                        const videoId = url.split('v=')[1]?.split('&')[0];
-                        if (videoId) {
-                            finalUrl = 'https://www.youtube-nocookie.com/embed/' + videoId;
-                        }
-                    }
-                    finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'autoplay=1&rel=0&modestbranding=1';
-                    modalIframe.src = finalUrl;
-                    modalTitle.textContent = title;
-                    videoModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            };
-            item.addEventListener('click', openVideo);
-            item.addEventListener('touchend', function(e) {
-                if (!this._touched) {
-                    this._touched = true;
-                    openVideo.call(this, e);
-                    setTimeout(() => { this._touched = false; }, 300);
-                }
-            });
-        });
-
-        function closeVideoModal() {
-            videoModal.classList.remove('active');
-            modalIframe.src = '';
-            document.body.style.overflow = '';
-        }
-        modalClose.addEventListener('click', closeVideoModal);
-        videoModal.addEventListener('click', function(e) { if (e.target === this) closeVideoModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && videoModal.classList.contains('active')) closeVideoModal(); });
-
-        // ===== GÖRSEL MODAL =====
-        function openImageModal(src, title) {
-            if (!src) {
-                showToast('Görsel yüklenemedi.');
-                return;
-            }
-            modalImage.src = src;
-            modalImage.onerror = function() {
-                this.src = '';
-                this.alt = 'Görsel yüklenemedi';
-                showToast('Görsel yüklenirken hata oluştu.');
-            };
-            imageModalTitle.textContent = title || 'Görsel';
-            imageModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeImageModal() {
-            imageModal.classList.remove('active');
-            modalImage.src = '';
-            document.body.style.overflow = '';
-        }
-        imageModalClose.addEventListener('click', closeImageModal);
-        imageModal.addEventListener('click', function(e) { if (e.target === this) closeImageModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && imageModal.classList.contains('active')) closeImageModal(); });
-
-        // Görsel tıklama olayları
-        document.querySelectorAll('.image-container, .svg-container, .kirikkale-map, .image-container img, .content-section img:not(.modal-footer-logo-img)').forEach(el => {
-            if (el.tagName === 'IMG') {
-                el.style.cursor = 'pointer';
-                el.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    openImageModal(this.src, this.dataset.title || this.alt || '');
+            function updateFavoritesUI() {
+                favoriteBtns.forEach(btn => {
+                    const section = btn.closest('.content-section');
+                    if (!section) return;
+                    const id = section.id;
+                    const isFavorite = favorites.includes(id);
+                    btn.innerHTML = isFavorite ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+                    btn.classList.toggle('active', isFavorite);
                 });
-            } else if (el.classList.contains('image-container')) {
-                const img = el.querySelector('img');
-                if (img) {
+            }
+
+            function toggleFavorite(sectionId) {
+                const idx = favorites.indexOf(sectionId);
+                if (idx > -1) favorites.splice(idx, 1);
+                else favorites.push(sectionId);
+                localStorage.setItem('celiacFavorites', JSON.stringify(favorites));
+                updateFavoritesUI();
+            }
+
+            function showSection(sectionId) {
+                sections.forEach(sec => sec.classList.add('hidden'));
+                const target = document.getElementById(sectionId);
+                if (target) {
+                    target.classList.remove('hidden');
+                    currentSection = sectionId;
+                    tocLinks.forEach(link => link.classList.toggle('active', link.dataset.section === sectionId));
+                    if (window.location.hash !== '#' + sectionId) {
+                        history.pushState(null, '', '#' + sectionId);
+                    }
+                    updateFavoritesUI();
+                    localStorage.setItem('lastCeliacSection', sectionId);
+                    // Drawer'ı kapat (mobile)
+                    closeTocDrawer();
+                }
+            }
+
+            // TOC Drawer Kontrolleri
+            function openTocDrawer() {
+                sidebarToc.classList.add('open');
+                tocOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeTocDrawer() {
+                sidebarToc.classList.remove('open');
+                tocOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            tocDrawerToggle.addEventListener('click', openTocDrawer);
+            tocCloseBtn.addEventListener('click', closeTocDrawer);
+            tocOverlay.addEventListener('click', closeTocDrawer);
+
+            // ESC ile kapat
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeTocDrawer();
+                    closeVideoModal();
+                    closeModal();
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.dataset.section;
+                    if (sectionId) {
+                        showSection(sectionId);
+                        setTimeout(() => {
+                            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                });
+            });
+
+            // Hamburger menü
+            hamburgerBtn.addEventListener('click', function() {
+                const isOpen = mainNav.classList.toggle('open');
+                this.classList.toggle('active');
+                this.setAttribute('aria-expanded', isOpen);
+                navOverlay.classList.toggle('active', isOpen);
+            });
+            navOverlay.addEventListener('click', function() {
+                mainNav.classList.remove('open');
+                hamburgerBtn.classList.remove('active');
+                hamburgerBtn.setAttribute('aria-expanded', 'false');
+                this.classList.remove('active');
+            });
+
+            // Arama
+            function performSearch(query) {
+                const q = query.toLowerCase().trim();
+                let hasResults = false;
+                sections.forEach(section => {
+                    const searchData = section.dataset.search || '';
+                    const headerText = section.querySelector('.section-header h2')?.textContent || '';
+                    const bodyText = section.textContent || '';
+                    const match = q === '' || searchData.toLowerCase().includes(q) ||
+                        headerText.toLowerCase().includes(q) ||
+                        bodyText.toLowerCase().includes(q);
+                    section.classList.toggle('hidden', q !== '' && !match);
+                    if (match) hasResults = true;
+                });
+                const noResultMsg = document.getElementById('noResultMsg');
+                if (!hasResults && q !== '') {
+                    if (!noResultMsg) {
+                        const msg = document.createElement('div');
+                        msg.id = 'noResultMsg';
+                        msg.style.cssText = 'text-align:center;padding:2rem;color:var(--text-light);background:var(--bg);border-radius:12px;margin:1rem 0;';
+                        msg.innerHTML = '<i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.5;"></i> <strong>Sonuç bulunamadı.</strong><br>Farklı bir kelime deneyin.';
+                        document.querySelector('.main-content').prepend(msg);
+                    }
+                } else {
+                    document.getElementById('noResultMsg')?.remove();
+                }
+                searchClear.classList.toggle('visible', q.length > 0);
+            }
+
+            searchInput.addEventListener('input', function() { performSearch(this.value); });
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                performSearch('');
+                searchInput.focus();
+            });
+
+            // Progress Bar
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                progressFill.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+                scrollTopBtn.classList.toggle('visible', scrollTop > 300);
+            });
+
+            scrollTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+            // Dark Mode
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('celiacDarkMode', isDark);
+                darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                darkModeToggle.setAttribute('aria-label', isDark ? 'Aydınlık moda geç' : 'Karanlık moda geç');
+            }
+            if (localStorage.getItem('celiacDarkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+
+            // Video Modal
+            function openVideoModal(url, title) {
+                if (!url) return;
+                let finalUrl = url;
+                if (url.includes('youtube.com/watch?v=')) {
+                    const videoId = url.split('v=')[1]?.split('&')[0];
+                    if (videoId) {
+                        finalUrl = 'https://www.youtube-nocookie.com/embed/' + videoId;
+                    }
+                }
+                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'autoplay=1&rel=0&modestbranding=1';
+                modalIframe.src = finalUrl;
+                modalTitle.textContent = title || 'Video';
+                videoModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeVideoModal() {
+                videoModal.classList.remove('active');
+                modalIframe.src = '';
+                document.body.style.overflow = '';
+            }
+
+            videoItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const url = this.dataset.video;
+                    const title = this.dataset.title || 'Video';
+                    openVideoModal(url, title);
+                });
+            });
+
+            modalClose.addEventListener('click', closeVideoModal);
+            videoModal.addEventListener('click', function(e) { if (e.target === this) closeVideoModal(); });
+
+            // Favoriler
+            favoriteBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const section = this.closest('.content-section');
+                    if (section) toggleFavorite(section.id);
+                });
+            });
+            updateFavoritesUI();
+
+            // Accordion
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const isOpen = content.classList.contains('open');
+                    accordionHeaders.forEach(h => {
+                        h.classList.remove('active');
+                        h.nextElementSibling.classList.remove('open');
+                        h.setAttribute('aria-expanded', 'false');
+                    });
+                    if (!isOpen) {
+                        this.classList.add('active');
+                        content.classList.add('open');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+
+            // Related Cards
+            relatedCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.dataset.section;
+                    if (sectionId) {
+                        showSection(sectionId);
+                        setTimeout(() => {
+                            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                });
+            });
+
+            // Görsel Modal
+            const imageModal = document.createElement('div');
+            imageModal.className = 'video-modal';
+            imageModal.id = 'imageModal';
+            imageModal.innerHTML = `
+                <div class="modal-content" style="max-width:900px; background:transparent;">
+                    <button class="modal-close" id="imageModalClose" aria-label="Görseli kapat"><i class="fas fa-times"></i></button>
+                    <img id="imageModalImg" src="" alt="" style="width:100%; height:auto; max-height:80vh; object-fit:contain; border-radius:12px; background:#000;">
+                    <div class="modal-footer" style="background:transparent; border-top:none; padding:0.5rem 0;">
+                        <span class="modal-footer-title" id="imageModalTitle" style="color:#fff;">Görsel</span>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(imageModal);
+
+            function openImageModal(src, title) {
+                if (!src) return;
+                document.getElementById('imageModalImg').src = src;
+                document.getElementById('imageModalTitle').textContent = title || 'Görsel';
+                imageModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeImageModal() {
+                imageModal.classList.remove('active');
+                document.getElementById('imageModalImg').src = '';
+                document.body.style.overflow = '';
+            }
+
+            document.getElementById('imageModalClose').addEventListener('click', closeImageModal);
+            imageModal.addEventListener('click', function(e) { if (e.target === this) closeImageModal(); });
+
+            document.querySelectorAll('.image-container, .svg-container, .image-container img, .content-section img:not(.modal-footer-logo-img)').forEach(el => {
+                if (el.tagName === 'IMG') {
                     el.style.cursor = 'pointer';
                     el.addEventListener('click', function(e) {
-                        if (e.target.tagName === 'IMG') return;
-                        const imgEl = this.querySelector('img');
-                        if (imgEl) {
-                            openImageModal(imgEl.src, imgEl.dataset.title || imgEl.alt || '');
-                        }
+                        e.stopPropagation();
+                        openImageModal(this.src, this.dataset.title || this.alt || '');
                     });
-                }
-            } else if (el.classList.contains('svg-container') || el.classList.contains('kirikkale-map')) {
-                el.style.cursor = 'pointer';
-                const containerHTML = el.innerHTML;
-                const title = el.dataset.title || 'Görsel';
-                el.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const blob = new Blob([containerHTML], { type: 'image/svg+xml' });
-                    openImageModal(URL.createObjectURL(blob), title);
-                });
-            }
-        });
-
-        favoriteBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const section = this.closest('.content-section');
-                if (section) toggleFavorite(section.id);
-            });
-        });
-        updateFavoritesUI();
-
-        accordionHeaders.forEach(header => {
-            header.addEventListener('click', function() {
-                const content = this.nextElementSibling;
-                const isOpen = content.classList.contains('open');
-                accordionHeaders.forEach(h => {
-                    h.classList.remove('active');
-                    h.nextElementSibling.classList.remove('open');
-                    h.setAttribute('aria-expanded', 'false');
-                });
-                if (!isOpen) {
-                    this.classList.add('active');
-                    content.classList.add('open');
-                    this.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-
-        relatedCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.dataset.section;
-                if (sectionId) {
-                    showSection(sectionId);
-                    setTimeout(() => {
-                        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
-            });
-        });
-
-        // Yerel Rehber (Leaflet)
-        let rehberMap = null;
-        let rehberMarkers = [];
-        let venuesData = [];
-
-        async function loadRehberData() {
-            const listContainer = $('#rehberList');
-            const mapContainer = document.getElementById('rehberMap');
-            if (!mapContainer) return;
-            try {
-                const response = await fetch('isletmeler.json');
-                if (!response.ok) throw new Error('JSON yüklenemedi');
-                const data = await response.json();
-                venuesData = [];
-                if (data.overlayLayers) {
-                    data.overlayLayers.forEach(layer => {
-                        if (layer.stores && layer.stores.length > 0) {
-                            layer.stores.forEach(store => {
-                                venuesData.push({
-                                    id: venuesData.length + 1,
-                                    name: store.name,
-                                    type: store.type || layer.layerName,
-                                    iconColor: store.iconColor || layer.icon?.color || 'blue',
-                                    address: store.address || 'Adres bilgisi yok',
-                                    description: store.description || '',
-                                    tags: store.tags || [],
-                                    coords: store.coords || [0, 0],
-                                    layerName: layer.layerName
-                                });
-                            });
-                        }
-                    });
-                }
-                const countEl = document.getElementById('rehberCount');
-                if (countEl) countEl.textContent = venuesData.length;
-
-                listContainer.innerHTML = venuesData.length === 0 ?
-                    '<div style="text-align:center;padding:1rem;color:#6B8E7E;font-size:0.8rem;">Kayıtlı mekan bulunmuyor.</div>' :
-                    '';
-                venuesData.forEach(venue => {
-                    const typeIcon = venue.type === 'Market' ? 'fa-store' :
-                        venue.type === 'Şarküteri' ? 'fa-utensils' :
-                        venue.type === 'Kuruyemiş' ? 'fa-seedling' : 'fa-map-marker-alt';
-                    listContainer.innerHTML += `
-                        <div class="rehber-item" data-id="${venue.id}">
-                            <div class="r-name"><i class="fas ${typeIcon}" style="color:#1A7A5A;margin-right:0.3rem;"></i>${venue.name}</div>
-                            <span class="r-type">${venue.type}</span>
-                            <span class="r-address">${venue.address}</span>
-                        </div>
-                    `;
-                });
-                listContainer.querySelectorAll('.rehber-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const id = parseInt(this.dataset.id);
-                        const venue = venuesData.find(v => v.id === id);
-                        if (venue && venue.coords && venue.coords.length === 2 && rehberMap) {
-                            rehberMap.setView(venue.coords, 16, { animate: true });
-                        }
-                    });
-                });
-
-                const mapCenter = data.mapConfig?.center || [39.85, 33.49];
-                const mapZoom = data.mapConfig?.zoom || 13;
-                if (rehberMap) { rehberMap.remove(); rehberMap = null; }
-                rehberMap = L.map(mapContainer, {
-                    center: mapCenter,
-                    zoom: mapZoom,
-                    scrollWheelZoom: false,
-                    touchZoom: true,
-                    dragging: true,
-                    bounceAtZoomLimits: false
-                });
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CartoDB'
-                }).addTo(rehberMap);
-
-                function getRehberMarkerIcon(color, name) {
-                    let bgColor = '#3b82f6';
-                    if (color === 'green') bgColor = '#22c55e';
-                    else if (color === 'darkgreen') bgColor = '#166534';
-                    else if (color === 'blue') bgColor = '#3b82f6';
-                    const firstLetter = name ? name.charAt(0).toUpperCase() : 'M';
-                    return L.icon({
-                        iconUrl: 'data:image/svg+xml,' + encodeURIComponent(`
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-                                <circle cx="16" cy="16" r="16" fill="${bgColor}" stroke="white" stroke-width="2"/>
-                                <text x="16" y="20" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">${firstLetter}</text>
-                            </svg>
-                        `),
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32],
-                        popupAnchor: [0, -32]
-                    });
-                }
-                venuesData.forEach(venue => {
-                    if (venue.coords && venue.coords.length === 2 && venue.coords[0] !== 0 && venue.coords[1] !== 0) {
-                        const marker = L.marker(venue.coords, { icon: getRehberMarkerIcon(venue.iconColor, venue.name) }).addTo(rehberMap);
-                        marker.bindPopup(`
-                            <b style="font-size:14px;color:#0F5A3E;">${venue.name}</b><br>
-                            <span style="font-size:12px;color:#3A4E4E;">${venue.type}</span><br>
-                            ${venue.description ? venue.description + '<br>' : ''}
-                            <span style="font-size:12px;color:#6B8E7E;">📍 ${venue.address}</span><br>
-                            <span style="font-size:11px;color:#6B8E7E;">🏷️ ${venue.tags.join(', ')}</span>
-                        `);
-                        rehberMarkers.push(marker);
+                } else if (el.classList.contains('image-container')) {
+                    const img = el.querySelector('img');
+                    if (img) {
+                        el.style.cursor = 'pointer';
+                        el.addEventListener('click', function(e) {
+                            if (e.target.tagName === 'IMG') return;
+                            const imgEl = this.querySelector('img');
+                            if (imgEl) {
+                                openImageModal(imgEl.src, imgEl.dataset.title || imgEl.alt || '');
+                            }
+                        });
                     }
-                });
-                if (rehberMarkers.length > 0) {
-                    try {
-                        const bounds = L.latLngBounds(rehberMarkers.map(m => m.getLatLng()));
-                        rehberMap.fitBounds(bounds, { padding: [30, 30] });
-                    } catch (e) {}
+                } else if (el.classList.contains('svg-container')) {
+                    el.style.cursor = 'pointer';
+                    const containerHTML = el.innerHTML;
+                    const title = el.dataset.title || 'Görsel';
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const blob = new Blob([containerHTML], { type: 'image/svg+xml' });
+                        openImageModal(URL.createObjectURL(blob), title);
+                    });
                 }
-                setTimeout(() => { if (rehberMap) rehberMap.invalidateSize(); }, 300);
-            } catch (error) {
-                console.error('Rehber yükleme hatası:', error);
-                listContainer.innerHTML = '<div style="text-align:center;padding:1rem;color:#6B8E7E;font-size:0.8rem;">Veriler yüklenirken hata oluştu.</div>';
+            });
+
+            // ===== GENEL MODAL (Bağış & İletişim) =====
+            function openModal(title, contentHtml) {
+                $('#modalTitle').innerHTML = title;
+                $('#modalBody').innerHTML = contentHtml;
+                $('#modalOverlay').classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
-        }
 
-        function updateDate() {
-            const now = new Date();
-            const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-            const dateEl = document.getElementById('currentDate');
-            if (dateEl) dateEl.textContent = now.getDate() + ' ' + months[now.getMonth()];
-        }
-
-        function init() {
-            const hash = window.location.hash.replace('#', '');
-            const lastSection = localStorage.getItem('lastCeliacSection') || 'section-1';
-            const targetId = (hash && document.getElementById(hash)) ? hash : (document.getElementById(lastSection) ? lastSection : 'section-1');
-            showSection(targetId);
-            const anyVisible = Array.from(sections).some(s => !s.classList.contains('hidden'));
-            if (!anyVisible) {
-                const first = document.getElementById('section-1');
-                if (first) first.classList.remove('hidden');
+            function closeModal() {
+                $('#modalOverlay').classList.remove('active');
+                document.body.style.overflow = '';
             }
-            updateDate();
-            try { loadRehberData(); } catch (err) { console.warn('Rehber yüklenemedi', err); }
-        }
 
-        window.addEventListener('popstate', function() {
-            const hash = window.location.hash.replace('#', '');
-            if (hash && document.getElementById(hash)) showSection(hash);
-        });
+            $('#modalCloseBtn').addEventListener('click', closeModal);
+            $('#modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+            function copyIban(iban) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(iban).then(() => {
+                        showToast('IBAN kopyalandı!');
+                    }).catch(() => {
+                        fallbackCopy(iban);
+                    });
+                } else {
+                    fallbackCopy(iban);
+                }
+            }
 
-    })();
+            function fallbackCopy(text) {
+                const input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('IBAN kopyalandı!');
+                } catch (e) {
+                    showToast('Kopyalama başarısız, lütfen manuel kopyalayın.');
+                }
+                document.body.removeChild(input);
+            }
+
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.modal-iban-copy-btn')) {
+                    const btn = e.target.closest('.modal-iban-copy-btn');
+                    const iban = btn.dataset.iban || 'TR33 0001 0003 1698 0774 5750 01';
+                    copyIban(iban);
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                const trigger = e.target.closest('[data-modal]');
+                if (!trigger) return;
+                e.preventDefault();
+                const type = trigger.dataset.modal;
+
+                let title = '';
+                let content = '';
+
+                switch (type) {
+                    case 'bagis':
+                        title = '<i class="fas fa-hand-holding-heart"></i> Bağış Yap';
+                        content = `
+                            <div class="modal-iban-box">
+                                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği" class="modal-logo">
+                                <div class="modal-iban-title">Banka Havalesi / EFT ile Bağış</div>
+                                <div class="modal-iban-divider"></div>
+                                <div class="modal-iban-number">TR33 0001 0003 1698 0774 5750 01</div>
+                                <div class="modal-iban-detail">🏦 Ziraat Bankası · Kırıkkale Şubesi<br>Alıcı: Kırıkkale Çölyak Derneği</div>
+                                <button class="modal-iban-copy-btn" data-iban="TR33 0001 0003 1698 0774 5750 01">
+                                    <i class="fas fa-copy"></i> IBAN Kopyala
+                                </button>
+                            </div>
+                        `;
+                        break;
+                    case 'iletisim':
+                        title = '<i class="fas fa-envelope"></i> İletişim';
+                        content = `
+                            <div style="text-align:center;padding:0.5rem 0;">
+                                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği Logo" style="width:100px;height:auto;margin:0 auto 1rem;display:block;border-radius:12px;">
+                                <h3 style="color:var(--primary-dark);font-size:1.1rem;margin-bottom:1.2rem;">Kırıkkale Çölyak Derneği</h3>
+                                <div style="display:flex;flex-direction:column;gap:0.6rem;max-width:420px;margin:0 auto;text-align:left;">
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--primary);">
+                                        <i class="fas fa-map-marker-alt" style="color:var(--primary);font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;">Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--accent);">
+                                        <i class="fas fa-phone" style="color:var(--accent);font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;">0543 295 46 71</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #1d4ed8;">
+                                        <i class="fas fa-envelope" style="color:#1d4ed8;font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;word-break:break-all;">kirikkalecolyak@gmail.com</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #8b5cf6;">
+                                        <i class="fas fa-globe" style="color:#8b5cf6;font-size:0.9rem;width:18px;text-align:center;"></i>
+                                        <span style="font-size:0.8rem;font-weight:500;word-break:break-all;">www.kirikkalecolyak.org.tr</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(0,0,0,0.06);display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+                                    <a href="tel:05432954671" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--primary);color:#fff;padding:0.4rem 1.4rem;border-radius:30px;font-weight:600;font-size:0.8rem;text-decoration:none;transition:all 0.2s ease;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                                        <i class="fas fa-phone" style="font-size:0.7rem;"></i> Ara
+                                    </a>
+                                    <a href="mailto:kirikkalecolyak@gmail.com" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--accent);color:#fff;padding:0.4rem 1.4rem;border-radius:30px;font-weight:600;font-size:0.8rem;text-decoration:none;transition:all 0.2s ease;" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='var(--accent)'">
+                                        <i class="fas fa-envelope" style="font-size:0.7rem;"></i> E-posta Gönder
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (content) {
+                    openModal(title, content);
+                }
+            });
+
+            // ===== TARİH GÜNCELLEME =====
+            function updateDate() {
+                const now = new Date();
+                const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+                const dateEl = document.getElementById('currentDate');
+                if (dateEl) dateEl.textContent = now.getDate() + ' ' + months[now.getMonth()];
+            }
+
+            // ===== SAYFA AÇILIŞI =====
+            function init() {
+                // Hash kontrolü
+                const hash = window.location.hash.replace('#', '');
+                if (hash && document.getElementById(hash)) {
+                    showSection(hash);
+                } else {
+                    sections.forEach(sec => sec.classList.add('hidden'));
+                    const firstSection = document.getElementById('section-1');
+                    if (firstSection) {
+                        firstSection.classList.remove('hidden');
+                        currentSection = 'section-1';
+                        tocLinks.forEach(link => link.classList.toggle('active', link.dataset.section === 'section-1'));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
+                updateFavoritesUI();
+                updateDate();
+            }
+
+            window.addEventListener('popstate', function() {
+                const hash = window.location.hash.replace('#', '');
+                if (hash && document.getElementById(hash)) {
+                    showSection(hash);
+                } else {
+                    sections.forEach(sec => sec.classList.add('hidden'));
+                    const firstSection = document.getElementById('section-1');
+                    if (firstSection) {
+                        firstSection.classList.remove('hidden');
+                        currentSection = 'section-1';
+                        tocLinks.forEach(link => link.classList.toggle('active', link.dataset.section === 'section-1'));
+                    }
+                }
+            });
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            // ===== LEAFLET HARİTA (Yerel Rehber) =====
+            // Leaflet haritasını başlat (eğer #rehberMap varsa)
+            let mapInitialized = false;
+            const mapContainer = document.getElementById('rehberMap');
+            if (mapContainer && typeof L !== 'undefined') {
+                // Harita koordinatları: Kırıkkale yaklaşık
+                const map = L.map('rehberMap', {
+                    center: [39.8467, 33.5153],
+                    zoom: 13,
+                    scrollWheelZoom: false,
+                    tap: false
+                });
+
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
+                    subdomains: 'abcd',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Marker'lar için renkler
+                const colors = {
+                    'Market': '#3b82f6',
+                    'Şarküteri': '#22c55e',
+                    'Kuruyemiş': '#f59e0b'
+                };
+
+                const icons = {
+                    'Market': 'M',
+                    'Şarküteri': 'E',
+                    'Kuruyemiş': 'F'
+                };
+
+                // Rehber listesinden verileri al ve marker ekle
+                const items = document.querySelectorAll('.rehber-item');
+                const markers = [];
+                // Örnek koordinatlar (gerçek veri yok, yaklaşık konumlar)
+                const coords = [
+                    [39.8467, 33.5153],
+                    [39.8500, 33.5200],
+                    [39.8420, 33.5100],
+                    [39.8480, 33.5250],
+                    [39.8450, 33.5050],
+                    [39.8520, 33.5120],
+                    [39.8400, 33.5180]
+                ];
+
+                items.forEach((item, index) => {
+                    const name = item.querySelector('.r-name')?.textContent?.trim() || 'Mekan';
+                    const type = item.querySelector('.r-type')?.textContent?.trim() || 'Market';
+                    const address = item.querySelector('.r-address')?.textContent?.trim() || '';
+                    const color = colors[type] || '#3b82f6';
+                    const iconLetter = icons[type] || 'M';
+                    const lat = coords[index]?.[0] || 39.8467;
+                    const lng = coords[index]?.[1] || 33.5153;
+
+                    // SVG marker
+                    const svgIcon = L.divIcon({
+                        html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                                <circle cx="16" cy="16" r="16" fill="${color}" stroke="white" stroke-width="2"/>
+                                <text x="16" y="20" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">${iconLetter}</text>
+                              </svg>`,
+                        className: '',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32]
+                    });
+
+                    const marker = L.marker([lat, lng], { icon: svgIcon })
+                        .addTo(map)
+                        .bindPopup(`<strong>${name}</strong><br>${type}<br>${address}`);
+
+                    markers.push(marker);
+
+                    // Listeye tıklama ile marker'ı aç
+                    item.addEventListener('click', function() {
+                        map.setView([lat, lng], 15);
+                        marker.openPopup();
+                    });
+                });
+
+                // Haritayı tüm markerları gösterecek şekilde ayarla
+                if (markers.length > 0) {
+                    const group = L.featureGroup(markers);
+                    map.fitBounds(group.getBounds().pad(0.1));
+                }
+
+                mapInitialized = true;
+
+                // Yeniden boyutlandırma için
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+            }
+
+        })();
     </script>
 
 </body>
