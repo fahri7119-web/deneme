@@ -159,6 +159,12 @@
                 padding: 0.4rem 0.75rem !important;
                 width: calc(100% + 1.5rem);
                 overflow-x: visible;
+                background: #ffffff !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            body.dark-mode header {
+                background: #1e1e1e !important;
             }
         }
 
@@ -181,7 +187,13 @@
             width: auto;
             border-radius: 8px;
         }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
         .logo-text .city {
+            display: block;
             font-size: clamp(1.1rem, 2.5vw, 1.4rem);
             font-weight: 800;
             color: var(--primary-dark);
@@ -190,6 +202,7 @@
             transition: color 0.3s ease;
         }
         .logo-text .sub {
+            display: block;
             font-size: clamp(0.7rem, 1.5vw, 0.85rem);
             font-weight: 600;
             color: var(--primary);
@@ -383,11 +396,11 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.35);
             z-index: 98;
             opacity: 0;
             transition: opacity 0.3s ease;
+            /* blur yok — menü açıkken üstte bulanıklık oluşmasın */
         }
         .nav-overlay.active {
             display: block;
@@ -425,6 +438,11 @@
                 opacity: 1;
                 visibility: visible;
                 overflow-y: auto;
+                background: #ffffff;
+                z-index: 101;
+            }
+            body.dark-mode .main-nav.open {
+                background: #2a2a2a;
             }
             .main-nav a {
                 width: 100%;
@@ -456,7 +474,10 @@
                 margin-top: 0.5rem;
                 justify-content: center !important;
             }
-            .nav-overlay { display: none !important; }
+            .nav-overlay.active {
+                display: block !important;
+                opacity: 1;
+            }
             .header-divider { margin: 0.2rem 0; }
             .logo img { height: 42px; }
             .logo-text .city { font-size: 0.95rem; }
@@ -475,6 +496,31 @@
             outline: 3px solid var(--primary);
             outline-offset: 2px;
         }
+
+        
+        /* ===== PAGE BREADCRUMB (hero dışı) ===== */
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            padding: 0.75rem 0 0.25rem;
+            flex-wrap: wrap;
+        }
+        .page-breadcrumb a {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        .page-breadcrumb a:hover { text-decoration: underline; }
+        .page-breadcrumb .sep { opacity: 0.5; color: #999; }
+        .page-breadcrumb .current {
+            font-weight: 600;
+            color: var(--text);
+        }
+        body.dark-mode .page-breadcrumb { color: #999; }
+        body.dark-mode .page-breadcrumb a { color: var(--primary-light); }
+        body.dark-mode .page-breadcrumb .current { color: #ddd; }
 
         /* ===== PAGE HEADER / HERO - AYNI HİZAYA GETİRİLDİ ===== */
         .page-header {
@@ -1559,9 +1605,110 @@
         body.dark-mode .business-count strong { color: #a7f3d0; }
 
         /* Font size helpers */
-        body.font-large { font-size: 110%; }
-        body.font-xlarge { font-size: 120%; }
-    </style>
+    
+        /* Genel modal (bağış / iletişim) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #fff;
+            max-width: 800px;
+            width: 100%;
+            border-radius: 14px;
+            padding: 1.5rem 1.5rem 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            margin-bottom: 0.8rem;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-dark);
+        }
+        .modal-header h3 i { color: var(--accent); }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-light);
+            line-height: 1;
+        }
+        .modal-close:hover { color: var(--primary-dark); }
+        .modal-body { overflow-y: auto; flex: 1; }
+        .modal-iban-box {
+            background: linear-gradient(135deg, #f8fafc, #eef2f1);
+            border-radius: 14px;
+            padding: 1.5rem 1.8rem;
+            border: 2px solid var(--accent);
+            border-left: 6px solid var(--accent);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .modal-iban-box .modal-logo {
+            width: 80px; height: 80px; border-radius: 50%;
+            margin: 0 auto 0.8rem; display: block;
+            border: 3px solid var(--primary-light); padding: 4px; background: #fff;
+        }
+        .modal-iban-box .modal-iban-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-light); font-weight: 600; margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-number {
+            font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);
+            font-family: 'Inter', monospace; word-break: break-all;
+            background: rgba(255,255,255,0.6); padding: 0.3rem 0.8rem;
+            border-radius: 8px; display: inline-block; margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-detail {
+            font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.8rem;
+        }
+        .modal-iban-box .modal-iban-copy-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: var(--primary); color: #fff; border: none;
+            padding: 0.4rem 1.6rem; border-radius: 30px; font-weight: 600;
+            font-size: 0.8rem; cursor: pointer;
+        }
+        .modal-iban-box .modal-iban-copy-btn:hover { background: var(--primary-dark); }
+        .modal-iban-box .modal-iban-divider {
+            width: 80px; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0.5rem auto; border-radius: 4px;
+        }
+        .toast-msg {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--primary-dark); color: #fff;
+            padding: 0.6rem 1.5rem; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            opacity: 0; transition: all 0.4s ease; z-index: 999; pointer-events: none;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
 </head>
 <body>
 
@@ -1582,10 +1729,6 @@
                     </a>
                     <div class="header-actions">
                         <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
-                        <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
-                            <i class="fas fa-font"></i>
-                            <span class="header-actions-label font-size-btn">A</span>
-                        </button>
                         <div class="header-info">
                             <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
                             <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
@@ -1617,20 +1760,21 @@
             <!-- ===== MAIN ===== -->
             <main id="main">
 
-                <!-- ===== PAGE HEADER / HERO - AYNI HİZAYA GETİRİLDİ ===== -->
+                <!-- ===== BREADCRUMB ===== -->
+                <nav class="page-breadcrumb" aria-label="Breadcrumb">
+                    <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <span class="sep">›</span>
+                    <span class="current">İşletmeler</span>
+                </nav>
+
+                <!-- ===== PAGE HEADER / HERO ===== -->
                 <div class="page-header">
                     <div class="hero-content">
                         <div class="hero-text">
-                            <nav class="breadcrumb" aria-label="Breadcrumb">
-                                <a href="index.html">Ana Sayfa</a>
-                                <span class="sep">›</span>
-                                <span class="current">İşletmeler</span>
-                            </nav>
                             <h1>📍 Glutensiz İşletmeler</h1>
                             <p>Türkiye genelinde glutensiz ürün satan, glutensiz menü sunan restoran, kafe, market ve fırınlar.</p>
                             <div class="hero-buttons">
                                 <a href="#isletme-listesi" class="btn-primary"><i class="fas fa-store"></i> İşletmeleri Keşfet</a>
-                                <a href="#isletme-oner" class="btn-secondary"><i class="fas fa-plus"></i> İşletme Öner</a>
                             </div>
                         </div>
                         <div class="hero-illustration">
@@ -1695,22 +1839,34 @@
                     <button class="filter-reset" id="resetFilters"><i class="fas fa-undo"></i> Sıfırla</button>
                 </div>
 
+                <!-- ===== BİLGİLENDİRME ===== -->
+                <div class="info-notice" style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:12px;padding:1rem 1.2rem;margin:0 0 1.25rem;display:flex;gap:0.85rem;align-items:flex-start;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+                    <i class="fas fa-info-circle" style="color:#f59e0b;font-size:1.25rem;margin-top:0.15rem;flex-shrink:0;"></i>
+                    <div style="font-size:0.88rem;line-height:1.65;color:#78350f;">
+                        <strong style="display:block;margin-bottom:0.25rem;">Önemli Bilgilendirme</strong>
+                        Haritadaki konumlar, işletmelerin adreslerinden yaklaşık olarak tespit edilmiştir; birebir kapı önü konumu olmayabilir.
+                        Listelenen işletmelerin glutensiz menü veya ürün sunup sunmadığı konusunda en doğru bilgi için lütfen işletmeyle iletişime geçerek doğrulama yapınız.
+                        Derneğimiz bu listedeki bilgilerin güncelliğini garanti etmez.
+                    </div>
+                </div>
+
                 <!-- ===== HARİTA ===== -->
                 <div class="map-container">
                     <div id="businessMap"></div>
                     <div class="map-info">
-                        <i class="fas fa-map-pin"></i> Haritada <span id="mapPinCount">0</span> işletme gösteriliyor
+                        <i class="fas fa-map-pin"></i> Haritada <span id="mapPinCount">0</span> işletme gösteriliyor <span style="opacity:0.85;">· Konumlar yaklaşıktır</span>
                     </div>
                 </div>
 
                 <!-- ===== İŞLETME SAYACI ===== -->
-                <div class="business-count">
+                <div class="business-count" id="isletme-listesi" style="scroll-margin-top:90px;">
                     <span><strong id="resultCount">0</strong> işletme listeleniyor</span>
                     <span id="activeFilters" style="font-size:0.75rem;color:#6B8E7E;"></span>
                 </div>
 
                 <!-- ===== İŞLETME KARTLARI ===== -->
-                <div class="business-grid" id="businessGrid">
+                <div class="business-grid" id="businessGrid" data-anchor="isletme-listesi">
+                <div id="isletme-listesi" style="scroll-margin-top:80px;"></div>
                     <div style="grid-column:1/-1;text-align:center;padding:3rem;">
                         <div class="loading-spinner"></div>
                         <p style="margin-top:1rem;color:var(--text-light);font-size:0.85rem;">İşletmeler yükleniyor...</p>
@@ -1752,10 +1908,10 @@
                         Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
                     </p>
                     <div class="footer-menu">
-                        <a href="index.html"><i class="fas fa-house"></i> Ana Sayfa</a>
-                        <a href="gida-stok-durumu.html" class="footer-bagis-btn"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                        <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="#" data-modal="bagis"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
                         <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
-                        <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
+                        <a href="#" data-modal="iletisim"><i class="fas fa-envelope"></i> İletişim</a>
                     </div>
                     <div class="footer-social">
                         <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -1782,6 +1938,18 @@
     </button>
 
     <!-- ===== JAVASCRIPT ===== -->
+    <!-- ===== GENEL MODAL (Bağış & İletişim) ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="genelModalTitle"><i class="fas fa-list"></i> Liste</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+    <div class="toast-msg" id="toastMsg"><i class="fas fa-check-circle"></i> <span id="toastText">Kopyalandı!</span></div>
+
     <script>
         $(document).ready(function() {
 
@@ -1796,12 +1964,24 @@
             updateDate();
 
             // ===== HAMBURGER =====
-            $('#hamburgerBtn').on('click', function() {
-                var nav = $('#mainNav');
-                var btn = $(this);
-                nav.toggleClass('open');
-                btn.toggleClass('active');
-                btn.attr('aria-expanded', nav.hasClass('open'));
+            function closeMobileNav() {
+                $('#mainNav').removeClass('open');
+                $('#hamburgerBtn').removeClass('active').attr('aria-expanded', 'false');
+                $('#navOverlay').removeClass('active');
+            }
+            function openMobileNav() {
+                $('#mainNav').addClass('open');
+                $('#hamburgerBtn').addClass('active').attr('aria-expanded', 'true');
+                $('#navOverlay').addClass('active');
+            }
+            $('#hamburgerBtn').on('click', function(e) {
+                e.stopPropagation();
+                if ($('#mainNav').hasClass('open')) closeMobileNav();
+                else openMobileNav();
+            });
+            $('#navOverlay').on('click', closeMobileNav);
+            $('#mainNav a').on('click', function() {
+                if (window.innerWidth <= 640) closeMobileNav();
             });
 
             // ===== SCROLL TO TOP =====
@@ -1833,28 +2013,6 @@
                 });
             }
 
-            // ===== FONT SIZE =====
-            const fontSizeToggle = document.getElementById('fontSizeToggle');
-            let fontSizeLevel = parseInt(localStorage.getItem('celiacFontSize') || '0');
-            if (fontSizeToggle) {
-                if (fontSizeLevel === 1) document.body.classList.add('font-large');
-                if (fontSizeLevel === 2) document.body.classList.add('font-xlarge');
-                const sizeBtn = fontSizeToggle.querySelector('.font-size-btn');
-                if (sizeBtn) {
-                    sizeBtn.textContent = fontSizeLevel === 0 ? 'A' : fontSizeLevel === 1 ? 'A+' : 'A++';
-                }
-                fontSizeToggle.addEventListener('click', function() {
-                    fontSizeLevel = (fontSizeLevel + 1) % 3;
-                    document.body.classList.remove('font-large', 'font-xlarge');
-                    if (fontSizeLevel === 1) document.body.classList.add('font-large');
-                    if (fontSizeLevel === 2) document.body.classList.add('font-xlarge');
-                    localStorage.setItem('celiacFontSize', fontSizeLevel);
-                    const sizeBtn = this.querySelector('.font-size-btn');
-                    if (sizeBtn) {
-                        sizeBtn.textContent = fontSizeLevel === 0 ? 'A' : fontSizeLevel === 1 ? 'A+' : 'A++';
-                    }
-                });
-            }
 
             // ===== VERİLER =====
             let allBusinesses = [];
@@ -2244,6 +2402,81 @@
                 }
             });
 
+
+            // ===== GENEL MODAL (Bağış & İletişim) =====
+            function openGenelModal(title, contentHtml) {
+                $('#genelModalTitle').html(title);
+                $('#modalBody').html(contentHtml);
+                $('#modalOverlay').addClass('active');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeGenelModal() {
+                $('#modalOverlay').removeClass('active');
+                document.body.style.overflow = '';
+            }
+            function showToast(msg) {
+                const $t = $('#toastMsg');
+                $('#toastText').text(msg);
+                $t.addClass('show');
+                setTimeout(() => $t.removeClass('show'), 3000);
+            }
+            function copyIban(iban) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(iban).then(() => showToast('IBAN kopyalandı!')).catch(() => {
+                        const input = document.createElement('input');
+                        input.value = iban; document.body.appendChild(input); input.select();
+                        try { document.execCommand('copy'); showToast('IBAN kopyalandı!'); } catch(e) {}
+                        document.body.removeChild(input);
+                    });
+                }
+            }
+            $(document).on('click', '#modalCloseBtn', closeGenelModal);
+            $('#modalOverlay').on('click', function(e) { if (e.target === this) closeGenelModal(); });
+            $(document).on('click', '.modal-iban-copy-btn', function() {
+                copyIban($(this).data('iban') || 'TR33 0001 0003 1698 0774 5750 01');
+            });
+            $(document).on('click', '[data-modal]', function(e) {
+                e.preventDefault();
+                const type = $(this).data('modal');
+                let title = '', content = '';
+                if (type === 'bagis') {
+                    title = '<i class="fas fa-hand-holding-heart"></i> Bağış Yap';
+                    content = `
+                        <div class="modal-iban-box">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Logo" class="modal-logo">
+                            <div class="modal-iban-title">Banka Havalesi / EFT ile Bağış</div>
+                            <div class="modal-iban-divider"></div>
+                            <div class="modal-iban-number">TR33 0001 0003 1698 0774 5750 01</div>
+                            <div class="modal-iban-detail">🏦 Ziraat Bankası · Kırıkkale Şubesi<br>Alıcı: Kırıkkale Çölyak Derneği</div>
+                            <button class="modal-iban-copy-btn" data-iban="TR33 0001 0003 1698 0774 5750 01">
+                                <i class="fas fa-copy"></i> IBAN Kopyala
+                            </button>
+                        </div>`;
+                } else if (type === 'iletisim') {
+                    title = '<i class="fas fa-envelope"></i> İletişim';
+                    content = `
+                        <div style="text-align:center;padding:0.5rem 0;">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Logo" style="width:100px;margin:0 auto 1rem;display:block;border-radius:12px;">
+                            <h3 style="color:var(--primary-dark);font-size:1.1rem;margin-bottom:1.2rem;">Kırıkkale Çölyak Derneği</h3>
+                            <div style="display:flex;flex-direction:column;gap:0.6rem;max-width:420px;margin:0 auto;text-align:left;">
+                                <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--primary);">
+                                    <i class="fas fa-map-marker-alt" style="color:var(--primary);width:18px;text-align:center;"></i>
+                                    <span style="font-size:0.8rem;">Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--accent);">
+                                    <i class="fas fa-phone" style="color:var(--accent);width:18px;text-align:center;"></i>
+                                    <span style="font-size:0.8rem;">0543 295 46 71</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #1d4ed8;">
+                                    <i class="fas fa-envelope" style="color:#1d4ed8;width:18px;text-align:center;"></i>
+                                    <span style="font-size:0.8rem;">kirikkalecolyak@gmail.com</span>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+                if (content) openGenelModal(title, content);
+            });
+
             loadBusinesses();
             setTimeout(initMap, 500);
 
@@ -2254,6 +2487,7 @@
             });
         });
     </script>
+
 
 </body>
 </html>

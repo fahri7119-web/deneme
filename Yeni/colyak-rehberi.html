@@ -266,7 +266,13 @@
             width: auto;
             border-radius: 8px;
         }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
         .logo-text .city {
+            display: block;
             font-size: clamp(1.1rem, 2.5vw, 1.4rem);
             font-weight: 800;
             color: var(--primary-dark);
@@ -274,6 +280,7 @@
             line-height: 1.1;
         }
         .logo-text .sub {
+            display: block;
             font-size: clamp(0.7rem, 1.5vw, 0.85rem);
             font-weight: 600;
             color: var(--primary);
@@ -338,10 +345,6 @@
         }
         body.dark-mode .header-actions button:hover {
             background: rgba(26, 122, 90, 0.2);
-        }
-        .header-actions .font-size-btn {
-            font-size: 0.7rem;
-            font-weight: 600;
         }
         @media (max-width: 640px) {
             .header-actions .header-actions-label {
@@ -940,7 +943,15 @@
             background: var(--primary-light);
         }
         .toc-drawer-toggle i {
-            font-size: 1rem;
+            font-size: 1.15rem;
+        }
+        .toc-drawer-toggle .pointing-finger {
+            animation: pointRight 1s ease-in-out infinite;
+            display: inline-block;
+        }
+        @keyframes pointRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
         }
         @media (max-width: 900px) {
             .toc-drawer-toggle {
@@ -2647,7 +2658,7 @@
                     </a>
                     <div class="header-actions">
                         <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
-                        <button class="font-size-btn" aria-label="Yazı boyutunu büyüt/küçült" title="Yazı Boyutu"><i class="fas fa-font"></i></button>
+                        
                         <div class="header-info">
                             <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
                             <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
@@ -2664,7 +2675,7 @@
                 <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
                     <div class="nav-left">
                         <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
-                        <a href="derneğimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
                         <a href="haberler.html"><i class="fas fa-newspaper"></i> Haberler</a>
                         <a href="colyak-rehberi.html" class="active"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
                         <a href="isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
@@ -2690,8 +2701,7 @@
                         <h1>❤️ Glutensiz Yaşam Bilgi Merkezi</h1>
                         <p>Çölyak hastalığı, glutensiz beslenme, tanı ve tedavi yöntemleri hakkında kapsamlı bilgiye ulaşın. Kırıkkale Çölyak Derneği olarak yanınızdayız.</p>
                         <div class="hero-buttons">
-                            <a href="#" class="btn-primary"><i class="fas fa-leaf"></i> Rehberi Keşfet</a>
-                            <a href="#" class="btn-secondary"><i class="fas fa-users"></i> Derneğimiz</a>
+                            <a href="#" class="btn-primary" id="heroTocBtn"><i class="fas fa-leaf"></i> Rehberi Keşfet</a>
                         </div>
                     </div>
                     <div class="hero-illustration">
@@ -2706,16 +2716,9 @@
                 </div>
             </div>
 
-            <!-- ===== SEARCH BOX ===== -->
-            <div class="search-box" role="search">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Konu, başlık veya kelime ara..." aria-label="Sayfa içinde ara">
-                <button class="search-clear" id="searchClear" aria-label="Aramayı temizle"><i class="fas fa-times"></i></button>
-            </div>
-
             <!-- ===== TOC DRAWER TOGGLE (Mobile) ===== -->
             <button class="toc-drawer-toggle" id="tocDrawerToggle" aria-label="İçindekileri aç">
-                <i class="fas fa-bars"></i> İçindekileri Göster
+                <i class="fas fa-hand-point-right pointing-finger"></i> İçindekileri Göster
             </button>
 
             <!-- ===== TOC OVERLAY (Mobile) ===== -->
@@ -2744,10 +2747,8 @@
                         <li><a data-section="section-11">💚 Psikososyal Destek</a></li>
                         <li><a data-section="section-12">⚠️ Komplikasyonlar</a></li>
                         <li><a data-section="section-13">🤝 Türkiye'deki Destekler</a></li>
-                        <li><a data-section="section-14">📍 Kırıkkale'de Glutensiz Yaşam</a></li>
                         <li><a data-section="section-17">📋 ÇÖZGER Raporu (Çocuklar İçin)</a></li>
                         <li><a data-section="section-18">🎖️ Askerlik Muafiyeti</a></li>
-                        <li><a data-section="section-15">🏛️ Kırıkkale Çölyak Derneği</a></li>
                         <li><a data-section="section-16">📚 Yararlı Kaynaklar</a></li>
                     </ul>
                 </aside>
@@ -2773,7 +2774,7 @@
                         <div class="section-body">
                             <p><strong>Çölyak hastalığı</strong>; buğday, arpa, çavdar ve bazı bireylerde yulafta bulunan <strong>gluten</strong> proteinine karşı ince bağırsakta gelişen <strong>otoimmün (bağışıklık kaynaklı) kronik</strong> bir hastalıktır.</p>
                             <p>Gluten alındığında bağışıklık sistemi, ince bağırsağın iç yüzeyini kaplayan <strong>villus</strong> adı verilen emilim uzantılarına saldırır. Bu durum <strong>villus atrofisi</strong> (körelmesi) ile sonuçlanır ve besin emilimi bozulur. Zamanla demir, kalsiyum, folik asit ve B12 vitamini gibi önemli besin öğelerinin emilimi azalır.</p>
-                            <div class="image-container"><img src="colyak_nedir.png" alt="Çölyak Hastalığı Nedir" data-title="Gluten Bağırsakta Ne Yapar"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/colyak_nedir.png" alt="Çölyak Hastalığı Nedir" data-title="Gluten Bağırsakta Ne Yapar"></div>
                             <div class="info-box green">
                                 <i class="fas fa-info-circle"></i>
                                 <div class="info-content">
@@ -2845,20 +2846,6 @@
                                 <li>Kadınlarda erkeklere göre yaklaşık <strong>2 kat</strong> daha sık görülür.</li>
                                 <li>2024 verilerine göre her yıl yeni tanı oranı artmakta, farkındalık arttıkça tanı konan hasta sayısı da yükselmektedir.</li>
                             </ul>
-                            <div class="svg-container" data-title="Dünya ve Türkiye Çölyak İstatistikleri Karşılaştırması">
-                                <svg viewBox="0 0 600 180" style="max-width:100%; height:auto;" aria-label="Dünya ve Türkiye çölyak istatistikleri">
-                                    <rect x="20" y="20" width="250" height="130" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
-                                    <text x="145" y="50" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#0F5A3E" text-anchor="middle">🌍 Dünya</text>
-                                    <text x="145" y="80" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#1A7A5A" text-anchor="middle">%1</text>
-                                    <text x="145" y="105" font-family="Inter, sans-serif" font-size="11" fill="#3A4E4E" text-anchor="middle">Her 100 kişiden 1'i</text>
-                                    <text x="145" y="130" font-family="Inter, sans-serif" font-size="11" fill="#888" text-anchor="middle">~70 milyon kişi</text>
-                                    <rect x="330" y="20" width="250" height="130" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"></rect>
-                                    <text x="455" y="50" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#0F5A3E" text-anchor="middle">🇹🇷 Türkiye</text>
-                                    <text x="455" y="80" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#1A7A5A" text-anchor="middle">250.000 - 850.000</text>
-                                    <text x="455" y="105" font-family="Inter, sans-serif" font-size="11" fill="#3A4E4E" text-anchor="middle">Tahmini hasta sayısı</text>
-                                    <text x="455" y="130" font-family="Inter, sans-serif" font-size="11" fill="#888" text-anchor="middle">166.614 tanı konmuş (2023)</text>
-                                </svg>
-                            </div>
                             <div class="info-box orange">
                                 <i class="fas fa-lightbulb"></i>
                                 <div class="info-content">
@@ -2928,7 +2915,7 @@
                                 <li>Eklem ağrıları, kas ağrıları</li>
                             </ul>
                             <p><strong>Atipik (Sessiz) Çölyak:</strong> Sindirim şikayeti olmadan, sadece anemi, osteoporoz veya infertilite gibi bulgularla ortaya çıkabilir. Bu nedenle risk gruplarında (Tip 1 diyabet, tiroid hastalıkları, Down sendromu) tarama yapılması önerilir.</p>
-                            <div class="image-container"><img src="belirtiler.png" alt="Çölyak Belirtileri" data-title="Çölyak Hastalığı Belirtileri (Yaş Gruplarına Göre)"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/belirtiler.png" alt="Çölyak Belirtileri" data-title="Çölyak Hastalığı Belirtileri (Yaş Gruplarına Göre)"></div>
                             <div class="info-box red">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <div class="info-content">
@@ -2983,7 +2970,7 @@
                             <p><strong>HLA-DQ2/DQ8</strong> — dışlama amaçlı kullanılır. Bu genler yoksa çölyak hastalığı olasılığı neredeyse sıfırdır.</p>
                             <h4>4. Gluten Yükleme Testi (Provokasyon)</h4>
                             <p>Tanı net değilse veya hasta diyete başlamışsa, belirli bir süre gluten yüklemesi yapılarak testler tekrarlanabilir.</p>
-                            <div class="image-container"><img src="tani_sureci.png" alt="Çölyak Tanı Süreci" data-title="Çölyak Tanı Süreci (Kan Testi - Endoskopi - Biyopsi)"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/tani_sureci.png" alt="Çölyak Tanı Süreci" data-title="Çölyak Tanı Süreci (Kan Testi - Endoskopi - Biyopsi)"></div>
                             <!-- VIDEO -->
                             <div class="video-inline" data-video="https://www.youtube-nocookie.com/embed/C1wlce7CBc0" data-title="Çölyak Tanı Süreci - Uzman Anlatıyor">
                                 <img src="https://img.youtube.com/vi/C1wlce7CBc0/maxresdefault.jpg" alt="Çölyak Tanı Süreci" loading="lazy" onerror="this.src='img/video-placeholder.jpg'">
@@ -3018,7 +3005,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="karsilastirma.png" alt="Çölyak, Gluten Hassasiyeti ve Buğday Alerjisi Karşılaştırması" data-title="Çölyak vs Gluten Hassasiyeti vs Buğday Alerjisi"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/karsilastirma.png" alt="Çölyak, Gluten Hassasiyeti ve Buğday Alerjisi Karşılaştırması" data-title="Çölyak vs Gluten Hassasiyeti vs Buğday Alerjisi"></div>
                             <ul>
                                 <li><strong>Çölyak:</strong> Otoimmün, bağırsak hasarı, villus atrofisi, HLA-DQ2/DQ8, ömür boyu glutensiz diyet.</li>
                                 <li><strong>Non-Çölyak Gluten Duyarlılığı (NCGS):</strong> Bağırsak hasarı yok, antikorlar negatif, belirtiler glutensiz diyetle düzelir, kesin tanı kriteri yoktur.</li>
@@ -3057,7 +3044,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="tedavi.png" alt="Çölyak Tedavisi" data-title="Çölyak Hastalığı Tedavisi"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/tedavi.png" alt="Çölyak Tedavisi" data-title="Çölyak Hastalığı Tedavisi"></div>
                             <p><strong>Tek ve kesin tedavi:</strong> Ömür boyu %100 glutensiz diyet. Henüz onaylanmış ilaç tedavisi yoktur, ancak çeşitli klinik çalışmalar devam etmektedir (örneğin, latiglutenaz enzimleri, zamaglutenaz, ve aşı çalışmaları).</p>
                             <ul>
                                 <li>Diyete uyum sağlandığında ince bağırsak yaklaşık <strong>6 ay – 2 yıl</strong> içinde iyileşir.</li>
@@ -3118,7 +3105,7 @@
                                 <li><strong>Kuruyemişler</strong> (çiğ, tuzsuz), <strong>patates</strong>, <strong>tatlı patates</strong>, <strong>bal</strong>, <strong>zeytinyağı</strong>, <strong>tahin</strong></li>
                             </ul>
                             <p><strong>Yulaf:</strong> Sertifikasız yulaf çapraz bulaşma riski taşır. Sadece <strong>"glütensiz yulaf"</strong> etiketi taşıyan ürünler tüketilebilir.</p>
-                            <div class="image-container"><img src="glutensiz_beslenme.png" alt="Glutensiz Beslenme Rehberi" data-title="Glutensiz Beslenme — Yasaklı ve Serbest Gıdalar"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/glutensiz_beslenme.png" alt="Glutensiz Beslenme Rehberi" data-title="Glutensiz Beslenme — Yasaklı ve Serbest Gıdalar"></div>
                             <div class="info-box orange">
                                 <i class="fas fa-eye"></i>
                                 <div class="info-content">
@@ -3145,7 +3132,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="etiket_okuma.png" alt="Etiket Okuma Rehberi" data-title="Glutensiz Etiket Okuma Rehberi"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/etiket_okuma.png" alt="Etiket Okuma Rehberi" data-title="Glutensiz Etiket Okuma Rehberi"></div>
                             <ul>
                                 <li>Türk Gıda Kodeksi'ne göre <strong>"glutensiz"</strong> ibaresi için ürünün <strong>20 mg/kg (20 ppm)</strong> altında gluten içermesi gerekir.</li>
                                 <li>Sadece ön yüz değil, <strong>arka etiket ve içindekiler</strong> bölümü de mutlaka okunmalıdır.</li>
@@ -3185,7 +3172,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="capraz_bulasma.png" alt="Çapraz Bulaşma ve Önleme" data-title="Çapraz Bulaşma ve Önleme Yöntemleri"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/capraz_bulasma.png" alt="Çapraz Bulaşma ve Önleme" data-title="Çapraz Bulaşma ve Önleme Yöntemleri"></div>
                             <p>Çapraz bulaşma, glutensiz bir gıdanın hazırlık, pişirme veya servis sırasında glutenli bir gıda ile temas etmesidir. <strong>1/8 çay kaşığı</strong> kadar un bile hasara neden olabilir.</p>
                             <h4>Evde Alınması Gereken Önlemler</h4>
                             <ul>
@@ -3239,7 +3226,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="cocuklarda_colyak.png" alt="Çocuklarda Çölyak" data-title="Çocuklarda Çölyak ve Okul Yaşamı"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/cocuklarda_colyak.png" alt="Çocuklarda Çölyak" data-title="Çocuklarda Çölyak ve Okul Yaşamı"></div>
                             <ul>
                                 <li><strong>Ek gıdaya geçiş:</strong> 4-7. aylar arasında ve anne sütü ile birlikte glutenli gıdaya başlanması önerilir (ESPGHAN 2020). Ancak ailede çölyak varsa doktor kontrolünde yapılmalıdır.</li>
                                 <li><strong>Öğretmen bilgilendirmesi:</strong> Sınıf öğretmeni, rehber öğretmen ve okul yönetimi bilgilendirilmeli, çocuğun durumu hakkında bilgi verilmelidir.</li>
@@ -3275,7 +3262,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="psikososyal_destek.png" alt="Psikososyal Destek" data-title="Psikososyal Etkiler ve Aile Desteği"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/psikososyal_destek.png" alt="Psikososyal Destek" data-title="Psikososyal Etkiler ve Aile Desteği"></div>
                             <ul>
                                 <li><strong>Tanı sonrası "yas süreci":</strong> İnkâr, öfke, pazarlık, depresyon ve kabullenme aşamaları yaşanabilir. Bu süreçte psikolojik destek almak önemlidir.</li>
                                 <li><strong>Sosyal izolasyon riski:</strong> Davetlerde, restoranlarda, okul etkinliklerinde dışlanma hissi yaşanabilir. Arkadaş çevresinin bilgilendirilmesi ve anlayışı önemlidir.</li>
@@ -3310,7 +3297,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <div class="image-container"><img src="komplikasyonlar.png" alt="Komplikasyonlar" data-title="Tedavi Edilmeyen Çölyağın Uzun Vadeli Komplikasyonları"></div>
+                            <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/komplikasyonlar.png" alt="Komplikasyonlar" data-title="Tedavi Edilmeyen Çölyağın Uzun Vadeli Komplikasyonları"></div>
                             <ul>
                                 <li><strong>Osteoporoz ve osteopeni:</strong> Kalsiyum ve D vitamini emilim bozukluğu nedeniyle erken kemik erimesi görülür.</li>
                                 <li><strong>Anemi:</strong> Demir, B12, folik asit eksikliğine bağlı kansızlık.</li>
@@ -3798,8 +3785,6 @@
             const tocCloseBtn = $('#tocCloseBtn');
             const tocLinks = $$('.sidebar-toc ul li a');
             const sections = $$('.content-section');
-            const searchInput = $('#searchInput');
-            const searchClear = $('#searchClear');
             const progressFill = $('#progressFill');
             const scrollTopBtn = $('#scrollTopBtn');
             const darkModeToggle = $('#darkModeToggle');
@@ -3887,6 +3872,15 @@
             tocCloseBtn.addEventListener('click', closeTocDrawer);
             tocOverlay.addEventListener('click', closeTocDrawer);
 
+            // Hero "Rehberi Keşfet" -> open TOC
+            const heroTocBtn = document.getElementById('heroTocBtn');
+            if (heroTocBtn) {
+                heroTocBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openTocDrawer();
+                });
+            }
+
             // ESC ile kapat
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
@@ -3923,41 +3917,6 @@
                 this.classList.remove('active');
             });
 
-            // Arama
-            function performSearch(query) {
-                const q = query.toLowerCase().trim();
-                let hasResults = false;
-                sections.forEach(section => {
-                    const searchData = section.dataset.search || '';
-                    const headerText = section.querySelector('.section-header h2')?.textContent || '';
-                    const bodyText = section.textContent || '';
-                    const match = q === '' || searchData.toLowerCase().includes(q) ||
-                        headerText.toLowerCase().includes(q) ||
-                        bodyText.toLowerCase().includes(q);
-                    section.classList.toggle('hidden', q !== '' && !match);
-                    if (match) hasResults = true;
-                });
-                const noResultMsg = document.getElementById('noResultMsg');
-                if (!hasResults && q !== '') {
-                    if (!noResultMsg) {
-                        const msg = document.createElement('div');
-                        msg.id = 'noResultMsg';
-                        msg.style.cssText = 'text-align:center;padding:2rem;color:var(--text-light);background:var(--bg);border-radius:12px;margin:1rem 0;';
-                        msg.innerHTML = '<i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.5;"></i> <strong>Sonuç bulunamadı.</strong><br>Farklı bir kelime deneyin.';
-                        document.querySelector('.main-content').prepend(msg);
-                    }
-                } else {
-                    document.getElementById('noResultMsg')?.remove();
-                }
-                searchClear.classList.toggle('visible', q.length > 0);
-            }
-
-            searchInput.addEventListener('input', function() { performSearch(this.value); });
-            searchClear.addEventListener('click', function() {
-                searchInput.value = '';
-                performSearch('');
-                searchInput.focus();
-            });
 
             // Progress Bar
             window.addEventListener('scroll', function() {

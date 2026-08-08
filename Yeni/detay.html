@@ -26,6 +26,7 @@
             --bg-elevated: #FAFBFB;
             --text: #1A2626;
             --text-secondary: #3A4E4E;
+            --text-light: #3A4E4E;
             --text-muted: #9CA3AF;
             --border: rgba(0,0,0,0.06);
             --white: #FFFFFF;
@@ -81,10 +82,10 @@
                 margin: 0 !important;
                 border-radius: 0 !important;
                 min-height: 100vh;
-                padding: 0 0 !important;
+                padding: 0 0.75rem !important;
                 box-shadow: none;
                 border: none;
-                overflow: hidden !important;
+                overflow-x: visible !important;
                 width: 100% !important;
                 max-width: 100% !important;
             }
@@ -371,20 +372,6 @@
             .main-nav .nav-right { margin-left: 0; }
         }
 
-        /* ===== BREADCRUMB ===== */
-        .breadcrumb {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 1.2rem 0 0;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .breadcrumb a { color: var(--primary); font-weight: 500; text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .breadcrumb i { font-size: 0.55rem; }
 
         /* ===== PAGE CONTENT ===== */
         .page-content {
@@ -868,130 +855,144 @@
         .footer {
             background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/web-footer.png') center/cover no-repeat;
             color: #fff;
-            margin-top: 3rem;
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            margin-top: 60px;
+            border-radius: 28px;
             overflow: hidden;
+            transition: background 0.3s ease;
             position: relative;
         }
         .footer::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(15, 90, 62, 0.5);
+            background: rgba(67, 205, 128, 0.3);
             z-index: 1;
+            border-radius: 28px;
         }
         .footer-container {
             position: relative;
             z-index: 2;
             max-width: 960px;
             margin: auto;
-            padding: 3rem 2rem 2rem;
+            padding: 35px 25px;
             text-align: center;
         }
         .footer-logo {
-            width: 100px;
-            margin: 0 auto 1rem;
+            width: 120px;
+            margin: 0 auto 15px;
             display: block;
         }
         .footer-title {
-            font-family: var(--font-display);
-            font-size: 1.6rem;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: #fff;
+            margin-bottom: 12px;
         }
         .footer-desc {
-            max-width: 600px;
+            max-width: 620px;
             margin: auto;
-            color: rgba(255,255,255,0.8);
-            line-height: 1.7;
-            font-size: 0.9rem;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            font-size: 15px;
+            transition: color 0.3s ease;
         }
         .footer-menu {
-            margin: 2rem 0 1.5rem;
+            margin: 28px 0 22px;
             display: flex;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 18px;
             flex-wrap: wrap;
         }
         .footer-menu a {
             text-decoration: none;
             color: #fff;
-            background: rgba(255,255,255,0.12);
-            padding: 0.6rem 1.2rem;
+            background: rgba(255,255,255,.15);
+            padding: 10px 18px;
             border-radius: 30px;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            transition: .30s;
+            font-size: 0.95rem;
         }
-        .footer-menu a:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            transform: translateY(-2px);
-        }
+        .footer-menu a:hover { background: var(--accent); }
+        .footer-menu .footer-bagis-btn { background: rgba(255,255,255,.15); }
+        .footer-menu .footer-bagis-btn:hover { background: var(--accent); }
+
         .footer-social {
             display: flex;
             justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            gap: 12px;
+            margin-bottom: 22px;
         }
         .footer-social a {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
-            color: #fff;
+            background: rgba(255,255,255,.15);
+            color: white;
             text-decoration: none;
-            transition: all 0.3s;
-            font-size: 1rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            transition: .30s;
+            font-size: 1.1rem;
         }
         .footer-social a:hover {
             background: var(--accent);
-            border-color: var(--accent);
-            transform: translateY(-3px);
+            transform: translateY(-4px);
         }
         .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.15);
-            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255,255,255,.20);
+            padding-top: 18px;
         }
         .footer-bottom p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            transition: color 0.3s ease;
         }
         .footer-links {
-            margin-top: 0.75rem;
+            margin-top: 10px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 10px;
         }
         .footer-links a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.8);
             text-decoration: none;
-            font-size: 0.78rem;
-            transition: color 0.3s;
+            font-size: 13px;
+            transition: .30s;
         }
-        .footer-links a:hover {
-            color: var(--accent);
-        }
+        .footer-links a:hover { color: var(--accent); }
+
         @media (max-width: 768px) {
             .footer {
-                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                margin-top: 35px;
+                border-radius: 28px !important;
                 background: url('https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/mobil-footer.png') center/cover no-repeat;
             }
-            .footer-container {
-                padding: 2rem 1.2rem 1.5rem;
+            .footer::before { border-radius: 28px; }
+            .footer-container { padding: 28px 18px; }
+            .footer-logo { width: 100px; }
+            .footer-title { font-size: 20px; }
+            .footer-desc {
+                font-size: 14px;
+                line-height: 1.7;
+                color: rgba(255,255,255,0.85);
             }
-            .footer-title {
-                font-size: 1.3rem;
+            .footer-menu { gap: 10px; }
+            .footer-menu a {
+                padding: 8px 14px;
+                font-size: 14px;
             }
+            .footer-social a {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+            .footer-links { gap: 8px; }
+            .footer-links a { font-size: 12px; }
         }
 
-        /* ===== SCROLL TOP ===== */
+        /* ===== SCROLL TO TOP ===== */
+
         .scroll-top {
             position: fixed;
             bottom: 2rem;
@@ -1055,6 +1056,101 @@
         html.font-xlarge .detail-title {
             font-size: clamp(2rem, 5vw, 3rem);
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #fff;
+            max-width: 800px;
+            width: 100%;
+            border-radius: 14px;
+            padding: 1.5rem 1.5rem 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            margin-bottom: 0.8rem;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-dark);
+        }
+        .modal-header h3 i { color: var(--accent); }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-light);
+            line-height: 1;
+            z-index: 5;
+            position: relative;
+            padding: 0.25rem 0.5rem;
+        }
+        .modal-close:hover { color: var(--primary-dark); }
+        .modal-body { overflow-y: auto; flex: 1; }
+        .modal-iban-box {
+            background: linear-gradient(135deg, #f8fafc, #eef2f1);
+            border-radius: 14px;
+            padding: 1.5rem 1.8rem;
+            border: 2px solid var(--accent);
+            border-left: 6px solid var(--accent);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .modal-iban-box .modal-logo {
+            width: 80px; height: 80px; border-radius: 50%;
+            margin: 0 auto 0.8rem; display: block;
+            border: 3px solid var(--primary-light); padding: 4px; background: #fff;
+        }
+        .modal-iban-box .modal-iban-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-light); font-weight: 600; margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-number {
+            font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);
+            font-family: 'Inter', monospace; word-break: break-all;
+            background: rgba(255,255,255,0.6); padding: 0.3rem 0.8rem;
+            border-radius: 8px; display: inline-block; margin-bottom: 0.2rem;
+        }
+        .modal-iban-box .modal-iban-detail {
+            font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.8rem;
+        }
+        .modal-iban-box .modal-iban-copy-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: var(--primary); color: #fff; border: none;
+            padding: 0.4rem 1.6rem; border-radius: 30px; font-weight: 600;
+            font-size: 0.8rem; cursor: pointer;
+        }
+        .modal-iban-box .modal-iban-copy-btn:hover { background: var(--primary-dark); }
+        .modal-iban-box .modal-iban-divider {
+            width: 80px; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0.5rem auto; border-radius: 4px;
+        }
+
     </style>
 </head>
 <body>
@@ -1073,11 +1169,7 @@
                 </a>
                 <div class="header-actions">
                     <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
-                    <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
-                        <i class="fas fa-font"></i>
-                        <span class="header-actions-label font-size-btn">A</span>
-                    </button>
-                    <div class="header-info">
+<div class="header-info">
                         <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
                         <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
                     </div>
@@ -1106,15 +1198,6 @@
         </header>
 
         <main id="main">
-            <!-- ===== BREADCRUMB ===== -->
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="haberler.html">Haberler</a>
-                <i class="fas fa-chevron-right"></i>
-                <span id="breadcrumbTitle">Haber Detayı</span>
-            </nav>
-
             <!-- ===== İÇERİK ===== -->
             <div class="page-content">
                 <div id="detailContent">
@@ -1128,33 +1211,33 @@
 
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
-            <div class="footer-container">
-                <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" class="footer-logo" alt="Kırıkkale Çölyak Derneği Logo">
-                <h2 class="footer-title">Kırıkkale Çölyak Derneği</h2>
-                <p class="footer-desc">
-                    Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
-                </p>
-                <div class="footer-menu">
-                    <a href="index.html"><i class="fas fa-house"></i> Ana Sayfa</a>
-                    <a href="gida-stok-durumu.html"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
-                    <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
-                    <a href="iletisim.html"><i class="fas fa-envelope"></i> İletişim</a>
-                </div>
-                <div class="footer-social">
-                    <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/kirikkalecolyak?igsh=MXI0eDhsbTB4bGp4aw==" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz?s=cl&p=a&ilr=4" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                </div>
-                <div class="footer-bottom">
-                    <p>&copy; 2026 Kırıkkale Çölyak Derneği<br>Tüm hakları saklıdır.</p>
-                    <div class="footer-links">
-                        <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
-                        <a href="cerezler.html">Çerezler</a>
-                        <a href="kvkk.html">KVKK</a>
+                <div class="footer-container">
+                    <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" class="footer-logo" alt="Kırıkkale Çölyak Derneği Logo">
+                    <h2 class="footer-title">Kırıkkale Çölyak Derneği</h2>
+                    <p class="footer-desc">
+                        Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
+                    </p>
+                    <div class="footer-menu">
+                        <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="#" data-modal="bagis"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
+                        <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                        <a href="#" data-modal="iletisim"><i class="fas fa-envelope"></i> İletişim</a>
+                    </div>
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/share/1D8fUfhLvk/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/kirikkalecolyak?igsh=MXI0eDhsbTB4bGp4aw==" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz?s=cl&p=a&ilr=4" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>© 2026 Kırıkkale Çölyak Derneği<br>Tüm hakları saklıdır.</p>
+                        <div class="footer-links">
+                            <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+                            <a href="cerezler.html">Çerezler</a>
+                            <a href="kvkk.html">KVKK</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </footer>
+            </footer>
     </div>
 
     <!-- ===== SCROLL TO TOP ===== -->
@@ -1162,6 +1245,16 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
+    <!-- ===== GENEL MODAL (Bağış & İletişim) ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="genelModalTitle"><i class="fas fa-list"></i> Liste</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    
     <script>
         // ============================================================
         // SUPABASE BAĞLANTISI
@@ -1185,8 +1278,6 @@
         // DOM ELEMENTLERİ
         // ============================================================
         const container = $('#detailContent');
-        const breadcrumbTitle = $('#breadcrumbTitle');
-
         // ============================================================
         // 1. TARİH
         // ============================================================
@@ -1217,14 +1308,7 @@
         // Font size
         var fontSizes = ['normal', 'large', 'xlarge'];
         var currentFontIdx = 0;
-        $('#fontSizeToggle').on('click', function() {
-            $('html').removeClass('font-large font-xlarge');
-            currentFontIdx = (currentFontIdx + 1) % fontSizes.length;
-            if (fontSizes[currentFontIdx] === 'large') $('html').addClass('font-large');
-            if (fontSizes[currentFontIdx] === 'xlarge') $('html').addClass('font-xlarge');
-        });
-
-        // Hamburger
+// Hamburger
         $('#hamburgerBtn').on('click', function() {
             var nav = $('#mainNav');
             var btn = $(this);
@@ -1725,9 +1809,6 @@
 
                 container.html(html);
 
-                // Breadcrumb güncelle
-                breadcrumbTitle.text(title.length > 40 ? title.substring(0, 40) + '...' : title);
-
                 console.log('✅ === SAYFA OLUŞTURULDU ===');
                 console.log('📌 Kaynak tablo:', sourceTable);
                 console.log('👤 Yazar:', author ? author.name : 'Yok');
@@ -1744,7 +1825,85 @@
             }
         }
 
+        // ===== GENEL MODAL (Bağış & İletişim) =====
+        function openModal(title, content) {
+            $('#genelModalTitle').html(title);
+            $('#modalBody').html(content);
+            $('#modalOverlay').addClass('active');
+            $('body').css('overflow', 'hidden');
+        }
+        function closeModal() {
+            $('#modalOverlay').removeClass('active');
+            $('body').css('overflow', '');
+        }
+        $(document).on('click', '#modalCloseBtn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+        });
+        $(document).on('click', '#modalOverlay', function(e) {
+            if (e.target === this || e.target.id === 'modalOverlay') closeModal();
+        });
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+        $(document).on('click', '[data-modal]', function(e) {
+            e.preventDefault();
+            const type = $(this).data('modal');
+            let title = '', content = '';
+            if (type === 'bagis') {
+                title = '<i class="fas fa-hand-holding-heart"></i> Bağış Yap';
+                content = `
+                    <div class="modal-iban-box">
+                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Logo" class="modal-logo">
+                        <div class="modal-iban-title">Banka Havalesi / EFT ile Bağış</div>
+                        <div class="modal-iban-divider"></div>
+                        <div class="modal-iban-number">TR33 0001 0003 1698 0774 5750 01</div>
+                        <div class="modal-iban-detail">🏦 Ziraat Bankası · Kırıkkale Şubesi<br>Alıcı: Kırıkkale Çölyak Derneği</div>
+                        <button type="button" class="modal-iban-copy-btn" data-iban="TR33 0001 0003 1698 0774 5750 01">
+                            <i class="fas fa-copy"></i> IBAN Kopyala
+                        </button>
+                    </div>`;
+            } else if (type === 'iletisim') {
+                title = '<i class="fas fa-envelope"></i> İletişim';
+                content = `
+                    <div style="text-align:center;padding:0.5rem 0;">
+                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Logo" style="width:100px;margin:0 auto 1rem;display:block;border-radius:12px;">
+                        <h3 style="color:var(--primary-dark);font-size:1.1rem;margin-bottom:1.2rem;">Kırıkkale Çölyak Derneği</h3>
+                        <div style="display:flex;flex-direction:column;gap:0.6rem;max-width:420px;margin:0 auto;text-align:left;">
+                            <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--primary);">
+                                <i class="fas fa-map-marker-alt" style="color:var(--primary);width:18px;text-align:center;"></i>
+                                <span style="font-size:0.8rem;">Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid var(--accent);">
+                                <i class="fas fa-phone" style="color:var(--accent);width:18px;text-align:center;"></i>
+                                <span style="font-size:0.8rem;">0543 295 46 71</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #1d4ed8;">
+                                <i class="fas fa-envelope" style="color:#1d4ed8;width:18px;text-align:center;"></i>
+                                <span style="font-size:0.8rem;word-break:break-all;">kirikkalecolyak@gmail.com</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.6rem;background:#f8fafc;padding:0.6rem 1rem;border-radius:10px;border-left:3px solid #8b5cf6;">
+                                <i class="fas fa-globe" style="color:#8b5cf6;width:18px;text-align:center;"></i>
+                                <span style="font-size:0.8rem;">www.kirikkalecolyak.org.tr</span>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            if (content) openModal(title, content);
+        });
+        $(document).on('click', '.modal-iban-copy-btn', function() {
+            const iban = $(this).data('iban') || 'TR33 0001 0003 1698 0774 5750 01';
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(iban).then(function() {
+                    alert('IBAN kopyalandı!');
+                });
+            }
+        });
+
         loadDetail();
     </script>
+
+    </div>
 </body>
 </html>

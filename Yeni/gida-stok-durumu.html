@@ -181,7 +181,13 @@
             width: auto;
             border-radius: 8px;
         }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
         .logo-text .city {
+            display: block;
             font-size: clamp(1.1rem, 2.5vw, 1.4rem);
             font-weight: 800;
             color: var(--primary-dark);
@@ -190,6 +196,7 @@
             transition: color 0.3s ease;
         }
         .logo-text .sub {
+            display: block;
             font-size: clamp(0.7rem, 1.5vw, 0.85rem);
             font-weight: 600;
             color: var(--primary);
@@ -392,8 +399,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.35);
             z-index: 98;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -477,8 +483,24 @@
                 margin-top: 0.5rem;
                 justify-content: center !important;
             }
-            .nav-overlay {
-                display: none !important;
+            .nav-overlay.active {
+                display: block !important;
+                opacity: 1;
+            }
+            header {
+                background: #ffffff !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            body.dark-mode header {
+                background: #1e1e1e !important;
+            }
+            .main-nav.open {
+                background: #ffffff;
+                z-index: 101;
+            }
+            body.dark-mode .main-nav.open {
+                background: #2a2a2a;
             }
             .header-divider {
                 margin: 0.2rem 0;
@@ -515,6 +537,31 @@
         /* ============================================================
            BAĞIŞ SAYFASI ÖZEL STILLER
            ============================================================ */
+
+        
+        /* ===== PAGE BREADCRUMB ===== */
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            padding: 0.75rem 0 0.25rem;
+            flex-wrap: wrap;
+        }
+        .page-breadcrumb a {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        .page-breadcrumb a:hover { text-decoration: underline; }
+        .page-breadcrumb .sep { opacity: 0.5; color: #999; }
+        .page-breadcrumb .current {
+            font-weight: 600;
+            color: var(--text);
+        }
+        body.dark-mode .page-breadcrumb { color: #999; }
+        body.dark-mode .page-breadcrumb a { color: var(--primary-light); }
+        body.dark-mode .page-breadcrumb .current { color: #ddd; }
 
         /* ----- HERO ----- */
         .bagis-hero {
@@ -2738,10 +2785,6 @@
                     </a>
                     <div class="header-actions">
                         <button id="darkModeToggle" aria-label="Karanlık moda geç" title="Karanlık Mod"><i class="fas fa-moon"></i></button>
-                        <button id="fontSizeToggle" aria-label="Yazı boyutunu değiştir" title="Yazı Boyutu">
-                            <i class="fas fa-font"></i>
-                            <span class="header-actions-label font-size-btn">A</span>
-                        </button>
                         <div class="header-info">
                             <span><i class="fas fa-calendar-alt"></i> <span id="currentDate">17 Haziran</span></span>
                             <span><i class="fas fa-map-marker-alt"></i> Kırıkkale</span>
@@ -2757,8 +2800,8 @@
                 <div class="nav-overlay" id="navOverlay"></div>
                 <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
                     <div class="nav-left">
-                        <a href="index.html"><i class="fas fa-home"></i>Ana Sayfa</a>
-                        <a href="derneğimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                        <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                        <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
                         <a href="haberler.html"><i class="fas fa-newspaper"></i> Haberler</a>
                         <a href="colyak-rehberi.html"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
                         <a href="isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
@@ -2771,6 +2814,13 @@
             </header>
 
             <main id="main">
+
+                <!-- ===== BREADCRUMB ===== -->
+                <nav class="page-breadcrumb" aria-label="Breadcrumb">
+                    <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <span class="sep">›</span>
+                    <span class="current">Gıda Stok Durumu</span>
+                </nav>
 
                 <!-- ===== HERO ===== -->
                 <div class="bagis-hero">
@@ -3053,13 +3103,24 @@
             }
             updateDate();
 
-            $('#hamburgerBtn').on('click', function() {
-                var nav = $('#mainNav');
-                var btn = $(this);
-                nav.toggleClass('open');
-                btn.toggleClass('active');
-                var expanded = nav.hasClass('open');
-                btn.attr('aria-expanded', expanded);
+            function closeMobileNav() {
+                $('#mainNav').removeClass('open');
+                $('#hamburgerBtn').removeClass('active').attr('aria-expanded', 'false');
+                $('#navOverlay').removeClass('active');
+            }
+            function openMobileNav() {
+                $('#mainNav').addClass('open');
+                $('#hamburgerBtn').addClass('active').attr('aria-expanded', 'true');
+                $('#navOverlay').addClass('active');
+            }
+            $('#hamburgerBtn').on('click', function(e) {
+                e.stopPropagation();
+                if ($('#mainNav').hasClass('open')) closeMobileNav();
+                else openMobileNav();
+            });
+            $('#navOverlay').on('click', closeMobileNav);
+            $('#mainNav a').on('click', function() {
+                if (window.innerWidth <= 640) closeMobileNav();
             });
 
             // Sayfa içi IBAN kopyalama
@@ -3110,6 +3171,36 @@
             let totalIncome = 0;
             let totalExpense = 0;
 
+
+            function animateCounter(selector, target, isCurrency) {
+                const $el = $(selector);
+                const end = Number(target) || 0;
+                const duration = 1400;
+                const startTime = performance.now();
+                const startVal = 0;
+                function frame(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    // easeOutCubic
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = Math.round(startVal + (end - startVal) * eased);
+                    if (isCurrency) {
+                        $el.text('₺' + current.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }));
+                    } else {
+                        $el.text(current.toLocaleString('tr-TR'));
+                    }
+                    if (progress < 1) {
+                        requestAnimationFrame(frame);
+                    } else {
+                        if (isCurrency) {
+                            $el.text('₺' + end.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }));
+                        } else {
+                            $el.text(end.toLocaleString('tr-TR'));
+                        }
+                    }
+                }
+                requestAnimationFrame(frame);
+            }
+
             async function loadSummaryAndDonors() {
                 try {
                     const { data, error } = await supabaseClient
@@ -3126,13 +3217,10 @@
                         totalExpense = data.toplam_gider || 0;
                         const cashBalance = totalIncome - totalExpense;
 
-                        $('#statCeliacCount').text(celiacCount.toLocaleString('tr-TR'));
-                        $('#statTotalIncome').text('₺' + Number(totalIncome).toLocaleString('tr-TR', { minimumFractionDigits: 0,
-                            maximumFractionDigits: 0 }));
-                        $('#statTotalExpense').text('₺' + Number(totalExpense).toLocaleString('tr-TR', { minimumFractionDigits: 0,
-                            maximumFractionDigits: 0 }));
-                        $('#statCashBalance').text('₺' + Number(cashBalance).toLocaleString('tr-TR', { minimumFractionDigits: 0,
-                            maximumFractionDigits: 0 }));
+                        animateCounter('#statCeliacCount', celiacCount, false);
+                        animateCounter('#statTotalIncome', totalIncome, true);
+                        animateCounter('#statTotalExpense', totalExpense, true);
+                        animateCounter('#statCashBalance', cashBalance, true);
 
                         const donors = data.bagis_yapan || [];
                         globalDonors = donors;
@@ -3910,30 +3998,7 @@
                 });
             }
 
-            // ===== YAZI BOYUTU =====
-            const fontSizeToggle = document.getElementById('fontSizeToggle');
-            let fontSizeLevel = parseInt(localStorage.getItem('celiacFontSize') || '0');
 
-            if (fontSizeToggle) {
-                if (fontSizeLevel === 1) document.body.classList.add('font-large');
-                if (fontSizeLevel === 2) document.body.classList.add('font-xlarge');
-                const sizeBtn = fontSizeToggle.querySelector('.font-size-btn');
-                if (sizeBtn) {
-                    sizeBtn.textContent = fontSizeLevel === 0 ? 'A' : fontSizeLevel === 1 ? 'A+' : 'A++';
-                }
-                
-                fontSizeToggle.addEventListener('click', function() {
-                    fontSizeLevel = (fontSizeLevel + 1) % 3;
-                    document.body.classList.remove('font-large', 'font-xlarge');
-                    if (fontSizeLevel === 1) document.body.classList.add('font-large');
-                    if (fontSizeLevel === 2) document.body.classList.add('font-xlarge');
-                    localStorage.setItem('celiacFontSize', fontSizeLevel);
-                    const sizeBtn = this.querySelector('.font-size-btn');
-                    if (sizeBtn) {
-                        sizeBtn.textContent = fontSizeLevel === 0 ? 'A' : fontSizeLevel === 1 ? 'A+' : 'A++';
-                    }
-                });
-            }
 
             // Sayfa yüklendiğinde verileri çek
             loadSummaryAndDonors();
