@@ -4,9 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
     <title>Haber Detayı | Kırıkkale Çölyak Derneği</title>
-    <meta name="description" content="Kırıkkale Çölyak Derneği haber detay sayfası.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.kirikkalecolyak.org/detay.html">
+    <meta name="description" content="Kırıkkale Çölyak Derneği haberleri, dernek duyuruları ve çölyak topluluğuna yönelik güncel içerikler.">
+    <meta name="robots" content="noindex, follow">
+    <meta name="author" content="Kırıkkale Çölyak Derneği">
+    <meta name="theme-color" content="#1A7A5A">
+    <link rel="canonical" href="https://www.kirikkalecolyak.org.tr/detay.html">
+    <meta property="og:locale" content="tr_TR">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Haber Detayı | Kırıkkale Çölyak Derneği">
+    <meta property="og:description" content="Kırıkkale Çölyak Derneği haberleri, dernek duyuruları ve çölyak topluluğuna yönelik güncel içerikler.">
+    <meta property="og:url" content="https://www.kirikkalecolyak.org.tr/detay.html">
+    <meta property="og:site_name" content="Kırıkkale Çölyak Derneği">
+    <meta property="og:image" content="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png">
+    <meta property="og:image:alt" content="Kırıkkale Çölyak Derneği">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Haber Detayı | Kırıkkale Çölyak Derneği">
+    <meta name="twitter:description" content="Kırıkkale Çölyak Derneği haberleri, dernek duyuruları ve çölyak topluluğuna yönelik güncel içerikler.">
+    <meta name="twitter:url" content="https://www.kirikkalecolyak.org.tr/detay.html">
+    <meta name="twitter:image" content="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png">
+    <meta name="twitter:image:alt" content="Kırıkkale Çölyak Derneği">
+    <script id="articleStructuredData" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Haber Bulunamadı | Kırıkkale Çölyak Derneği",
+      "description": "Kırıkkale Çölyak Derneği haber detay sayfası.",
+      "url": "https://www.kirikkalecolyak.org.tr/detay.html",
+      "inLanguage": "tr-TR"
+    }
+    </script>
     <link rel="icon" href="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -1412,7 +1438,177 @@
         function getIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-            return id ? parseInt(id, 10) : null;
+            const parsedId = id ? parseInt(id, 10) : null;
+            return Number.isInteger(parsedId) ? parsedId : null;
+        }
+
+        function stripHtml(value) {
+            if (!value) return '';
+            const div = document.createElement('div');
+            div.innerHTML = String(value);
+            return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function truncateSeoText(value, maxLength) {
+            const text = stripHtml(value);
+            if (text.length <= maxLength) return text;
+            return text.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim() + '…';
+        }
+
+        function getMetaElement(attribute, value) {
+            return document.head.querySelector('meta[' + attribute + '="' + value + '"]');
+        }
+
+        function setMeta(attribute, name, content) {
+            let element = getMetaElement(attribute, name);
+            if (!element) {
+                element = document.createElement('meta');
+                element.setAttribute(attribute, name);
+                document.head.appendChild(element);
+            }
+            element.setAttribute('content', content || '');
+        }
+
+        function setCanonicalUrl(url) {
+            let element = document.head.querySelector('link[rel="canonical"]');
+            if (!element) {
+                element = document.createElement('link');
+                element.setAttribute('rel', 'canonical');
+                document.head.appendChild(element);
+            }
+            element.setAttribute('href', url);
+        }
+
+        function getAbsoluteUrl(value, fallback) {
+            if (!value) return fallback;
+            try {
+                return new URL(String(value), window.location.href).toString();
+            } catch {
+                return fallback;
+            }
+        }
+
+        function getArticleImage(article) {
+            return article.featured_image || article.image_url || article.bg_image ||
+                article.image || article.thumbnail || article.cover_image || article.og_image || null;
+        }
+
+        function getArticleDescription(article) {
+            const source = article.seo_description || article.meta_description || article.summary ||
+                article.excerpt || article.description || article.full_description ||
+                article.content || article.fullContent || '';
+            return truncateSeoText(source, 160) ||
+                'Kırıkkale Çölyak Derneği haberleri, dernek duyuruları ve çölyak topluluğuna yönelik güncel içerikler.';
+        }
+
+        function getArticleDate(article) {
+            return article.pubDate || article.pub_date || article.published_at ||
+                article.publishedAt || article.created_at || null;
+        }
+
+        function getCanonicalForArticle(article) {
+            const url = new URL('https://www.kirikkalecolyak.org.tr/detay.html');
+            if (article.slug) {
+                url.searchParams.set('slug', article.slug);
+            } else if (Number.isInteger(Number(article.id))) {
+                url.searchParams.set('id', String(article.id));
+            }
+            return url.toString();
+        }
+
+        function updateSeoMetadata(article, sourceTable) {
+            const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png';
+            const structuredData = document.getElementById('articleStructuredData');
+
+            if (!article) {
+                document.title = 'Haber Bulunamadı | Kırıkkale Çölyak Derneği';
+                setMeta('name', 'description', 'Aradığınız haber Kırıkkale Çölyak Derneği içeriklerinde bulunamadı.');
+                setMeta('name', 'robots', 'noindex, nofollow');
+                setCanonicalUrl('https://www.kirikkalecolyak.org.tr/detay.html');
+                setMeta('property', 'og:title', document.title);
+                setMeta('property', 'og:description', 'Aradığınız haber Kırıkkale Çölyak Derneği içeriklerinde bulunamadı.');
+                setMeta('property', 'og:url', 'https://www.kirikkalecolyak.org.tr/detay.html');
+                setMeta('property', 'og:type', 'website');
+                setMeta('property', 'og:image', defaultImage);
+                setMeta('name', 'twitter:title', document.title);
+                setMeta('name', 'twitter:description', 'Aradığınız haber Kırıkkale Çölyak Derneği içeriklerinde bulunamadı.');
+                setMeta('name', 'twitter:url', 'https://www.kirikkalecolyak.org.tr/detay.html');
+                setMeta('name', 'twitter:image', defaultImage);
+                if (structuredData) {
+                    structuredData.textContent = JSON.stringify({
+                        '@context': 'https://schema.org',
+                        '@type': 'WebPage',
+                        name: document.title,
+                        description: 'Aradığınız haber Kırıkkale Çölyak Derneği içeriklerinde bulunamadı.',
+                        url: 'https://www.kirikkalecolyak.org.tr/detay.html',
+                        inLanguage: 'tr-TR'
+                    });
+                }
+                return;
+            }
+
+            const title = stripHtml(article.title || 'Haber Detayı');
+            const titleWithBrand = title + ' | Kırıkkale Çölyak Derneği';
+            const description = getArticleDescription(article);
+            const canonicalUrl = getCanonicalForArticle(article);
+            const imageUrl = getAbsoluteUrl(getArticleImage(article), defaultImage);
+            const datePublished = getArticleDate(article);
+            const dateModified = article.updated_at || article.updatedAt || datePublished;
+            const rawAuthor = article.author_name ||
+                (article.author && typeof article.author === 'object' ? article.author.name : article.author) || '';
+            const authorName = stripHtml(rawAuthor);
+            let category = 'Haber';
+            if (sourceTable === 'dernek_haberleri') category = 'Dernek Haberi';
+            else if (sourceTable === 'hero') category = 'Öne Çıkan';
+            else if (Array.isArray(article.tags) && article.tags[0]) category = stripHtml(article.tags[0]);
+
+            const structuredArticle = {
+                '@context': 'https://schema.org',
+                '@type': 'NewsArticle',
+                headline: title,
+                description: description,
+                url: canonicalUrl,
+                mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+                image: [imageUrl],
+                inLanguage: 'tr-TR',
+                articleSection: category,
+                publisher: {
+                    '@type': 'Organization',
+                    name: 'Kırıkkale Çölyak Derneği',
+                    url: 'https://www.kirikkalecolyak.org.tr/',
+                    logo: {
+                        '@type': 'ImageObject',
+                        url: defaultImage
+                    }
+                },
+                author: authorName ? { '@type': 'Person', name: authorName } : {
+                    '@type': 'Organization',
+                    name: 'Kırıkkale Çölyak Derneği'
+                }
+            };
+            if (datePublished && !Number.isNaN(new Date(datePublished).getTime())) {
+                structuredArticle.datePublished = new Date(datePublished).toISOString();
+            }
+            if (dateModified && !Number.isNaN(new Date(dateModified).getTime())) {
+                structuredArticle.dateModified = new Date(dateModified).toISOString();
+            }
+
+            document.title = titleWithBrand;
+            setMeta('name', 'description', description);
+            setMeta('name', 'robots', 'index, follow');
+            setCanonicalUrl(canonicalUrl);
+            setMeta('property', 'og:title', titleWithBrand);
+            setMeta('property', 'og:description', description);
+            setMeta('property', 'og:url', canonicalUrl);
+            setMeta('property', 'og:type', 'article');
+            setMeta('property', 'og:image', imageUrl);
+            setMeta('property', 'og:image:alt', title);
+            setMeta('name', 'twitter:title', titleWithBrand);
+            setMeta('name', 'twitter:description', description);
+            setMeta('name', 'twitter:url', canonicalUrl);
+            setMeta('name', 'twitter:image', imageUrl);
+            setMeta('name', 'twitter:image:alt', title);
+            if (structuredData) structuredData.textContent = JSON.stringify(structuredArticle);
         }
 
         // ============================================================
@@ -1421,6 +1617,17 @@
         async function loadDetail() {
             const slug = getSlugFromUrl();
             const id = getIdFromUrl();
+
+            if (!slug && !id) {
+                updateSeoMetadata(null);
+                container.html('<div class="error-placeholder">' +
+                    '<i class="fas fa-exclamation-triangle"></i>' +
+                    '<h3>Haber bağlantısı eksik.</h3>' +
+                    '<p style="color:var(--text-muted);">Lütfen haberler sayfasından bir içerik seçiniz.</p>' +
+                    '<a href="haberler.html" class="btn-home">Haberler</a>' +
+                    '</div>');
+                return;
+            }
 
             console.log('🔍 === DETAY SAYFASI BAŞLATILDI ===');
             console.log('📌 Slug:', slug);
@@ -1432,7 +1639,7 @@
             try {
                 // ===== 1) ARTICLES =====
                 console.log('🔍 1. ARTICLES tablosu aranıyor...');
-                let q = supabaseClient.from('articles').select('*');
+                let q = supabaseClient.from('articles').select('*').eq('is_published', true);
                 if (slug) q = q.eq('slug', slug);
                 else if (id) q = q.eq('id', id);
                 const { data: aData, error: aError } = await q.maybeSingle();
@@ -1445,7 +1652,7 @@
                 // ===== 2) DERNEK HABERLERİ =====
                 if (!article) {
                     console.log('🔍 2. DERNEK_HABERLERİ tablosu aranıyor...');
-                    let q2 = supabaseClient.from('dernek_haberleri').select('*');
+                    let q2 = supabaseClient.from('dernek_haberleri').select('*').eq('is_active', true);
                     if (slug) q2 = q2.eq('slug', slug);
                     else if (id) q2 = q2.eq('id', id);
                     const { data: dData, error: dError } = await q2.maybeSingle();
@@ -1459,7 +1666,7 @@
                 // ===== 3) HERO =====
                 if (!article) {
                     console.log('🔍 3. HERO tablosu aranıyor...');
-                    let q3 = supabaseClient.from('hero').select('*');
+                    let q3 = supabaseClient.from('hero').select('*').eq('is_active', true);
                     if (slug) q3 = q3.eq('slug', slug);
                     else if (id) q3 = q3.eq('id', id);
                     const { data: hData, error: hError } = await q3.maybeSingle();
@@ -1472,22 +1679,8 @@
 
                 // ===== 4) HİÇBİR YERDE YOKSA =====
                 if (!article) {
-                    console.log('❌ Hiçbir tabloda bulunamadı, en son haber alınıyor...');
-                    const { data: lastData, error: lastError } = await supabaseClient
-                        .from('dernek_haberleri')
-                        .select('*')
-                        .eq('is_active', true)
-                        .order('pub_date', { ascending: false })
-                        .limit(1)
-                        .maybeSingle();
-
-                    if (!lastError && lastData) {
-                        article = lastData;
-                        sourceTable = 'dernek_haberleri';
-                        console.log('✅ En son dernek haberi alındı. ID:', article.id);
-                    } else {
-                        throw new Error('Hiç içerik bulunamadı.');
-                    }
+                    updateSeoMetadata(null);
+                    throw new Error('İstenen haber içeriği bulunamadı.');
                 }
 
                 // ============================================================
@@ -1617,6 +1810,7 @@
                 else if (article.tags && Array.isArray(article.tags) && article.tags.length > 0) {
                     category = article.tags[0];
                 }
+                updateSeoMetadata(article, sourceTable);
 
                 let content = article.fullContent || article.content || article.full_description || article.description ||
                     article.summary || '';
