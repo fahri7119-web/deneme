@@ -1141,61 +1141,7 @@
 
                 showModal('success', 'Başarılı!', 'Başvurunuz alınmıştır. En kısa sürede dönüş yapılacaktır.');
                 form.reset();
-
-
-        // Footer data-modal (bağış / iletişim)
-        (function() {
-            const overlay = document.getElementById('footerModalOverlay');
-            const body = document.getElementById('footerModalBody');
-            const closeBtn = document.getElementById('footerModalClose');
-            function openFooterModal(html) {
-                if (!overlay || !body) return;
-                body.innerHTML = html;
-                overlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-            function closeFooterModal() {
-                if (!overlay) return;
-                overlay.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-            if (closeBtn) closeBtn.addEventListener('click', closeFooterModal);
-            if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) closeFooterModal(); });
-            document.querySelectorAll('[data-modal]').forEach(function(el) {
-                el.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const type = el.getAttribute('data-modal');
-                    if (type === 'bagis') {
-                        openFooterModal(
-                            '<div style="text-align:center;">' +
-                            '<h3 style="color:#0F5A3E;margin-bottom:0.75rem;"><i class="fas fa-hand-holding-heart" style="color:#E8850C;"></i> Bağış Yap</h3>' +
-                            '<p style="font-size:0.75rem;color:#6b7280;margin-bottom:0.5rem;">Ziraat Bankası · Kırıkkale Çölyak Derneği</p>' +
-                            '<div style="font-weight:800;font-size:1.05rem;color:#0F5A3E;letter-spacing:0.5px;margin-bottom:1rem;">TR33 0001 0003 1698 0774 5750 01</div>' +
-                            '<button type="button" id="copyFooterIban" style="background:#1A7A5A;color:#fff;border:none;padding:0.5rem 1.4rem;border-radius:30px;font-weight:600;cursor:pointer;"><i class="fas fa-copy"></i> IBAN Kopyala</button>' +
-                            '</div>'
-                        );
-                        setTimeout(function() {
-                            const b = document.getElementById('copyFooterIban');
-                            if (b) b.addEventListener('click', function() {
-                                const iban = 'TR33 0001 0003 1698 0774 5750 01';
-                                if (navigator.clipboard) navigator.clipboard.writeText(iban);
-                            });
-                        }, 50);
-                    } else if (type === 'iletisim') {
-                        openFooterModal(
-                            '<div style="text-align:center;">' +
-                            '<h3 style="color:#0F5A3E;margin-bottom:1rem;"><i class="fas fa-envelope" style="color:#E8850C;"></i> İletişim</h3>' +
-                            '<p style="font-size:0.85rem;margin:0.4rem 0;">📞 0543 295 46 71</p>' +
-                            '<p style="font-size:0.85rem;margin:0.4rem 0;">✉️ kirikkalecolyak@gmail.com</p>' +
-                            '<p style="font-size:0.8rem;margin:0.4rem 0;color:#6b7280;">Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale</p>' +
-                            '</div>'
-                        );
-                    }
-                });
-            });
-        })();
-
-        showStep(1);
+                showStep(1);
             } catch (error) {
                 showModal('error', 'Hata', error.message);
             } finally {
@@ -1243,7 +1189,7 @@
             });
         });
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' closeMobileNav();
+            if (e.key === 'Escape') closeMobileNav();
         });
 
         // ============================================================
