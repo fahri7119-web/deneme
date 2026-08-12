@@ -1549,5 +1549,42 @@
             })
         })();
     </script>
+   <!-- Sayacın görüneceği alan (CSS tasarımı sitenize uyumludur) -->
+<div class="page-counter" style="text-align: center; margin: 20px 0; font-family: sans-serif; color: #555;">
+  Bu sayfa toplam <strong id="view-count">...</strong> kez görüntülendi.
+</div>
+
+<script>
+  (function() {
+    // 1. ADIM: Siteniz için benzersiz bir alan adı yazın (Boşluk ve Türkçe karakter bırakmayın)
+    const namespace = "www.kirikkalecolyak.org.tr"; 
+
+    // 2. ADIM: URL'den sadece "slug=" değerini çekip temiz bir anahtar üretir
+    const urlParams = new URLSearchParams(window.location.search);
+    let slugValue = urlParams.get('slug');
+
+    // Eğer URL'de bir slug parametresi varsa onu kullanır, yoksa sayfa adını anahtar yapar
+    let pageKey = slugValue ? slugValue : window.location.pathname.replace(/[/.]/g, "-").replace(/^-|-$/g, "");
+    if (!pageKey || pageKey === "index") { pageKey = "home"; }
+
+    // Türkçe karakterleri ve güvenli olmayan sembolleri API için temizler
+    pageKey = encodeURIComponent(pageKey).replace(/%/g, "-");
+
+    // 3. ADIM: CounterAPI'ye istek atarak sayacı 1 artırır ve ekrana yazar
+    const apiUrl = `https://counterapi.dev{namespace}/${pageKey}/up`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.count) {
+          document.getElementById("view-count").innerText = Number(data.count).toLocaleString();
+        }
+      })
+      .catch(error => {
+        console.error("Sayaç hatası:", error);
+        document.getElementById("view-count").innerText = "1";
+      });
+  })();
+</script>
 </body>
 </html>
