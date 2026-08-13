@@ -43,7 +43,6 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="text/javascript"> (function(c,l,a,r,i,t,y){ c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)}; t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i; y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y); })(window, document, "clarity", "script", "wthzc9odvw"); </script>
     <style>
 /* ===== TICKER BAR KALDIRILDI ===== */
 
@@ -645,7 +644,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            margin: 1.5rem 0;
+            margin: 1.2rem 0;
         }
         .action-card{
             background: var(--white);
@@ -776,7 +775,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
-            margin: 2rem 0;
+            margin: 0.4rem 0 1.5rem;
             align-items: stretch;
         }
         .yazar-card{
@@ -1067,7 +1066,7 @@
             border-radius: 20px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.06);
             padding: 1.5rem;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             border: 1px solid rgba(0,0,0,0.04);
             width: 100%;
             max-width: 100%;
@@ -1498,7 +1497,7 @@
             border-radius: 20px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.06);
             padding: 1.5rem;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             border: 1px solid rgba(0,0,0,0.04);
             width: 100%;
             max-width: 100%;
@@ -1631,7 +1630,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            margin: 1.5rem 0;
+            margin: 1rem 0 1.5rem;
         }
         .video-card{
             background: var(--white);
@@ -1742,7 +1741,7 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            margin: 1.5rem 0 0.8rem;
+            margin: 1.2rem 0 0.5rem;
         }
         .section-title h2{ font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
         .section-title a{ color: var(--primary); font-weight: 500; font-size: 0.9rem; }
@@ -1751,7 +1750,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            margin: 1.5rem 0;
+            margin: 1rem 0 1.5rem;
         }
         .card{
             background: var(--white);
@@ -2050,7 +2049,28 @@
         }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
-<style id="site-layout-critical">html{overflow-y:scroll;scrollbar-gutter:stable;scroll-padding-top:140px} body{overflow-x:clip} .site-wrapper{width:100%;max-width:960px;margin:1.5rem auto;padding:0 1rem;box-sizing:border-box} @media(max-width:640px){.site-wrapper{width:100%;max-width:100%;margin:0;padding:0 0.5rem;border-radius:0;box-shadow:none;border:none}} header{position:sticky;top:0;z-index:2000} body.dark-mode{background:#111827!important;color:#E5E7EB!important} body.dark-mode .site-wrapper{background:#111827!important;border-color:rgba(255,255,255,.08)!important} body.dark-mode header{background:#1E1E1E!important;border-bottom-color:rgba(255,255,255,.12)!important} body.dark-mode .main-nav,body.dark-mode .main-nav.open{background:#2A2A2A!important} body.dark-mode .logo-text .city,body.dark-mode .logo-text .sub{color:#4ade80!important}</style>
+<style id="spacing-refinements">
+    /* Kartlar arasındaki dikey ve yatay boşluklar daha dengeli hâle getirildi. */
+    .hero-row { gap: 1rem; margin: 0.75rem 0 0.4rem; }
+    .action-cards-grid { gap: 0.75rem; margin: 0.75rem 0; }
+    .section-title { margin: 0.75rem 0 0.35rem; }
+    .yazarlar-grid { gap: 0.85rem; margin: 0.15rem 0 0.9rem; }
+    .yazar-card { padding: 1.2rem; min-height: 320px; }
+    .gida-card, .rehber-card { margin: 1rem 0; }
+    .card-grid, .video-grid { gap: 0.75rem; margin: 0.75rem 0 1rem; }
+
+    @media (max-width: 768px) {
+        .yazarlar-grid { gap: 0.75rem; margin-top: 0.1rem; }
+        .yazar-card { min-height: auto; padding: 1rem; }
+    }
+
+    @media (max-width: 640px) {
+        .hero-row { gap: 0.65rem; margin: 0.4rem 0; }
+        .action-cards-grid { gap: 0.45rem; margin: 0.55rem 0; }
+        .section-title { margin: 0.65rem 0 0.3rem; }
+        .card-grid, .video-grid { gap: 0.65rem; margin: 0.6rem 0 0.8rem; }
+    }
+</style>
 </head>
 <body>
     <div class="site-wrapper">
@@ -2490,27 +2510,46 @@
             }
             updateDate();
 
-            // ===== HAMBURGER =====
-            // Dark mode
-            $('#darkModeToggle').on('click', function() {
-                $('body').toggleClass('dark-mode');
-                var isDark = $('body').hasClass('dark-mode');
-                $(this).find('i').toggleClass('fa-moon', !isDark).toggleClass('fa-sun', isDark);
-                localStorage.setItem('darkMode', isDark);
-            });
-            if (localStorage.getItem('darkMode') === 'true') {
-                $('body').addClass('dark-mode');
-                $('#darkModeToggle i').removeClass('fa-moon').addClass('fa-sun');
+            // ===== SUPABASE'DEN RASTGELE ÇÖLYAK BİLGİSİ =====
+            let lastCeliacFactId = null;
+            let celiacFactRequestInProgress = false;
+
+            async function showRandomCeliacFact() {
+                if (celiacFactRequestInProgress) return;
+                celiacFactRequestInProgress = true;
+
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('colyak_bilgi_kartlari')
+                        .select('id, etiket, baslik, icerik')
+                        .eq('yayinda_mi', true);
+
+                    if (error) throw error;
+
+                    if (!data || data.length === 0) {
+                        $('#infoBadgeManset').text('Bilgi');
+                        $('#infoTitleManset').empty().text('Henüz yayımlanmış bilgi yok ').append($('<span>', { class: 'highlight', text: '✦' }));
+                        $('#infoTextManset').text('Bilgi kartının görünmesi için Supabase tablosunda yayinda_mi alanı true olan en az bir kayıt bulunmalıdır.');
+                        return;
+                    }
+
+                    const differentFacts = data.filter(fact => fact.id !== lastCeliacFactId);
+                    const factPool = differentFacts.length ? differentFacts : data;
+                    const fact = factPool[Math.floor(Math.random() * factPool.length)];
+
+                    lastCeliacFactId = fact.id;
+                    $('#infoBadgeManset').text(fact.etiket || 'Çölyak Bilgisi');
+                    $('#infoTitleManset').empty().text(`${fact.baslik || 'Çölyak Bilgisi'} `).append($('<span>', { class: 'highlight', text: '✦' }));
+                    $('#infoTextManset').text(fact.icerik || '');
+                } catch (error) {
+                    console.error('Çölyak bilgisi yüklenemedi:', error);
+                } finally {
+                    celiacFactRequestInProgress = false;
+                }
             }
-            // Hamburger
-            $('#hamburgerBtn').on('click', function() {
-                var nav = $('#mainNav');
-                var btn = $(this);
-                nav.toggleClass('open');
-                btn.toggleClass('active');
-                var expanded = nav.hasClass('open');
-                btn.attr('aria-expanded', expanded);
-            });
+
+            showRandomCeliacFact();
+            setInterval(showRandomCeliacFact, 10000);
 
             // ===== 1. HERO SLIDER =====
             let heroSlidesData = [];
@@ -3343,30 +3382,46 @@
                 const mapContainer = document.getElementById('rehberMap');
                 
                 try {
-                    const response = await fetch('isletmeler.json');
-                    if (!response.ok) throw new Error('JSON dosyası yüklenemedi');
-                    const data = await response.json();
-                    
-                    venuesData = [];
-                    if (data.overlayLayers) {
-                        data.overlayLayers.forEach(layer => {
-                            if (layer.stores && layer.stores.length > 0) {
-                                layer.stores.forEach(store => {
-                                    venuesData.push({
-                                        id: venuesData.length + 1,
-                                        name: store.name,
-                                        type: store.type || layer.layerName,
-                                        iconColor: store.iconColor || layer.icon?.color || 'blue',
-                                        address: store.address || 'Adres bilgisi yok',
-                                        description: store.description || '',
-                                        tags: store.tags || [],
-                                        coords: store.coords || [0, 0],
-                                        layerName: layer.layerName
-                                    });
-                                });
-                            }
-                        });
-                    }
+                    // Kırıkkale ilindeki işletmeleri Supabase mekanlar tablosundan çek
+                    const { data, error } = await supabaseClient
+                        .from('mekanlar')
+                        .select('isim,il,ilce,kategori,adres,telefon,aciklama,kaynak_url,konum,enlem,boylam')
+                        .ilike('il', 'Kırıkkale')
+                        .order('isim', { ascending: true });
+
+                    if (error) throw error;
+
+                    const kategoriIconColor = {
+                        'restoran': 'green',
+                        'kafe': 'blue',
+                        'market': 'darkgreen',
+                        'fırın': 'green',
+                        'belediye': 'darkgreen',
+                        'tatlıcı': 'blue',
+                        'otel': 'blue',
+                        'pub': 'blue',
+                        'food_truck': 'green',
+                        'üretici': 'darkgreen'
+                    };
+
+                    venuesData = (data || []).map((row, idx) => {
+                        const enlem = parseFloat(row.enlem) || 0;
+                        const boylam = parseFloat(row.boylam) || 0;
+                        const kategori = (row.kategori || '').toLowerCase();
+                        return {
+                            id: idx + 1,
+                            name: row.isim || 'İsimsiz',
+                            type: row.kategori || 'İşletme',
+                            iconColor: kategoriIconColor[kategori] || 'blue',
+                            address: row.adres || (row.ilce ? row.ilce + ', Kırıkkale' : 'Adres bilgisi yok'),
+                            description: row.aciklama || '',
+                            tags: row.kategori ? [row.kategori] : [],
+                            coords: (enlem && boylam) ? [enlem, boylam] : [0, 0],
+                            layerName: row.kategori || 'İşletme',
+                            telefon: row.telefon || '',
+                            konum: row.konum || ''
+                        };
+                    });
                     
                     $('#rehberCount').text(venuesData.length);
                     
@@ -3377,9 +3432,11 @@
                     }
                     
                     venuesData.forEach(venue => {
-                        const typeIcon = venue.type === 'Market' ? 'fa-store' : 
-                                        venue.type === 'Şarküteri' ? 'fa-utensils' : 
-                                        venue.type === 'Kuruyemiş' ? 'fa-seedling' : 'fa-map-marker-alt';
+                        const typeLower = (venue.type || '').toLowerCase();
+                        const typeIcon = typeLower.includes('market') ? 'fa-store' : 
+                                        typeLower.includes('restoran') || typeLower.includes('kafe') ? 'fa-utensils' : 
+                                        typeLower.includes('fırın') || typeLower.includes('firin') ? 'fa-bread-slice' : 
+                                        typeLower.includes('kuruyemiş') ? 'fa-seedling' : 'fa-map-marker-alt';
                         listContainer.append(`
                             <div class="rehber-item" data-id="${venue.id}">
                                 <div class="r-name"><i class="fas ${typeIcon}" style="color:#1A7A5A;margin-right:0.3rem;"></i>${escapeHtml(venue.name)}</div>
@@ -3397,8 +3454,9 @@
                         }
                     });
                     
-                    const mapCenter = data.mapConfig?.center || [39.85, 33.49];
-                    const mapZoom = data.mapConfig?.zoom || 13;
+                    // Kırıkkale merkez koordinatları
+                    const mapCenter = [39.8468, 33.5153];
+                    const mapZoom = 13;
                     
                     if (rehberMap) {
                         rehberMap.remove();
@@ -3633,6 +3691,5 @@
         });
     </script>
 <script id="page-controls-script">(function(){'use strict';function init(){var b=document.body;if(!b)return;function copy(id){var e=document.getElementById(id);if(!e)return null;var c=e.cloneNode(true);e.replaceWith(c);return c}var d=copy('darkModeToggle'),h=copy('hamburgerBtn'),o=copy('navOverlay'),n=document.getElementById('mainNav');function stored(){try{return['colyakDarkMode','celiacDarkMode','darkMode'].some(function(k){return localStorage.getItem(k)==='true'})}catch(e){return false}}function theme(v,save){b.classList.toggle('dark-mode',v);if(d){var i=d.querySelector('i');if(i)i.className=v?'fas fa-sun':'fas fa-moon';d.setAttribute('aria-label',v?'Aydınlık moda geç':'Karanlık moda geç');d.setAttribute('title',v?'Aydınlık Mod':'Karanlık Mod')}if(save)try{['colyakDarkMode','celiacDarkMode','darkMode'].forEach(function(k){localStorage.setItem(k,String(v))})}catch(e){}}function close(){if(n)n.classList.remove('open');if(h){h.classList.remove('active');h.setAttribute('aria-expanded','false')}if(o)o.classList.remove('active')}function toggle(){if(!n||!h)return;n.classList.contains('open')?close():(n.classList.add('open'),h.classList.add('active'),h.setAttribute('aria-expanded','true'),o&&o.classList.add('active'))}theme(stored(),false);if(d)d.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();theme(!b.classList.contains('dark-mode'),true)});if(h)h.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();toggle()});if(o)o.addEventListener('click',close);if(n)n.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){if(innerWidth<=768)close()})});document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});addEventListener('resize',function(){if(innerWidth>768)close()})}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init()})();</script>
-<script id="page-controls-emergency">(function(){var q=function(s){return document.querySelector(s)},set=function(e,p,v){if(e)e.style.setProperty(p,v,'important')},rm=function(e,p){if(e)e.style.removeProperty(p)},close=function(){var n=q('#mainNav'),h=q('#hamburgerBtn'),o=q('#navOverlay');if(n)n.classList.remove('open');if(h){h.classList.remove('active');h.setAttribute('aria-expanded','false')}if(o)o.classList.remove('active');['display','max-height','opacity','visibility','overflow-y','transform'].forEach(function(p){rm(n,p)});['display','opacity','visibility','pointer-events'].forEach(function(p){rm(o,p)})};function theme(v){document.body.classList.toggle('dark-mode',v);var d=q('#darkModeToggle');if(d){var i=d.querySelector('i');if(i)i.className=v?'fas fa-sun':'fas fa-moon';d.setAttribute('aria-label',v?'Aydınlık moda geç':'Karanlık moda geç');d.setAttribute('title',v?'Aydınlık Mod':'Karanlık Mod')}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('#hamburgerBtn,#darkModeToggle,#navOverlay');if(!t)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();var n=q('#mainNav'),h=q('#hamburgerBtn'),o=q('#navOverlay');if(t.id==='darkModeToggle'){var v=!document.body.classList.contains('dark-mode');theme(v);try{['colyakDarkMode','celiacDarkMode','darkMode'].forEach(function(k){localStorage.setItem(k,String(v))})}catch(x){}return}if(t.id==='navOverlay'){close();return}if(!n||!h)return;var open=!n.classList.contains('open');if(open){n.classList.add('open');h.classList.add('active');h.setAttribute('aria-expanded','true');if(o)o.classList.add('active');set(n,'display','flex');set(n,'max-height','80vh');set(n,'opacity','1');set(n,'visibility','visible');set(n,'overflow-y','auto');set(n,'transform','none');if(o){set(o,'display','block');set(o,'opacity','1');set(o,'visibility','visible');set(o,'pointer-events','auto')}}else close()},true);try{theme(['colyakDarkMode','celiacDarkMode','darkMode'].some(function(k){return localStorage.getItem(k)==='true'}))}catch(e){theme(false)}addEventListener('resize',function(){if(innerWidth>768)close()})})();</script>
 </body>
 </html>

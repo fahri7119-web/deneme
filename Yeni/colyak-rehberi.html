@@ -652,7 +652,7 @@
         }
         .table-wrapper table{
             width: 100%;
-            min-width: 500px;
+            min-width: 350px;
             border-collapse: collapse;
             font-size: 0.85rem;
         }
@@ -672,11 +672,12 @@
         }
         @media (max-width: 640px) {.table-wrapper table{
                 font-size: 0.75rem;
-                min-width: 400px;
+                min-width: 320px;
             }
             .table-wrapper table th,
             .table-wrapper table td{
                 padding: 0.3rem 0.5rem;
+                white-space: nowrap;
             }}
         /* SVG container */
         .svg-container{
@@ -1496,14 +1497,15 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
-                            <p><strong>Çölyak hastalığı</strong>; buğday, arpa, çavdar ve bazı bireylerde yulafta bulunan <strong>gluten</strong> proteinine karşı ince bağırsakta gelişen <strong>otoimmün (bağışıklık kaynaklı) kronik</strong> bir hastalıktır.</p>
-                            <p>Gluten alındığında bağışıklık sistemi, ince bağırsağın iç yüzeyini kaplayan <strong>villus</strong> adı verilen emilim uzantılarına saldırır. Bu durum <strong>villus atrofisi</strong> (körelmesi) ile sonuçlanır ve besin emilimi bozulur. Zamanla demir, kalsiyum, folik asit ve B12 vitamini gibi önemli besin öğelerinin emilimi azalır.</p>
+                            <p><strong>Çölyak hastalığı</strong>, buğday, arpa, çavdar ve (çoğu üründe çapraz bulaş riski nedeniyle) yulafta bulunan <strong>gluten</strong> proteinine karşı, genetik yatkınlığı olan kişilerde ortaya çıkan <strong>otoimmün ve ömür boyu süren</strong> bir ince bağırsak hastalığıdır. Basit bir “tahıl alerjisi” veya “mide hassasiyeti” değildir; bağışıklık sistemi glutene her maruz kaldığında ince bağırsağın emilim yüzeyine saldırır.</p>
+                            <p>Sağlıklı ince bağırsakta <strong>villus</strong> adı verilen parmak benzeri uzantılar, besinlerin kana geçmesini sağlar. Çölyakta bu villuslar zamanla düzleşir (<strong>villus atrofisi</strong>). Emilim bozulunca demir, kalsiyum, D vitamini, B12 ve folik asit gibi kritik öğeler yeterince alınamaz. Bu yüzden hastalık yalnızca karın şikâyetiyle değil; kansızlık, kemik zayıflığı, yorgunluk ve çocukta büyüme geriliği gibi “bağırsak dışı” tablolarla da kendini gösterebilir.</p>
+                            <p>Hastalık <strong>HLA-DQ2</strong> veya <strong>HLA-DQ8</strong> gen tipleriyle güçlü biçimde ilişkilidir. Bu genler tek başına hastalık demek değildir; ancak birinci derece akrabalarda görülme riski yaklaşık <strong>%10</strong>’a çıkar. Ailede çölyak varsa, şikâyet olmasa bile tarama konuşulmalıdır.</p>
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/colyak_nedir.png" alt="Çölyak Hastalığı Nedir" data-title="Gluten Bağırsakta Ne Yapar"></div>
                             <div class="info-box green">
                                 <i class="fas fa-info-circle"></i>
                                 <div class="info-content">
                                     <strong>🟢 Bilmeniz Gerekenler</strong>
-                                    <p>Hastalık <strong>genetik yatkınlık</strong> temellidir (HLA-DQ2 ve HLA-DQ8 genleri). Birinci derece akrabalarda görülme riski <strong>%10</strong>'a kadar çıkar. Çölyak bir alerji değildir, intolerans da değildir — otoimmün bir hastalıktır.</p>
+                                    <p>Çölyak bir alerji değildir, intolerans da değildir — <strong>otoimmün</strong> bir hastalıktır. “Birazcık yesem sorun olmaz” yaklaşımı bağırsak hasarını sürdürebilir. Erken tanı ve sıkı glutensiz diyet ile bağırsak çoğu kişide iyileşir; yaşam kalitesi belirgin şekilde artar.</p>
                                 </div>
                             </div>
                             <!-- VIDEO -->
@@ -1611,6 +1613,7 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Çölyak belirtileri tek bir “klasik tablo”ya sığmaz. Aynı ailede biri kronik ishalle, diğeri yalnızca açıklanamayan kansızlıkla başvurabilir. Belirtiler yaşa, hastalığın süresine ve emilim bozukluğunun derecesine göre değişir; “tipik değil” diye elemek yanıltıcıdır.</p>
                             <h4>👶 Bebek ve Küçük Çocuklarda</h4>
                             <ul>
                                 <li>Kronik ishal veya kabızlık</li>
@@ -1619,6 +1622,7 @@
                                 <li>Kilo alamama, büyüme geriliği</li>
                                 <li>Huzursuzluk, sinirlilik, ağlama nöbetleri</li>
                             </ul>
+                            <p>Glutenli ek gıdaya geçişten sonra ishal veya kabızlık, karın şişliği, kusma ve kilo alamama sık görülür. Büyüme eğrisinin düzleşmesi aile ve hekim için önemli bir uyarıdır.</p>
                             <h4>🧒 Okul Çağı Çocuklarda</h4>
                             <ul>
                                 <li>Karın ağrısı ve şişkinlik (özellikle yemeklerden sonra)</li>
@@ -1681,7 +1685,10 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Tanı tek bir teste dayanmaz; klinik şüphe, kan testleri ve gerektiğinde ince bağırsak biyopsisi birlikte değerlendirilir. Amaç hem doğru tanıyı koymak hem de gereksiz ömür boyu diyeti önlemektir. <strong>Test öncesi glutensiz diyete başlanmamalıdır</strong> — aksi hâlde sonuçlar yanlış negatif çıkabilir.</p>
+
                             <h4>1. Serolojik (Kan) Testleri</h4>
+                            <p>İlk basamak genellikle kanda çölyaka özgü antikorların bakılmasıdır. En sık kullanılan test <strong>anti-tTG IgA</strong>dır; yüksek özgüllük için <strong>EMA</strong> eklenebilir. IgA eksikliğinde total IgA ve gerekirse IgG temelli testler istenir.</p>
                             <ul>
                                 <li><strong>Anti-doku transglutaminaz (Anti-tTG IgA)</strong> — en yaygın tarama testi, duyarlılığı yüksektir.</li>
                                 <li><strong>Anti-endomisyum antikoru (EMA)</strong> — yüksek özgüllüğü ile bilinir.</li>
@@ -1689,11 +1696,11 @@
                                 <li><strong>Deamide gliadin peptid antikorları (DGP)</strong> — özellikle küçük çocuklarda kullanışlıdır.</li>
                             </ul>
                             <h4>2. Endoskopi ve İnce Bağırsak Biyopsisi</h4>
-                            <p>Kesin tanı için altın standarttır. Duodenumdan alınan biyopside villus atrofisi araştırılır ve Marsh sınıflaması ile derecelendirilir (Marsh 0-4).</p>
+                            <p>Seroloji pozitifse veya klinik şüphe güçlüyse üst endoskopi ile duodenumdan biyopsi alınır. Patoloji, villus atrofisi ve inflamasyonu <strong>Marsh sınıflaması</strong> ile derecelendirir. Birçok merkezde kesin tanı için biyopsi hâlâ altın standarttır; çocuklarda seçilmiş olgularda farklı algoritmalar da uygulanabilir — kararı gastroenteroloji uzmanı verir.</p>
                             <h4>3. Genetik Test</h4>
-                            <p><strong>HLA-DQ2/DQ8</strong> — dışlama amaçlı kullanılır. Bu genler yoksa çölyak hastalığı olasılığı neredeyse sıfırdır.</p>
+                            <p><strong>HLA-DQ2/DQ8</strong> daha çok <strong>dışlama</strong> amaçlıdır: Bu genler yoksa çölyak olasılığı çok düşüktür. Genlerin pozitif olması tek başına tanı koydurmaz; toplumda bu genleri taşıyan birçok sağlıklı kişi vardır.</p>
                             <h4>4. Gluten Yükleme Testi (Provokasyon)</h4>
-                            <p>Tanı net değilse veya hasta diyete başlamışsa, belirli bir süre gluten yüklemesi yapılarak testler tekrarlanabilir.</p>
+                            <p>Hasta testlerden önce diyete başlamışsa veya tanı net değilse, hekim kontrolünde belirli süre gluten yüklemesi yapılıp testler tekrarlanabilir. Bu süreç rastgele değil, planlı ve izlemli olmalıdır.</p>
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/tani_sureci.png" alt="Çölyak Tanı Süreci" data-title="Çölyak Tanı Süreci (Kan Testi - Endoskopi - Biyopsi)"></div>
                             <!-- VIDEO -->
                             <div class="video-inline" data-video="https://www.youtube-nocookie.com/embed/C1wlce7CBc0" data-title="Çölyak Tanı Süreci - Uzman Anlatıyor">
@@ -1729,6 +1736,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>“Gluten bana yaramıyor” cümlesi üç farklı durumu karıştırabilir: <strong>çölyak hastalığı</strong>, <strong>buğday alerjisi</strong> ve <strong>non-çölyak gluten hassasiyeti</strong>. Üçü de diyet gerektirebilir; ancak mekanizma, tanı yolu ve uzun dönem riskleri aynı değildir. Yanlış etiketleme, ya gereksiz katı diyete ya da gerçek çölyakın gecikmesine yol açar.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/karsilastirma.png" alt="Çölyak, Gluten Hassasiyeti ve Buğday Alerjisi Karşılaştırması" data-title="Çölyak vs Gluten Hassasiyeti vs Buğday Alerjisi"></div>
                             <ul>
                                 <li><strong>Çölyak:</strong> Otoimmün, bağırsak hasarı, villus atrofisi, HLA-DQ2/DQ8, ömür boyu glutensiz diyet.</li>
@@ -1768,6 +1777,9 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Bugün için çölyakın <strong>tek kanıtlanmış tedavisi ömür boyu, sıkı glutensiz diyettir</strong>. “Bir süre tutup sonra esnetme” modeli hastalığı yönetmez; az miktarda tekrarlayan gluten bile bağırsak iltihabını sürdürebilir. Onaylı bir ilaç diyeti henüz ikame etmez.</p>
+                            <p>Diyete gerçek anlamda uyulduğunda birçok kişide şikâyetler günler–haftalar içinde hafifler. İnce bağırsağın yapısal iyileşmesi daha uzun sürer: çocuklarda genelde aylar, erişkinlerde sıklıkla <strong>6 ay–2 yıl</strong>. Tanı anında demir, D vitamini, B12 ve folat eksiklikleri sık görülür; destekler hekim planıyla verilir.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/tedavi.png" alt="Çölyak Tedavisi" data-title="Çölyak Hastalığı Tedavisi"></div>
                             <p><strong>Tek ve kesin tedavi:</strong> Ömür boyu %100 glutensiz diyet. Henüz onaylanmış ilaç tedavisi yoktur, ancak çeşitli klinik çalışmalar devam etmektedir (örneğin, latiglutenaz enzimleri, zamaglutenaz, ve aşı çalışmaları).</p>
                             <ul>
@@ -1810,6 +1822,9 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Glutensiz beslenme yalnızca “ekmek yememek” değildir. Buğday, arpa, çavdar ve bulaş riski yüksek yulaf ile bunlardan üretilen her şey diyetten çıkarılır. Asıl zorluk açık tahıllardan çok; soslar, hazır çorbalar, işlenmiş etler ve paketli ürünlerdeki gizli kaynaklardır.</p>
+                            <p>İyi haber: taze et, balık, yumurta, süt ürünleri, sebze, meyve, baklagiller, pirinç, mısır, karabuğday ve kinoa gibi birçok gıda doğal olarak glutensizdir. Amaç yasak listesinde boğulmak değil; güvenli temelle sofra kurmayı öğrenmektir.</p>
+
                             <h4 style="color:#dc2626;">❌ YASAK Gıdalar (Gluten İçerir)</h4>
                             <ul>
                                 <li><strong>Tahıllar:</strong> Buğday (tüm türleri), arpa, çavdar, yulaf (sertifikasız), kılçıksız buğday, bulgur, irmik, kepek, malt</li>
@@ -1856,6 +1871,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Glutensiz yaşamın günlük muharebe alanı market rafıdır. “Doğal” veya “ev yapımı” gluten garantisi vermez. Asıl rehber <strong>içindekiler listesi</strong>, alerjen uyarısı ve güvenilir <strong>glutensiz</strong> ifadesidir. Türkiye’de “glutensiz” ibaresi genelde glutenin <strong>≤20 mg/kg</strong> olmasıyla ilişkilidir.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/etiket_okuma.png" alt="Etiket Okuma Rehberi" data-title="Glutensiz Etiket Okuma Rehberi"></div>
                             <ul>
                                 <li>Türk Gıda Kodeksi'ne göre <strong>"glutensiz"</strong> ibaresi için ürünün <strong>20 mg/kg (20 ppm)</strong> altında gluten içermesi gerekir.</li>
@@ -1896,6 +1913,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Çölyakta en sık kırılma noktası bilerek yemek değil, <strong>çapraz bulaş</strong>tır: ortak tost makinesi, aynı yağda kızartma, unlu tezgâh, paylaşılan bıçak. Görünmez miktarlar bile bazı hastalarda semptom ve antikor yüksekliğini sürdürebilir. Evde ayrı ekipman ve net kurallar; dışarıda ise utanmadan soru sormak gerekir.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/capraz_bulasma.png" alt="Çapraz Bulaşma ve Önleme" data-title="Çapraz Bulaşma ve Önleme Yöntemleri"></div>
                             <p>Çapraz bulaşma, glutensiz bir gıdanın hazırlık, pişirme veya servis sırasında glutenli bir gıda ile temas etmesidir. <strong>1/8 çay kaşığı</strong> kadar un bile hasara neden olabilir.</p>
                             <h4>Evde Alınması Gereken Önlemler</h4>
@@ -1950,6 +1969,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Çocukta çölyak; büyüme, okul başarısı ve duygusal gelişimle iç içedir. Tanı sıkça “boyu kısa kaldı” veya “demir ilacı bitmiyor” şikâyetiyle açığa çıkar. Tedavi yine glutensiz diyettir; uygulama çocuğun yaşına, okula ve aile rutinine göre planlanmalıdır. Öğretmen ve kantin bilgilendirilmeli; çocuğa “yasak” dili yerine “benim güvenli yiyeceklerim” dili öğretilmelidir.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/cocuklarda_colyak.png" alt="Çocuklarda Çölyak" data-title="Çocuklarda Çölyak ve Okul Yaşamı"></div>
                             <ul>
                                 <li><strong>Ek gıdaya geçiş:</strong> 4-7. aylar arasında ve anne sütü ile birlikte glutenli gıdaya başlanması önerilir (ESPGHAN 2020). Ancak ailede çölyak varsa doktor kontrolünde yapılmalıdır.</li>
@@ -1986,6 +2007,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Tanı anı yalnızca tıbbi bir olay değildir; yas, kaygı ve “bir daha normal yiyemeyecek miyim?” sorusu sık eşlik eder. Özellikle ergenler ve sosyal yemek kültürü güçlü ailelerde diyet, ilişkileri ve özgüveni de etkiler. Bu yüzden tedavi planına <strong>psikososyal destek</strong> bilerek eklenmelidir. Dernekler, destek grupları ve gerektiğinde ruh sağlığı uzmanı yalnızlığı azaltır.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/psikososyal_destek.png" alt="Psikososyal Destek" data-title="Psikososyal Etkiler ve Aile Desteği"></div>
                             <ul>
                                 <li><strong>Tanı sonrası "yas süreci":</strong> İnkâr, öfke, pazarlık, depresyon ve kabullenme aşamaları yaşanabilir. Bu süreçte psikolojik destek almak önemlidir.</li>
@@ -2021,6 +2044,8 @@
                             <button class="favorite-btn" aria-label="Favorilere ekle"><i class="far fa-star"></i></button>
                         </div>
                         <div class="section-body">
+                            <p>Tedavi edilmeyen veya diyete uyulmayan çölyak, yalnızca rahatsız edici sindirim şikâyeti olarak kalmaz. Uzun süreli emilim bozukluğu kemik, kan, üreme ve sinir sistemini etkileyebilir. İyi haber: Çoğu komplikasyon erken tanı ve sıkı diyetle önlenebilir veya geriletilebilir. Diyet “isteğe bağlı rejim” değil, komplikasyon kalkanıdır.</p>
+
                             <div class="image-container"><img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/komplikasyonlar.png" alt="Komplikasyonlar" data-title="Tedavi Edilmeyen Çölyağın Uzun Vadeli Komplikasyonları"></div>
                             <ul>
                                 <li><strong>Osteoporoz ve osteopeni:</strong> Kalsiyum ve D vitamini emilim bozukluğu nedeniyle erken kemik erimesi görülür.</li>
@@ -2331,7 +2356,7 @@
                         </div>
                     </section>
 
-                    <!-- SECTION 18: ASKERLİK MUAFİYETİ -->
+                    <!-- SECTION 18: ASKERLİK MUAFİYETİ (DÜZELTİLDİ) -->
                     <section class="content-section hidden" id="section-18" data-search="Askerlik muafiyet çürük rapor TSK yönetmelik dilim B D">
                         <div class="section-header">
                             <div class="section-icon"><i class="fas fa-shield-alt"></i></div>
@@ -2356,19 +2381,68 @@
                             </ul>
 
                             <h4>Muafiyet Dilimleri</h4>
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr><th>Dilim</th><th>Açıklama</th><th>Askerlik Durumu</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td><strong>A</strong></td><td>Hafif seyirli veya iyileşmiş</td><td>Elverişli</td></tr>
-                                        <tr><td><strong>B</strong></td><td>Orta/ağır hastalık – kilo kaybı 11-20 kg</td><td>Elverişli Değil (Muaf)</td></tr>
-                                        <tr><td><strong>C</strong></td><td>Geçici engel</td><td>Erteleme</td></tr>
-                                        <tr><td><strong>D</strong></td><td>Çok ağır – kilo kaybı 21 kg ve üzeri</td><td>Elverişli Değil (Muaf)</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+
+<!-- Masaüstü: Tablo -->
+<div class="table-wrapper desktop-only" style="overflow-x:auto; margin:0.8rem 0; border-radius:10px; border:1px solid rgba(0,0,0,0.04);">
+    <table style="width:100%; min-width:500px; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+            <tr>
+                <th style="background:var(--primary); color:#fff; padding:0.5rem 0.8rem; text-align:left; white-space:nowrap;">Dilim</th>
+                <th style="background:var(--primary); color:#fff; padding:0.5rem 0.8rem; text-align:left; white-space:nowrap;">Açıklama</th>
+                <th style="background:var(--primary); color:#fff; padding:0.5rem 0.8rem; text-align:left; white-space:nowrap;">Askerlik Durumu</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;"><strong>A</strong></td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Hafif seyirli veya iyileşmiş</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Elverişli</td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;"><strong>B</strong></td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Orta/ağır hastalık – kilo kaybı 11-20 kg</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Elverişli Değil (Muaf)</td></tr>
+            <tr><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;"><strong>C</strong></td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Geçici engel</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Erteleme</td></tr>
+            <tr style="background:#f9fafb;"><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;"><strong>D</strong></td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Çok ağır – kilo kaybı 21 kg ve üzeri</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid #e5e7eb;">Elverişli Değil (Muaf)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Mobil: Kart görünümü (tablo yerine) -->
+<div class="mobile-only" style="display:none; margin:0.8rem 0;">
+    <div style="background:#f0fdf4; border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.5rem; border-left:4px solid #16a34a;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:1.1rem; color:#0F5A3E;">Dilim A</strong>
+            <span style="background:#16a34a; color:#fff; padding:0.2rem 0.8rem; border-radius:20px; font-size:0.7rem; font-weight:600;">Elverişli</span>
+        </div>
+        <div style="font-size:0.85rem; color:#3A4E4E; margin-top:0.3rem;">Hafif seyirli veya iyileşmiş</div>
+    </div>
+    <div style="background:#fef2f2; border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.5rem; border-left:4px solid #dc2626;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:1.1rem; color:#7f1d1d;">Dilim B</strong>
+            <span style="background:#dc2626; color:#fff; padding:0.2rem 0.8rem; border-radius:20px; font-size:0.7rem; font-weight:600;">Muaf</span>
+        </div>
+        <div style="font-size:0.85rem; color:#3A4E4E; margin-top:0.3rem;">Orta/ağır hastalık – kilo kaybı 11-20 kg</div>
+    </div>
+    <div style="background:#fffbeb; border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.5rem; border-left:4px solid #f59e0b;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:1.1rem; color:#78350f;">Dilim C</strong>
+            <span style="background:#f59e0b; color:#fff; padding:0.2rem 0.8rem; border-radius:20px; font-size:0.7rem; font-weight:600;">Erteleme</span>
+        </div>
+        <div style="font-size:0.85rem; color:#3A4E4E; margin-top:0.3rem;">Geçici engel</div>
+    </div>
+    <div style="background:#fef2f2; border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.5rem; border-left:4px solid #dc2626;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:1.1rem; color:#7f1d1d;">Dilim D</strong>
+            <span style="background:#dc2626; color:#fff; padding:0.2rem 0.8rem; border-radius:20px; font-size:0.7rem; font-weight:600;">Muaf</span>
+        </div>
+        <div style="font-size:0.85rem; color:#3A4E4E; margin-top:0.3rem;">Çok ağır – kilo kaybı 21 kg ve üzeri</div>
+    </div>
+</div>
+
+<style>
+@media (max-width: 640px) {
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
+}
+@media (min-width: 641px) {
+    .desktop-only { display: block !important; }
+    .mobile-only { display: none !important; }
+}
+</style>
                             <p style="font-size:0.8rem; color:var(--text-light);">(B ve D dilimleri çölyak hastaları için muafiyet sebebidir.)</p>
 
                             <h4>Başvuru Süreci</h4>

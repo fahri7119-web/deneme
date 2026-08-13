@@ -39,7 +39,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script type="text/javascript"> (function(c,l,a,r,i,t,y){ c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)}; t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i; y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y); })(window, document, "clarity", "script", "wthzc9odvw"); </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
 a:focus-visible,
         button:focus-visible{
@@ -845,7 +846,6 @@ a:focus-visible,
         /* Font size helpers */
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
-<style id="site-layout-critical">html{overflow-y:scroll;scrollbar-gutter:stable;scroll-padding-top:140px} body{overflow-x:clip} .site-wrapper{width:100%;max-width:960px;margin:1.5rem auto;padding:0 1rem;box-sizing:border-box} @media(max-width:640px){.site-wrapper{width:100%;max-width:100%;margin:0;padding:0 0.5rem;border-radius:0;box-shadow:none;border:none}} header{position:sticky;top:0;z-index:2000} body.dark-mode{background:#111827!important;color:#E5E7EB!important} body.dark-mode .site-wrapper{background:#111827!important;border-color:rgba(255,255,255,.08)!important} body.dark-mode header{background:#1E1E1E!important;border-bottom-color:rgba(255,255,255,.12)!important} body.dark-mode .main-nav,body.dark-mode .main-nav.open{background:#2A2A2A!important} body.dark-mode .logo-text .city,body.dark-mode .logo-text .sub{color:#4ade80!important}</style>
 </head>
 <body>
 
@@ -1101,22 +1101,6 @@ a:focus-visible,
             updateDate();
 
             // ===== HAMBURGER =====
-            function closeMobileNav() {
-                $('#mainNav').removeClass('open');
-                $('#hamburgerBtn').removeClass('active').attr('aria-expanded', 'false');
-                $('#navOverlay').removeClass('active');
-            }
-            function openMobileNav() {
-                $('#mainNav').addClass('open');
-                $('#hamburgerBtn').addClass('active').attr('aria-expanded', 'true');
-                $('#navOverlay').addClass('active');
-            }
-            $('#hamburgerBtn').on('click', function(e) {
-                e.stopPropagation();
-                if ($('#mainNav').hasClass('open')) closeMobileNav();
-                else openMobileNav();
-            });
-            $('#navOverlay').on('click', closeMobileNav);
             $('#mainNav a').on('click', function() {
                 if (window.innerWidth <= 640) closeMobileNav();
             });
@@ -1134,23 +1118,6 @@ a:focus-visible,
             });
 
             // ===== DARK MODE =====
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                if (localStorage.getItem('celiacDarkMode') === 'true') {
-                    document.body.classList.add('dark-mode');
-                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                    darkModeToggle.setAttribute('aria-label', 'Aydınlık moda geç');
-                }
-                darkModeToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('dark-mode');
-                    const isDark = document.body.classList.contains('dark-mode');
-                    localStorage.setItem('celiacDarkMode', isDark);
-                    this.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-                    this.setAttribute('aria-label', isDark ? 'Aydınlık moda geç' : 'Karanlık moda geç');
-                });
-            }
-
-
             // ===== VERİLER =====
             let allBusinesses = [];
             let filteredBusinesses = [];
@@ -1226,28 +1193,35 @@ a:focus-visible,
                 if (e.key === 'Escape') closeGoogleMapsModal();
             });
 
-            // ===== JSON VERİSİNİ YÜKLE =====
-            function loadBusinesses() {
+            // ===== SUPABASE VERİSİNİ YÜKLE =====
+            const SUPABASE_URL = 'https://tmtdpykzmdvxszxwyege.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            async function loadBusinesses() {
                 const grid = $('#businessGrid');
-                $.ajax({
-                    url: 'mekanlar.json',
-                    dataType: 'json',
-                    success: function(data) {
-                        allBusinesses = data;
-                        populateFilters();
-                        updateStats();
-                        applyFilters();
-                    },
-                    error: function() {
-                        grid.html(`
-                            <div class="empty-state" style="grid-column:1/-1;">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <h3>Veriler yüklenemedi</h3>
-                                <p>Lütfen daha sonra tekrar deneyin.</p>
-                            </div>
-                        `);
-                    }
-                });
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('mekanlar')
+                        .select('isim,il,ilce,kategori,adres,telefon,aciklama,kaynak_url,konum,enlem,boylam')
+                        .order('isim', { ascending: true });
+
+                    if (error) throw error;
+
+                    allBusinesses = data || [];
+                    populateFilters();
+                    updateStats();
+                    applyFilters();
+                } catch (e) {
+                    console.error('İşletmeler yüklenirken hata:', e);
+                    grid.html(`
+                        <div class="empty-state" style="grid-column:1/-1;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Veriler yüklenemedi</h3>
+                            <p>Lütfen daha sonra tekrar deneyin.</p>
+                        </div>
+                    `);
+                }
             }
 
             function populateFilters() {
@@ -1627,6 +1601,5 @@ a:focus-visible,
 
 
 <script id="page-controls-script">(function(){'use strict';function init(){var b=document.body;if(!b)return;function copy(id){var e=document.getElementById(id);if(!e)return null;var c=e.cloneNode(true);e.replaceWith(c);return c}var d=copy('darkModeToggle'),h=copy('hamburgerBtn'),o=copy('navOverlay'),n=document.getElementById('mainNav');function stored(){try{return['colyakDarkMode','celiacDarkMode','darkMode'].some(function(k){return localStorage.getItem(k)==='true'})}catch(e){return false}}function theme(v,save){b.classList.toggle('dark-mode',v);if(d){var i=d.querySelector('i');if(i)i.className=v?'fas fa-sun':'fas fa-moon';d.setAttribute('aria-label',v?'Aydınlık moda geç':'Karanlık moda geç');d.setAttribute('title',v?'Aydınlık Mod':'Karanlık Mod')}if(save)try{['colyakDarkMode','celiacDarkMode','darkMode'].forEach(function(k){localStorage.setItem(k,String(v))})}catch(e){}}function close(){if(n)n.classList.remove('open');if(h){h.classList.remove('active');h.setAttribute('aria-expanded','false')}if(o)o.classList.remove('active')}function toggle(){if(!n||!h)return;n.classList.contains('open')?close():(n.classList.add('open'),h.classList.add('active'),h.setAttribute('aria-expanded','true'),o&&o.classList.add('active'))}theme(stored(),false);if(d)d.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();theme(!b.classList.contains('dark-mode'),true)});if(h)h.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();toggle()});if(o)o.addEventListener('click',close);if(n)n.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){if(innerWidth<=768)close()})});document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});addEventListener('resize',function(){if(innerWidth>768)close()})}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init()})();</script>
-<script id="page-controls-emergency">(function(){var q=function(s){return document.querySelector(s)},set=function(e,p,v){if(e)e.style.setProperty(p,v,'important')},rm=function(e,p){if(e)e.style.removeProperty(p)},close=function(){var n=q('#mainNav'),h=q('#hamburgerBtn'),o=q('#navOverlay');if(n)n.classList.remove('open');if(h){h.classList.remove('active');h.setAttribute('aria-expanded','false')}if(o)o.classList.remove('active');['display','max-height','opacity','visibility','overflow-y','transform'].forEach(function(p){rm(n,p)});['display','opacity','visibility','pointer-events'].forEach(function(p){rm(o,p)})};function theme(v){document.body.classList.toggle('dark-mode',v);var d=q('#darkModeToggle');if(d){var i=d.querySelector('i');if(i)i.className=v?'fas fa-sun':'fas fa-moon';d.setAttribute('aria-label',v?'Aydınlık moda geç':'Karanlık moda geç');d.setAttribute('title',v?'Aydınlık Mod':'Karanlık Mod')}}document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('#hamburgerBtn,#darkModeToggle,#navOverlay');if(!t)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();var n=q('#mainNav'),h=q('#hamburgerBtn'),o=q('#navOverlay');if(t.id==='darkModeToggle'){var v=!document.body.classList.contains('dark-mode');theme(v);try{['colyakDarkMode','celiacDarkMode','darkMode'].forEach(function(k){localStorage.setItem(k,String(v))})}catch(x){}return}if(t.id==='navOverlay'){close();return}if(!n||!h)return;var open=!n.classList.contains('open');if(open){n.classList.add('open');h.classList.add('active');h.setAttribute('aria-expanded','true');if(o)o.classList.add('active');set(n,'display','flex');set(n,'max-height','80vh');set(n,'opacity','1');set(n,'visibility','visible');set(n,'overflow-y','auto');set(n,'transform','none');if(o){set(o,'display','block');set(o,'opacity','1');set(o,'visibility','visible');set(o,'pointer-events','auto')}}else close()},true);try{theme(['colyakDarkMode','celiacDarkMode','darkMode'].some(function(k){return localStorage.getItem(k)==='true'}))}catch(e){theme(false)}addEventListener('resize',function(){if(innerWidth>768)close()})})();</script>
 </body>
 </html>
