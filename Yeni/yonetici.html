@@ -369,6 +369,9 @@
                     <a href="#" data-page="articles"><i class="fas fa-feather-alt"></i> Köşe Yazıları</a>
                     <a href="#" data-page="videos"><i class="fas fa-video"></i> Videolar</a>
 
+                    <div class="sidebar-section">Başvurular</div>
+                    <a href="#" data-page="basvurular"><i class="fas fa-clipboard-list"></i> Üyelik Başvuruları</a>
+
                     <div class="sidebar-section">Diğer</div>
                     <a href="index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Siteyi Görüntüle</a>
                     <a href="admin-dernek.html" target="_blank"><i class="fas fa-users-cog"></i> Dernek Yönetimi</a>
@@ -554,6 +557,8 @@
             document.body.style.overflow = '';
             editingId = null;
             editingTable = null;
+            $('#modalSaveBtn').show().html('<i class="fas fa-save"></i> Kaydet');
+            $('#modalCancelBtn').text('İptal');
         }
         $('#modalCloseBtn, #modalCancelBtn').on('click', closeModal);
         $('#crudModal').on('click', function(e) { if ($(e.target).is('#crudModal')) closeModal(); });
@@ -600,6 +605,7 @@
                     case 'authors': await renderAuthors(main); break;
                     case 'articles': await renderArticles(main); break;
                     case 'videos': await renderVideos(main); break;
+                    case 'basvurular': await renderBasvurular(main); break;
                     default: main.html('<div class="empty-state"><p>Sayfa bulunamadı.</p></div>');
                 }
             } catch (e) {
@@ -610,13 +616,14 @@
 
         // ===== DASHBOARD =====
         async function renderDashboard(main) {
-            const [hero, dernek, news, authors, articles, videos] = await Promise.all([
+            const [hero, dernek, news, authors, articles, videos, basvurular] = await Promise.all([
                 supabaseClient.from('hero').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('dernek_haberleri').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('news').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('authors').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('articles').select('id', { count: 'exact', head: true }),
-                supabaseClient.from('videos').select('id', { count: 'exact', head: true })
+                supabaseClient.from('videos').select('id', { count: 'exact', head: true }),
+                supabaseClient.from('basvurular').select('id', { count: 'exact', head: true })
             ]);
 
             main.html(`
@@ -628,6 +635,7 @@
                     <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-user-edit"></i></div><div class="stat-info"><div class="value">${authors.count ?? 0}</div><div class="label">Yazarlar</div></div></div>
                     <div class="stat-card"><div class="stat-icon green"><i class="fas fa-feather-alt"></i></div><div class="stat-info"><div class="value">${articles.count ?? 0}</div><div class="label">Köşe Yazıları</div></div></div>
                     <div class="stat-card"><div class="stat-icon red"><i class="fas fa-video"></i></div><div class="stat-info"><div class="value">${videos.count ?? 0}</div><div class="label">Videolar</div></div></div>
+                    <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clipboard-list"></i></div><div class="stat-info"><div class="value">${basvurular.count ?? 0}</div><div class="label">Başvurular</div></div></div>
                 </div>
                 <div class="card">
                     <div style="padding:1rem 1.2rem;display:flex;flex-wrap:wrap;gap:0.6rem;">
@@ -637,6 +645,7 @@
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('authors')"><i class="fas fa-plus"></i> Yazar</button>
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('articles')"><i class="fas fa-plus"></i> Köşe Yazısı</button>
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('videos')"><i class="fas fa-plus"></i> Video</button>
+                        <button class="btn btn-accent btn-sm" style="width:auto;" onclick="navigateTo('basvurular')"><i class="fas fa-clipboard-list"></i> Başvurular</button>
                     </div>
                 </div>
                 <div class="debug-console" id="debugConsole"></div>
@@ -1090,6 +1099,140 @@
             `;
         }
 
+        // ===== BAŞVURULAR (uyelik.html -> basvurular tablosu) =====
+        const BASVURU_TURU_LABEL = {
+            asil: 'Asıl Üyelik',
+            onursal: 'Onursal Üyelik',
+            sadece_gida: 'Gıda Desteği'
+        };
+        const DURUM_BADGE = {
+            beklemede: '<span class="badge badge-orange">Beklemede</span>',
+            onaylandi: '<span class="badge badge-green">Onaylandı</span>',
+            reddedildi: '<span class="badge badge-red">Reddedildi</span>',
+            islemde: '<span class="badge badge-blue">İşlemde</span>'
+        };
+
+        async function renderBasvurular(main) {
+            let data = null;
+            let error = null;
+            ({ data, error } = await supabaseClient.from('basvurular').select('*').order('created_at', { ascending: false }));
+            if (error) {
+                ({ data, error } = await supabaseClient.from('basvurular').select('*').order('id', { ascending: false }));
+                if (error) throw error;
+            }
+            renderBasvurularTable(main, data || []);
+        }
+
+        function renderBasvurularTable(main, data) {
+            let rows = '';
+            if (!data.length) {
+                rows = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Henüz başvuru yok.</p></div></td></tr>`;
+            } else {
+                data.forEach(r => {
+                    const tur = BASVURU_TURU_LABEL[r.basvuru_turu] || r.basvuru_turu || '—';
+                    const durum = DURUM_BADGE[r.durum] || `<span class="badge badge-orange">${escapeHtml(r.durum || 'beklemede')}</span>`;
+                    rows += `<tr>
+                        <td>#${r.id}</td>
+                        <td class="truncate" title="${escapeHtml(r.ad_soyad)}"><strong>${escapeHtml(r.ad_soyad || '—')}</strong></td>
+                        <td>${escapeHtml(r.tc_kimlik || '—')}</td>
+                        <td>${escapeHtml(r.cep_telefonu || '—')}</td>
+                        <td>${escapeHtml(tur)}</td>
+                        <td>${durum}</td>
+                        <td>${formatDate(r.created_at)}</td>
+                        <td><div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="viewBasvuru(${r.id})" title="Detay"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-outline btn-sm" onclick="editBasvuruDurum(${r.id}, '${escapeHtml(r.durum || 'beklemede')}')" title="Durum"><i class="fas fa-exchange-alt"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRecord('basvurular', ${r.id})" title="Sil"><i class="fas fa-trash"></i></button>
+                        </div></td>
+                    </tr>`;
+                });
+            }
+            main.html(`
+                <div class="page-header">
+                    <h2><i class="fas fa-clipboard-list"></i> Üyelik Başvuruları</h2>
+                    <button class="btn btn-outline" style="width:auto;" onclick="renderPage('basvurular')"><i class="fas fa-sync"></i> Yenile</button>
+                </div>
+                <div class="card"><div class="table-wrap"><table>
+                    <thead><tr>
+                        <th>ID</th><th>Ad Soyad</th><th>TC</th><th>Telefon</th>
+                        <th>Tür</th><th>Durum</th><th>Tarih</th><th>İşlem</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table></div></div>
+                <div class="debug-console" id="debugConsole"></div>
+            `);
+        }
+
+        async function viewBasvuru(id) {
+            const { data, error } = await supabaseClient.from('basvurular').select('*').eq('id', id).single();
+            if (error) { showToast(error.message, true); return; }
+            const r = data;
+            const tur = BASVURU_TURU_LABEL[r.basvuru_turu] || r.basvuru_turu || '—';
+            const html = `
+                <div class="form-section" style="border:none;margin:0;padding:0;">
+                    <div class="form-section-title">Başvuru #${r.id} — ${escapeHtml(tur)}</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Ad Soyad</label><input type="text" value="${escapeHtml(r.ad_soyad || '')}" disabled></div>
+                        <div class="form-group"><label>TC Kimlik</label><input type="text" value="${escapeHtml(r.tc_kimlik || '')}" disabled></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Telefon</label><input type="text" value="${escapeHtml(r.cep_telefonu || '')}" disabled></div>
+                        <div class="form-group"><label>E-posta</label><input type="text" value="${escapeHtml(r.eposta || '')}" disabled></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Doğum Tarihi</label><input type="text" value="${escapeHtml(r.dogum_tarihi || '')}" disabled></div>
+                        <div class="form-group"><label>Durum</label><input type="text" value="${escapeHtml(r.durum || 'beklemede')}" disabled></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>İl</label><input type="text" value="${escapeHtml(r.il || '')}" disabled></div>
+                        <div class="form-group"><label>İlçe</label><input type="text" value="${escapeHtml(r.ilce || '')}" disabled></div>
+                    </div>
+                    <div class="form-group"><label>Adres</label><textarea disabled>${escapeHtml(r.adres || '')}</textarea></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Meslek</label><input type="text" value="${escapeHtml(r.meslek || '')}" disabled></div>
+                        <div class="form-group"><label>Öğrenim</label><input type="text" value="${escapeHtml(r.ogrenim_durumu || '')}" disabled></div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">Sağlık Bilgileri</div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Çölyak Durumu</label><input type="text" value="${escapeHtml(r['cölyak_durumu'] || r.colyak_durumu || '')}" disabled></div>
+                            <div class="form-group"><label>Hasta Yakın</label><input type="text" value="${escapeHtml(r.hasta_yakin_durumu || '')}" disabled></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Yakın Ad Soyad</label><input type="text" value="${escapeHtml(r['cölyakli_ad_soyad'] || r.colyakli_ad_soyad || '')}" disabled></div>
+                            <div class="form-group"><label>Yakın TC</label><input type="text" value="${escapeHtml(r['cölyakli_tc'] || r.colyakli_tc || '')}" disabled></div>
+                        </div>
+                        <div class="form-group"><label>İhtiyaç</label><input type="text" value="${escapeHtml(r.ihtiyac || '')}" disabled></div>
+                        <div class="form-group"><label>Özel Gıda / Alerji</label><textarea disabled>${escapeHtml(r.ozel_gida || '')}</textarea></div>
+                        <div class="form-group"><label>Açıklama</label><textarea disabled>${escapeHtml(r.aciklama || '')}</textarea></div>
+                    </div>
+                </div>
+            `;
+            openModal('Başvuru Detayı', html, true);
+            $('#modalSaveBtn').hide();
+            $('#modalCancelBtn').text('Kapat');
+        }
+
+        function editBasvuruDurum(id, currentDurum) {
+            editingId = id;
+            editingTable = 'basvurular_durum';
+            const html = `
+                <div class="form-group">
+                    <label>Başvuru Durumu</label>
+                    <select id="f_durum">
+                        <option value="beklemede" ${currentDurum === 'beklemede' ? 'selected' : ''}>Beklemede</option>
+                        <option value="islemde" ${currentDurum === 'islemde' ? 'selected' : ''}>İşlemde</option>
+                        <option value="onaylandi" ${currentDurum === 'onaylandi' ? 'selected' : ''}>Onaylandı</option>
+                        <option value="reddedildi" ${currentDurum === 'reddedildi' ? 'selected' : ''}>Reddedildi</option>
+                    </select>
+                </div>
+                <p class="form-hint">Başvuru #${id} durumunu güncelleyin.</p>
+            `;
+            openModal('Durum Güncelle', html);
+            $('#modalSaveBtn').show().html('<i class="fas fa-save"></i> Kaydet');
+            $('#modalCancelBtn').text('İptal');
+        }
+
         // ===== SAVE =====
         $('#modalSaveBtn').on('click', async function() {
             if (!editingTable) return;
@@ -1198,6 +1341,16 @@
                         poster: $('#f_poster').val().trim() || null
                     };
                     if (!payload.title || !payload.video_url) throw new Error('Başlık ve video URL zorunlu');
+                } else if (editingTable === 'basvurular_durum') {
+                    payload = { durum: $('#f_durum').val() };
+                    debugLog('Durum güncelleniyor:', { id: editingId, payload });
+                    const result = await supabaseClient.from('basvurular').update(payload).eq('id', editingId);
+                    debugLog('Durum sonucu:', result);
+                    if (result.error) throw result.error;
+                    showToast('Durum güncellendi');
+                    closeModal();
+                    renderPage('basvurular');
+                    return;
                 }
 
                 debugLog('Kaydediliyor:', { table: editingTable, id: editingId, payload });
@@ -1269,8 +1422,11 @@
         window.editArticle = editArticle;
         window.addVideo = addVideo; 
         window.editVideo = editVideo;
+        window.viewBasvuru = viewBasvuru;
+        window.editBasvuruDurum = editBasvuruDurum;
         window.deleteRecord = deleteRecord;
         window.debugLog = debugLog;
+        window.renderPage = renderPage;
 
         checkSession();
     </script>
