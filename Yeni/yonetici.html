@@ -368,9 +368,13 @@
                     <a href="#" data-page="authors"><i class="fas fa-user-edit"></i> Yazarlar</a>
                     <a href="#" data-page="articles"><i class="fas fa-feather-alt"></i> Köşe Yazıları</a>
                     <a href="#" data-page="videos"><i class="fas fa-video"></i> Videolar</a>
+                    <a href="#" data-page="colyak_bilgi_kartlari"><i class="fas fa-lightbulb"></i> Bilgi Kartları</a>
 
                     <div class="sidebar-section">Başvurular</div>
                     <a href="#" data-page="basvurular"><i class="fas fa-clipboard-list"></i> Üyelik Başvuruları</a>
+
+                    <div class="sidebar-section">İşletmeler</div>
+                    <a href="#" data-page="mekanlar"><i class="fas fa-utensils"></i> Glutensiz Mekanlar</a>
 
                     <div class="sidebar-section">Diğer</div>
                     <a href="index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Siteyi Görüntüle</a>
@@ -605,7 +609,9 @@
                     case 'authors': await renderAuthors(main); break;
                     case 'articles': await renderArticles(main); break;
                     case 'videos': await renderVideos(main); break;
+                    case 'colyak_bilgi_kartlari': await renderColyakBilgiKartlari(main); break;
                     case 'basvurular': await renderBasvurular(main); break;
+                    case 'mekanlar': await renderMekanlar(main); break;
                     default: main.html('<div class="empty-state"><p>Sayfa bulunamadı.</p></div>');
                 }
             } catch (e) {
@@ -616,14 +622,16 @@
 
         // ===== DASHBOARD =====
         async function renderDashboard(main) {
-            const [hero, dernek, news, authors, articles, videos, basvurular] = await Promise.all([
+            const [hero, dernek, news, authors, articles, videos, colyakBilgiKartlari, basvurular, mekanlar] = await Promise.all([
                 supabaseClient.from('hero').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('dernek_haberleri').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('news').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('authors').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('articles').select('id', { count: 'exact', head: true }),
                 supabaseClient.from('videos').select('id', { count: 'exact', head: true }),
-                supabaseClient.from('basvurular').select('id', { count: 'exact', head: true })
+                supabaseClient.from('colyak_bilgi_kartlari').select('id', { count: 'exact', head: true }),
+                supabaseClient.from('basvurular').select('id', { count: 'exact', head: true }),
+                supabaseClient.from('mekanlar').select('id', { count: 'exact', head: true })
             ]);
 
             main.html(`
@@ -635,7 +643,9 @@
                     <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-user-edit"></i></div><div class="stat-info"><div class="value">${authors.count ?? 0}</div><div class="label">Yazarlar</div></div></div>
                     <div class="stat-card"><div class="stat-icon green"><i class="fas fa-feather-alt"></i></div><div class="stat-info"><div class="value">${articles.count ?? 0}</div><div class="label">Köşe Yazıları</div></div></div>
                     <div class="stat-card"><div class="stat-icon red"><i class="fas fa-video"></i></div><div class="stat-info"><div class="value">${videos.count ?? 0}</div><div class="label">Videolar</div></div></div>
+                    <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-lightbulb"></i></div><div class="stat-info"><div class="value">${colyakBilgiKartlari.count ?? 0}</div><div class="label">Bilgi Kartları</div></div></div>
                     <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clipboard-list"></i></div><div class="stat-info"><div class="value">${basvurular.count ?? 0}</div><div class="label">Başvurular</div></div></div>
+                    <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-utensils"></i></div><div class="stat-info"><div class="value">${mekanlar.count ?? 0}</div><div class="label">Mekanlar</div></div></div>
                 </div>
                 <div class="card">
                     <div style="padding:1rem 1.2rem;display:flex;flex-wrap:wrap;gap:0.6rem;">
@@ -645,7 +655,9 @@
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('authors')"><i class="fas fa-plus"></i> Yazar</button>
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('articles')"><i class="fas fa-plus"></i> Köşe Yazısı</button>
                         <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('videos')"><i class="fas fa-plus"></i> Video</button>
+                        <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('colyak_bilgi_kartlari')"><i class="fas fa-lightbulb"></i> Bilgi Kartı</button>
                         <button class="btn btn-accent btn-sm" style="width:auto;" onclick="navigateTo('basvurular')"><i class="fas fa-clipboard-list"></i> Başvurular</button>
+                        <button class="btn btn-primary btn-sm" style="width:auto;" onclick="navigateTo('mekanlar')"><i class="fas fa-utensils"></i> Mekan</button>
                     </div>
                 </div>
                 <div class="debug-console" id="debugConsole"></div>
@@ -1233,6 +1245,215 @@
             $('#modalCancelBtn').text('İptal');
         }
 
+        // ===== ÇÖLYAK BİLGİ KARTLARI =====
+        async function renderColyakBilgiKartlari(main) {
+            const { data, error } = await supabaseClient
+                .from('colyak_bilgi_kartlari')
+                .select('*')
+                .order('sira_no', { ascending: true })
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+
+            let rows = '';
+            if (!data?.length) {
+                rows = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-lightbulb"></i><p>Henüz bilgi kartı yok.</p></div></td></tr>`;
+            } else {
+                data.forEach(r => {
+                    const durum = r.yayinda_mi
+                        ? '<span class="badge badge-green">Yayında</span>'
+                        : '<span class="badge badge-orange">Taslak</span>';
+                    rows += `<tr>
+                        <td>#${r.id}</td>
+                        <td>${escapeHtml(r.etiket || 'Çölyak Bilgisi')}</td>
+                        <td class="truncate" title="${escapeHtml(r.baslik || '')}"><strong>${escapeHtml(r.baslik || '—')}</strong></td>
+                        <td class="truncate" title="${escapeHtml(r.icerik || '')}">${escapeHtml(r.icerik || '—')}</td>
+                        <td>${r.sira_no ?? 0}</td>
+                        <td>${durum}</td>
+                        <td><div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="editColyakBilgi(${r.id})" title="Düzenle"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRecord('colyak_bilgi_kartlari', ${r.id})" title="Sil"><i class="fas fa-trash"></i></button>
+                        </div></td>
+                    </tr>`;
+                });
+            }
+
+            main.html(`
+                <div class="page-header">
+                    <h2><i class="fas fa-lightbulb"></i> Çölyak Bilgi Kartları</h2>
+                    <button class="btn btn-primary" style="width:auto;" onclick="addColyakBilgi()"><i class="fas fa-plus"></i> Yeni Bilgi Ekle</button>
+                </div>
+                <div class="card"><div class="table-wrap"><table>
+                    <thead><tr><th>ID</th><th>Etiket</th><th>Başlık</th><th>İçerik</th><th>Sıra</th><th>Durum</th><th>İşlem</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table></div></div>
+                <div class="debug-console" id="debugConsole"></div>
+            `);
+        }
+
+        function addColyakBilgi() {
+            editingId = null;
+            editingTable = 'colyak_bilgi_kartlari';
+            openModal('Yeni Çölyak Bilgisi', colyakBilgiFormHtml({}));
+        }
+
+        async function editColyakBilgi(id) {
+            const { data, error } = await supabaseClient
+                .from('colyak_bilgi_kartlari')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (error) { showToast(error.message, true); return; }
+
+            editingId = id;
+            editingTable = 'colyak_bilgi_kartlari';
+            openModal('Çölyak Bilgisini Düzenle', colyakBilgiFormHtml(data));
+        }
+
+        function colyakBilgiFormHtml(r) {
+            return `
+                <div class="form-group">
+                    <label>Etiket *</label>
+                    <input type="text" id="f_etiket" value="${escapeHtml(r.etiket || 'Çölyak Bilgisi')}" placeholder="Örn. Gluten Bilgisi" required>
+                </div>
+                <div class="form-group">
+                    <label>Başlık *</label>
+                    <input type="text" id="f_baslik" value="${escapeHtml(r.baslik || '')}" placeholder="Örn. Gluten bazı tahıllarda bulunur" required>
+                </div>
+                <div class="form-group">
+                    <label>İçerik *</label>
+                    <textarea id="f_icerik" class="tall" placeholder="Bilgi kartında gösterilecek açıklama" required>${escapeHtml(r.icerik || '')}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sıra Numarası</label>
+                        <input type="number" id="f_sira_no" value="${r.sira_no ?? 0}" min="0" step="1">
+                        <div class="form-hint">Rastgele gösterimde zorunlu değildir; yönetim listesi için kullanılır.</div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check" style="margin-top:1.65rem;">
+                            <input type="checkbox" id="f_yayinda_mi" ${r.yayinda_mi !== false ? 'checked' : ''}>
+                            <label for="f_yayinda_mi">Yayında göster</label>
+                        </div>
+                        <div class="form-hint">Yalnızca yayındaki kartlar anasayfada gösterilir.</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== MEKANLAR (İşletmeler / Glutensiz Mekanlar) =====
+        async function renderMekanlar(main) {
+            const { data, error } = await supabaseClient
+                .from('mekanlar')
+                .select('*')
+                .order('isim', { ascending: true });
+            if (error) throw error;
+
+            let rows = '';
+            if (!data?.length) {
+                rows = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-utensils"></i><p>Henüz mekan yok.</p></div></td></tr>`;
+            } else {
+                data.forEach(r => {
+                    const konumStr = (r.enlem != null && r.boylam != null)
+                        ? `${Number(r.enlem).toFixed(5)}, ${Number(r.boylam).toFixed(5)}`
+                        : (r.konum || '—');
+                    rows += `<tr>
+                        <td class="truncate" title="${escapeHtml(r.isim)}"><strong>${escapeHtml(r.isim || '—')}</strong></td>
+                        <td>${escapeHtml(r.il || '—')}</td>
+                        <td>${escapeHtml(r.ilce || '—')}</td>
+                        <td><span class="badge badge-blue">${escapeHtml(r.kategori || '—')}</span></td>
+                        <td class="truncate" title="${escapeHtml(r.telefon)}">${escapeHtml(r.telefon || '—')}</td>
+                        <td class="truncate" title="${escapeHtml(konumStr)}">${escapeHtml(konumStr)}</td>
+                        <td class="truncate" title="${escapeHtml(r.adres)}">${escapeHtml(r.adres || '—')}</td>
+                        <td><div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="editMekan(${r.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRecord('mekanlar', ${r.id})"><i class="fas fa-trash"></i></button>
+                        </div></td>
+                    </tr>`;
+                });
+            }
+            main.html(`
+                <div class="page-header">
+                    <h2><i class="fas fa-utensils"></i> Glutensiz Mekanlar</h2>
+                    <button class="btn btn-primary" style="width:auto;" onclick="addMekan()"><i class="fas fa-plus"></i> Yeni Mekan</button>
+                </div>
+                <div class="card"><div class="table-wrap"><table>
+                    <thead><tr>
+                        <th>İsim</th><th>İl</th><th>İlçe</th><th>Kategori</th>
+                        <th>Telefon</th><th>Konum</th><th>Adres</th><th>İşlem</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table></div></div>
+                <div class="debug-console" id="debugConsole"></div>
+            `);
+        }
+
+        function addMekan() {
+            editingId = null;
+            editingTable = 'mekanlar';
+            openModal('Yeni Mekan', mekanFormHtml({}), true);
+            $('#modalSaveBtn').show().html('<i class="fas fa-save"></i> Kaydet');
+            $('#modalCancelBtn').text('İptal');
+        }
+
+        async function editMekan(id) {
+            const { data, error } = await supabaseClient.from('mekanlar').select('*').eq('id', id).single();
+            if (error) { showToast(error.message, true); return; }
+            editingId = id;
+            editingTable = 'mekanlar';
+            openModal('Mekan Düzenle', mekanFormHtml(data), true);
+            $('#modalSaveBtn').show().html('<i class="fas fa-save"></i> Kaydet');
+            $('#modalCancelBtn').text('İptal');
+        }
+
+        function mekanFormHtml(r) {
+            return `
+                <div class="form-group"><label>İsim *</label>
+                    <input type="text" id="f_isim" value="${escapeHtml(r.isim || '')}" required placeholder="İşletme adı">
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>İl</label>
+                        <input type="text" id="f_il" value="${escapeHtml(r.il || '')}" placeholder="Kırıkkale">
+                    </div>
+                    <div class="form-group"><label>İlçe</label>
+                        <input type="text" id="f_ilce" value="${escapeHtml(r.ilce || '')}" placeholder="Merkez">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Kategori</label>
+                        <input type="text" id="f_kategori" value="${escapeHtml(r.kategori || '')}" placeholder="Restoran, Kafe, Fırın...">
+                    </div>
+                    <div class="form-group"><label>Telefon</label>
+                        <input type="text" id="f_telefon" value="${escapeHtml(r.telefon || '')}" placeholder="0XXX XXX XX XX">
+                    </div>
+                </div>
+                <div class="form-group"><label>Adres</label>
+                    <textarea id="f_adres">${escapeHtml(r.adres || '')}</textarea>
+                </div>
+                <div class="form-group"><label>Açıklama</label>
+                    <textarea id="f_aciklama">${escapeHtml(r.aciklama || '')}</textarea>
+                </div>
+                <div class="form-group"><label>Kaynak URL</label>
+                    <input type="url" id="f_kaynak_url" value="${escapeHtml(r.kaynak_url || '')}" placeholder="https://...">
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Harita Konumu</div>
+                    <div class="form-group"><label>Konum (metin / etiket)</label>
+                        <input type="text" id="f_konum" value="${escapeHtml(r.konum || '')}" placeholder="Örn. Merkez, Kırıkkale">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Enlem (latitude)</label>
+                            <input type="number" step="any" id="f_enlem" value="${r.enlem != null && r.enlem !== '' ? escapeHtml(String(r.enlem)) : ''}" placeholder="39.8468">
+                        </div>
+                        <div class="form-group"><label>Boylam (longitude)</label>
+                            <input type="number" step="any" id="f_boylam" value="${r.boylam != null && r.boylam !== '' ? escapeHtml(String(r.boylam)) : ''}" placeholder="33.5153">
+                        </div>
+                    </div>
+                    <div class="form-hint">Haritada göstermek için enlem ve boylam zorunludur. Google Maps veya benzerinden kopyalayabilirsiniz.</div>
+                </div>
+            `;
+        }
+
         // ===== SAVE =====
         $('#modalSaveBtn').on('click', async function() {
             if (!editingTable) return;
@@ -1341,6 +1562,17 @@
                         poster: $('#f_poster').val().trim() || null
                     };
                     if (!payload.title || !payload.video_url) throw new Error('Başlık ve video URL zorunlu');
+                } else if (editingTable === 'colyak_bilgi_kartlari') {
+                    payload = {
+                        etiket: $('#f_etiket').val().trim(),
+                        baslik: $('#f_baslik').val().trim(),
+                        icerik: $('#f_icerik').val().trim(),
+                        sira_no: parseInt($('#f_sira_no').val(), 10) || 0,
+                        yayinda_mi: $('#f_yayinda_mi').is(':checked')
+                    };
+                    if (!payload.etiket || !payload.baslik || !payload.icerik) {
+                        throw new Error('Etiket, başlık ve içerik zorunlu');
+                    }
                 } else if (editingTable === 'basvurular_durum') {
                     payload = { durum: $('#f_durum').val() };
                     debugLog('Durum güncelleniyor:', { id: editingId, payload });
@@ -1351,6 +1583,25 @@
                     closeModal();
                     renderPage('basvurular');
                     return;
+                } else if (editingTable === 'mekanlar') {
+                    const enlemVal = $('#f_enlem').val().trim();
+                    const boylamVal = $('#f_boylam').val().trim();
+                    payload = {
+                        isim: $('#f_isim').val().trim(),
+                        il: $('#f_il').val().trim() || null,
+                        ilce: $('#f_ilce').val().trim() || null,
+                        kategori: $('#f_kategori').val().trim() || null,
+                        adres: $('#f_adres').val().trim() || null,
+                        telefon: $('#f_telefon').val().trim() || null,
+                        aciklama: $('#f_aciklama').val().trim() || null,
+                        kaynak_url: $('#f_kaynak_url').val().trim() || null,
+                        konum: $('#f_konum').val().trim() || null,
+                        enlem: enlemVal !== '' ? parseFloat(enlemVal) : null,
+                        boylam: boylamVal !== '' ? parseFloat(boylamVal) : null
+                    };
+                    if (!payload.isim) throw new Error('İsim zorunlu');
+                    if (enlemVal !== '' && Number.isNaN(payload.enlem)) throw new Error('Enlem geçerli bir sayı olmalı');
+                    if (boylamVal !== '' && Number.isNaN(payload.boylam)) throw new Error('Boylam geçerli bir sayı olmalı');
                 }
 
                 debugLog('Kaydediliyor:', { table: editingTable, id: editingId, payload });
@@ -1422,8 +1673,12 @@
         window.editArticle = editArticle;
         window.addVideo = addVideo; 
         window.editVideo = editVideo;
+        window.addColyakBilgi = addColyakBilgi;
+        window.editColyakBilgi = editColyakBilgi;
         window.viewBasvuru = viewBasvuru;
         window.editBasvuruDurum = editBasvuruDurum;
+        window.addMekan = addMekan;
+        window.editMekan = editMekan;
         window.deleteRecord = deleteRecord;
         window.debugLog = debugLog;
         window.renderPage = renderPage;

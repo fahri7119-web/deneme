@@ -3144,66 +3144,70 @@
                         $('#statCeliacCount').text(celiacCount.toLocaleString('tr-TR'));
                     }
 
-                    const { data: stockData, error: stockError } = await supabaseClient
-                        .from('stock')
-                        .select('*');
+                    // `distributions` tablosu herkese açık değildir. Bu nedenle dağıtım özeti,
+                    // RLS ile yayına açılmış `public_distributions` görünümünden hesaplanır.
+                    const [stockResult, distributionResult] = await Promise.all([
+                        supabaseClient
+                            .from('stock')
+                            .select('product_name, remaining_quantity'),
+                        supabaseClient
+                            .from('public_distributions')
+                            .select('items_list, total_items')
+                    ]);
 
-                    const { data: distData, error: distError } = await supabaseClient
-                        .from('distributions')
-                        .select('*');
+                    const { data: stockData, error: stockError } = stockResult;
+                    const { data: publicDistributionData, error: publicDistributionError } = distributionResult;
 
-                    let totalDistributed = 0;
-                    if (distData && distData.length > 0) {
-                        distData.forEach(d => {
-                            if (d.items && Array.isArray(d.items)) {
-                                d.items.forEach(item => {
-                                    totalDistributed += item.quantity || 0;
-                                });
-                            }
-                        });
+                    // `items_list` örneği: "Ürün A x2, Ürün B x1". `total_items` ürün çeşidi
+                    // sayısıdır; metinde adet bilgisi yoksa yalnızca geriye dönük destek için kullanılır.
+                    const toQuantity = (value) => {
+                        const number = Number(String(value ?? '').replace(',', '.'));
+                        return Number.isFinite(number) && number > 0 ? number : 0;
+                    };
+
+                    const getDistributedQuantity = (distribution) => {
+                        const itemsList = typeof distribution.items_list === 'string'
+                            ? distribution.items_list
+                            : '';
+                        const quantityMatches = [...itemsList.matchAll(/\bx\s*(\d+(?:[.,]\d+)?)/gi)];
+
+                        if (quantityMatches.length > 0) {
+                            return quantityMatches.reduce((total, match) => total + toQuantity(match[1]), 0);
+                        }
+
+                        return toQuantity(distribution.total_items);
+                    };
+
+                    if (publicDistributionError) {
+                        console.error('Açık dağıtım verisi yüklenemedi:', publicDistributionError);
+                        $('#statTotalProduct').text('—');
+                    } else {
+                        const totalDistributed = (publicDistributionData || []).reduce(
+                            (total, distribution) => total + getDistributedQuantity(distribution),
+                            0
+                        );
+                        $('#statTotalProduct').text(totalDistributed.toLocaleString('tr-TR'));
                     }
-                    $('#statTotalProduct').text(totalDistributed.toLocaleString('tr-TR'));
 
+                    // `remaining_quantity` stok hareketleri işlendiğinde güncellenen gerçek bakiye alanıdır.
+                    // Böylece ürün adlarındaki farklı yazımlar dağıtım düşümünü etkilemez.
                     const stockMap = new Map();
                     if (stockData && stockData.length > 0) {
                         stockData.forEach(s => {
                             const name = s.product_name || 'Bilinmeyen Ürün';
-                            const qty = s.received_quantity || 0;
-                            if (stockMap.has(name)) {
-                                stockMap.get(name).received += qty;
-                            } else {
-                                stockMap.set(name, { received: qty });
-                            }
+                            const remainingQuantity = toQuantity(s.remaining_quantity);
+                            stockMap.set(name, (stockMap.get(name) || 0) + remainingQuantity);
                         });
                     }
 
-                    const distributedMap = new Map();
-                    if (distData && distData.length > 0) {
-                        distData.forEach(d => {
-                            if (d.items && Array.isArray(d.items)) {
-                                d.items.forEach(item => {
-                                    const name = item.productName || '';
-                                    if (name) {
-                                        const qty = item.quantity || 0;
-                                        if (distributedMap.has(name)) {
-                                            distributedMap.set(name, distributedMap.get(name) + qty);
-                                        } else {
-                                            distributedMap.set(name, qty);
-                                        }
-                                    }
-                                });
-                            }
-                        });
+                    if (stockError) {
+                        console.error('Stok verisi yüklenemedi:', stockError);
+                        $('#statStockProduct').text('—');
+                    } else {
+                        const totalRemainingStock = Array.from(stockMap.values())
+                            .reduce((total, remainingQuantity) => total + remainingQuantity, 0);
+                        $('#statStockProduct').text(totalRemainingStock.toLocaleString('tr-TR'));
                     }
-
-                    let totalRemainingStock = 0;
-                    stockMap.forEach((val, name) => {
-                        const received = val.received;
-                        const distributed = distributedMap.get(name) || 0;
-                        const remaining = Math.max(0, received - distributed);
-                        totalRemainingStock += remaining;
-                    });
-                    $('#statStockProduct').text(totalRemainingStock.toLocaleString('tr-TR'));
 
                     // ===== EN ÇOK BAĞIŞ YAPANLAR (GÜNCELLENDİ) =====
                     const donorsContainer = $('#gidaDonorsList');
@@ -3284,11 +3288,7 @@
                     };
 
                     let html = '';
-                    stockMap.forEach((val, name) => {
-                        const received = val.received;
-                        const distributed = distributedMap.get(name) || 0;
-                        const remaining = Math.max(0, received - distributed);
-                        
+                    stockMap.forEach((remaining, name) => {
                         const encodedName = encodeURIComponent(name);
                         const imageUrl = `stokresim/${encodedName}.jpg`;
                         const iconClass = productIcons[name] || 'fa-box';
