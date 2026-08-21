@@ -2081,10 +2081,21 @@ a:focus-visible,
                         animateCounter('#statTotalExpense', totalExpense, true);
                         animateCounter('#statCashBalance', cashBalance, true);
 
-                        const donors = Array.isArray(data.bagis_yapan)
-                            ? data.bagis_yapan
-                            : [];
-                        globalDonors = donors; // Kesinlikle kırpma yapılmadan saklanır.
+                        // Bağışçı adları ve tutarları yalnızca maskeli public tablodan okunur.
+                        const { data: publicDonors, error: publicDonorError } = await supabaseClient
+                            .from('public_donations')
+                            .select('public_id, donation_date, payer_name_masked, amount')
+                            .order('donation_date', { ascending: false })
+                            .order('public_id', { ascending: false });
+
+                        if (publicDonorError) throw publicDonorError;
+
+                        const donors = (publicDonors || []).map(donor => ({
+                            bagisci: donor.payer_name_masked || 'Anonim',
+                            tarih: donor.donation_date || '—',
+                            miktar: Number(donor.amount) || 0
+                        }));
+                        globalDonors = donors; // Tam maskeli liste modal için saklanır.
                         renderDonors(globalDonors.slice(0, 10)); // Ana alanda yalnızca son 10.
                         $('#donorCountBadge').text(globalDonors.length + ' bağışçı');
                     } else {
@@ -2449,7 +2460,9 @@ a:focus-visible,
                         break;
                     case 'donors':
                         title = '<i class="fas fa-heart"></i> Tüm Bağışçılar';
-                        content = renderAllDonors(globalDonors);
+                        // Modal açılırken listeyi yeniden çek; böylece ana bölümdeki 10 kayıt
+                        // sınırı modal sonuçlarına hiçbir şekilde yansımaz.
+                        content = await loadAllDonorsForModal();
                         break;
                     case 'stock-cards':
                         title = '<i class="fas fa-boxes"></i> Ürün Bazlı Stok Durumumuz';
@@ -2526,12 +2539,31 @@ a:focus-visible,
                 }
             }
 
+            async function loadAllDonorsForModal() {
+                const { data, error } = await supabaseClient
+                    .from('public_donations')
+                    .select('public_id, donation_date, payer_name_masked, amount')
+                    .order('donation_date', { ascending: false })
+                    .order('public_id', { ascending: false });
+
+                if (error) throw error;
+
+                const allDonors = (data || []).map(donor => ({
+                    bagisci: donor.payer_name_masked || 'Anonim',
+                    tarih: donor.donation_date || '—',
+                    miktar: Number(donor.amount) || 0
+                }));
+                globalDonors = allDonors;
+                return renderAllDonors(allDonors);
+            }
+
             function renderAllDonors(donors = globalDonors) {
                 const allDonors = Array.isArray(donors) ? donors : [];
                 if (allDonors.length === 0) {
                     return `<div class="donors-empty"><i class="fas fa-heart"></i> Henüz bağışçı bilgisi bulunmuyor.</div>`;
                 }
                 let html = `
+                    <div style="max-height:70vh;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;">
                     <table class="donors-table">
                         <thead>
                             <tr><th>#</th><th>Bağışçı</th><th>Tarih</th><th style="text-align:right;">Miktar</th></tr>
@@ -2552,7 +2584,7 @@ a:focus-visible,
                         </tr>
                     `;
                 });
-                html += `</tbody></table>`;
+                html += `</tbody></table></div>`;
                 return html;
             }
 
@@ -2740,6 +2772,8 @@ a:focus-visible,
 
             // Supabase stock tablosu değiştiğinde anlık stok sütunlarını ekrana yansıt.
             let stockRefreshTimer = null;
+            let donorRefreshTimer = null;
+            let donorRefreshInProgress = false;
             let stockRefreshInProgress = false;
             function subscribeToLiveStock() {
                 supabaseClient
@@ -2763,11 +2797,34 @@ a:focus-visible,
                     .subscribe();
             }
 
+            function subscribeToLiveDonations() {
+                supabaseClient
+                    .channel('public-donations-live-gida')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'public_donations'
+                    }, () => {
+                        clearTimeout(donorRefreshTimer);
+                        donorRefreshTimer = setTimeout(async () => {
+                            if (donorRefreshInProgress) return;
+                            donorRefreshInProgress = true;
+                            try {
+                                await loadSummaryAndDonors();
+                            } finally {
+                                donorRefreshInProgress = false;
+                            }
+                        }, 200);
+                    })
+                    .subscribe();
+            }
+
             // Sayfa yüklendiğinde verileri çek
             loadSummaryAndDonors();
             loadStockData();
             loadDistributions();
             subscribeToLiveStock();
+            subscribeToLiveDonations();
 
             $('.sss-item').on('click', function() {
                 $(this).toggleClass('active');

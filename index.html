@@ -3331,63 +3331,52 @@
                         $('#statStockProduct').text(totalRemainingStock.toLocaleString('tr-TR'));
                     }
 
-                    // ===== EN ÇOK BAĞIŞ YAPANLAR (GÜNCELLENDİ) =====
+                    // ===== EN ÇOK BAĞIŞ YAPANLAR =====
                     const donorsContainer = $('#gidaDonorsList');
+                    const { data: publicDonors, error: publicDonorError } = await supabaseClient
+                        .from('public_donations')
+                        .select('public_id, payer_name_masked, amount')
+                        .order('amount', { ascending: false })
+                        .order('public_id', { ascending: false });
 
-                    // 1. Bağışçıları isimlerine göre gruplayalım ve toplam bağışlarını hesaplayalım
+                    if (publicDonorError) throw publicDonorError;
+
+                    // Aynı maskeli isme ait kayıtları toplam bağış tutarına göre grupla.
                     const donorMap = new Map();
+                    (publicDonors || []).forEach(donor => {
+                        const name = donor.payer_name_masked || 'Anonim';
+                        const amount = Number(donor.amount) || 0;
+                        donorMap.set(name, (donorMap.get(name) || 0) + amount);
+                    });
 
-                    if (!summaryError && summaryData && summaryData.bagis_yapan && summaryData.bagis_yapan.length > 0) {
-                        // Tüm bağışçıları dolaş
-                        summaryData.bagis_yapan.forEach(d => {
-                            const name = d.bagisci || 'Anonim';
-                            const amount = d.miktar || 0;
-                            
-                            if (donorMap.has(name)) {
-                                // Eğer bu isim daha önce eklenmişse, miktarını güncelle
-                                donorMap.set(name, donorMap.get(name) + amount);
-                            } else {
-                                // Yeni bir bağışçıysa, listeye ekle
-                                donorMap.set(name, amount);
-                            }
-                        });
+                    const sortedDonors = Array.from(donorMap, ([name, totalAmount]) => ({ name, totalAmount }))
+                        .sort((a, b) => b.totalAmount - a.totalAmount);
+                    const topDonors = sortedDonors.slice(0, 3);
+                    const medalEmojis = ['🥇', '🥈', '🥉'];
 
-                        // 2. Haritayı bir diziye çevir, bağış miktarına göre büyükten küçüğe sırala
-                        const sortedDonors = Array.from(donorMap, ([name, totalAmount]) => ({ name, totalAmount }))
-                            .sort((a, b) => b.totalAmount - a.totalAmount);
-
-                        // 3. En çok bağış yapan ilk 3 kişiyi al
-                        const topDonors = sortedDonors.slice(0, 3);
-                        const medalEmojis = ['🥇', '🥈', '🥉'];
-
-                        let html = '';
-                        topDonors.forEach((donor, index) => {
-                            const medal = medalEmojis[index] || '🏅'; 
-                            html += `
-                                <div class="gida-donor-item" style="background: ${index === 0 ? 'rgba(255, 215, 0, 0.1)' : index === 1 ? 'rgba(192, 192, 192, 0.1)' : index === 2 ? 'rgba(205, 127, 50, 0.1)' : 'transparent'}; border-radius: 10px; padding: 0.5rem 0.7rem; margin-bottom: 0.2rem; border-left: 4px solid ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'transparent'};">
-                                    <div class="gida-donor-avatar" style="background: ${index === 0 ? '#FFD700' : index === 1 ? '#E0E0E0' : index === 2 ? '#D2A679' : '#E8F0EC'}; color: ${index === 1 ? '#333' : '#fff'}; font-size: 0.9rem;">
-                                        <span style="font-size: 1.2rem;">${medal}</span>
-                                    </div>
-                                    <div class="gida-donor-info">
-                                        <div class="name" style="font-size: 0.9rem;">${escapeHtml(donor.name)}</div>
-                                        <div class="date" style="font-size: 0.6rem; color: #0F5A3E; font-weight: 700;">🏆 En Büyük Destekçi</div>
-                                    </div>
-                                    <div class="gida-donor-amount" style="font-size: 1.1rem; color: ${index === 0 ? '#B8860B' : index === 1 ? '#555' : index === 2 ? '#8B4513' : ''};">
-                                        ${formatMoney(donor.totalAmount)}
-                                    </div>
+                    let donorHtml = '';
+                    topDonors.forEach((donor, index) => {
+                        const medal = medalEmojis[index] || '🏅';
+                        donorHtml += `
+                            <div class="gida-donor-item" style="background: ${index === 0 ? 'rgba(255, 215, 0, 0.1)' : index === 1 ? 'rgba(192, 192, 192, 0.1)' : index === 2 ? 'rgba(205, 127, 50, 0.1)' : 'transparent'}; border-radius: 10px; padding: 0.5rem 0.7rem; margin-bottom: 0.2rem; border-left: 4px solid ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'transparent'};">
+                                <div class="gida-donor-avatar" style="background: ${index === 0 ? '#FFD700' : index === 1 ? '#E0E0E0' : index === 2 ? '#D2A679' : '#E8F0EC'}; color: ${index === 1 ? '#333' : '#fff'}; font-size: 0.9rem;">
+                                    <span style="font-size: 1.2rem;">${medal}</span>
                                 </div>
-                            `;
-                        });
+                                <div class="gida-donor-info">
+                                    <div class="name" style="font-size: 0.9rem;">${escapeHtml(donor.name)}</div>
+                                    <div class="date" style="font-size: 0.6rem; color: #0F5A3E; font-weight: 700;">🏆 En Büyük Destekçi</div>
+                                </div>
+                                <div class="gida-donor-amount" style="font-size: 1.1rem; color: ${index === 0 ? '#B8860B' : index === 1 ? '#555' : index === 2 ? '#8B4513' : ''};">
+                                    ${formatMoney(donor.totalAmount)}
+                                </div>
+                            </div>
+                        `;
+                    });
 
-                        // Eğer hiç bağışçı yoksa veya liste boşsa
-                        if (topDonors.length === 0) {
-                            donorsContainer.html('<div style="text-align:center;padding:0.5rem;color:#6B8E7E;font-size:0.7rem;">Henüz bağışçı bilgisi bulunmuyor.</div>');
-                        } else {
-                            donorsContainer.html(html);
-                        }
-
-                    } else {
+                    if (topDonors.length === 0) {
                         donorsContainer.html('<div style="text-align:center;padding:0.5rem;color:#6B8E7E;font-size:0.7rem;">Henüz bağışçı bilgisi bulunmuyor.</div>');
+                    } else {
+                        donorsContainer.html(donorHtml);
                     }
 
                     // ===== STOK BİLGİLERİ =====
@@ -3769,6 +3758,8 @@
             // Supabase stock tablosu değiştiğinde anlık stok sütunlarını ekrana yansıt.
             let stockRefreshTimer = null;
             let stockRefreshInProgress = false;
+            let donorRefreshTimer = null;
+            let donorRefreshInProgress = false;
             function subscribeToLiveStock() {
                 supabaseClient
                     .channel('public-stock-live-index')
@@ -3791,6 +3782,28 @@
                     .subscribe();
             }
 
+            function subscribeToLiveDonations() {
+                supabaseClient
+                    .channel('public-donations-live-index')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'public_donations'
+                    }, () => {
+                        clearTimeout(donorRefreshTimer);
+                        donorRefreshTimer = setTimeout(async () => {
+                            if (donorRefreshInProgress) return;
+                            donorRefreshInProgress = true;
+                            try {
+                                await loadDistributionInfo();
+                            } finally {
+                                donorRefreshInProgress = false;
+                            }
+                        }, 200);
+                    })
+                    .subscribe();
+            }
+
             // ===== TÜM FONKSİYONLARI BAŞLAT =====
             fetchHeroData();
             fetchDernekHaberleri();
@@ -3800,6 +3813,7 @@
             loadDistributionInfo();
             loadRehberData();
             subscribeToLiveStock();
+            subscribeToLiveDonations();
 
             // ===== SSS AKORDİYON =====
             $('.sss-item').on('click', function() {
