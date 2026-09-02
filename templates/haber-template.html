@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- === SEO ve Sosyal Medya Meta Etiketleri === -->
+    <title>{{title}} | Kırıkkale Çölyak Derneği</title>
+    <meta name="description" content="{{description}}">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{title}} | Kırıkkale Çölyak Derneği">
+    <meta property="og:description" content="{{description}}">
+    <meta property="og:image" content="{{image_url}}">
+    <meta property="og:url" content="https://senin-site.com/haber/{{slug}}.html">
+    <meta property="og:site_name" content="Kırıkkale Çölyak Derneği">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{title}} | Kırıkkale Çölyak Derneği">
+    <meta name="twitter:description" content="{{description}}">
+    <meta name="twitter:image" content="{{image_url}}">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://senin-site.com/haber/{{slug}}.html">
+    
+    <!-- Mevcut CSS -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Haber içeriği buraya gelecek - Mevcut detay.html'deki gibi -->
+    <div id="haber-container">
+        <h1>{{title}}</h1>
+        <div class="haber-meta">
+            <span>{{date}}</span>
+            <span>{{category}}</span>
+        </div>
+        <div class="haber-gorsel">
+            <img src="{{image_url}}" alt="{{title}}">
+        </div>
+        <div class="haber-icerik">
+            {{content}}
+        </div>
+    </div>
+    
+    <!-- Mevcut JavaScript'ler (değişmeyecek) -->
+    <script src="/script.js"></script>
+</body>
+</html>
