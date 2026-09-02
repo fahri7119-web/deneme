@@ -1,0 +1,12 @@
+{
+  "name": "kirkkale-colyak-haber-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "generate": "node admin/generate-haber.js",
+    "build": "npm run generate"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
