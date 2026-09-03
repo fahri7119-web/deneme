@@ -115,9 +115,6 @@ function getSource(sourceTable) {
 function getImage(haber, sourceTable) {
     const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
     
-    // Sadece debug modunda logla (çok fazla log olmasın)
-    // console.log(`🔍 getImage: source=${sourceTable}`)
-    
     if (sourceTable === 'dernek_haberleri') {
         const img = haber.gorsel_url || haber.image_url || haber.resim || haber.foto || null
         return img || defaultImage
@@ -127,29 +124,10 @@ function getImage(haber, sourceTable) {
         return img || defaultImage
     }
     if (sourceTable === 'articles') {
-        const img = haber.featured_image || haber.image_url || haber.resim || haber.foto || null
+        const img = haber.featured_image || haber.image_url || haber.author_avatar || haber.resim || haber.foto || null
         return img || defaultImage
     }
     return defaultImage
-}
-
-function getContent(haber) {
-    const content = haber.icerik || 
-                    haber.fullContent || 
-                    haber.content || 
-                    haber.full_description || 
-                    haber.description || 
-                    haber.ozet || 
-                    haber.summary || 
-                    ''
-    
-    // Eğer içerik boşsa ve hero kaydıysa, link ekle
-    if (!content && haber._source === 'hero') {
-        return `<p><strong>${escapeHtml(getTitle(haber))}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
-                <p><a href="../index.html" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>`
-    }
-    
-    return content || '<p>İçerik bulunamadı.</p>'
 }
 
 function getTitle(haber) {
@@ -163,11 +141,69 @@ function getDescription(haber) {
     return clean || getTitle(haber)
 }
 
+// ===== GÜNCELLENMİŞ getContent() =====
+function getContent(haber) {
+    const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+    
+    // Mevcut içeriği al
+    let content = haber.icerik || 
+                  haber.fullContent || 
+                  haber.content || 
+                  haber.full_description || 
+                  haber.description || 
+                  haber.ozet || 
+                  haber.summary || 
+                  ''
+    
+    // Kaynak tablosuna göre ana görseli al
+    let mainImage = null
+    const sourceTable = haber._source || 'unknown'
+    
+    if (sourceTable === 'dernek_haberleri') {
+        mainImage = haber.image_url || haber.gorsel_url || null
+    } else if (sourceTable === 'hero') {
+        mainImage = haber.bg_image || haber.gorsel_url || null
+    } else if (sourceTable === 'articles') {
+        mainImage = haber.featured_image || haber.image_url || haber.author_avatar || null
+    }
+    
+    // Eğer ana görsel varsa ve içerikte bu görsel yoksa, içeriğin başına ekle
+    if (mainImage) {
+        // İçerikte zaten bir resim var mı kontrol et (img etiketi var mı?)
+        const hasImage = /<img[^>]*>/i.test(content)
+        
+        // Eğer içerikte resim yoksa veya içerik boşsa, görseli ekle
+        if (!hasImage || !content.trim()) {
+            const imageHtml = `<figure class="haber-gorsel">
+                <img src="${mainImage}" alt="${escapeHtml(getTitle(haber))}" loading="lazy" onerror="this.src='${defaultImage}'">
+                <figcaption>${escapeHtml(getTitle(haber))}</figcaption>
+            </figure>`
+            
+            // İçerik varsa başına ekle, yoksa sadece resmi göster
+            if (content && content.trim()) {
+                content = imageHtml + content
+            } else {
+                content = imageHtml
+            }
+        }
+    }
+    
+    // Eğer içerik hala boşsa ve hero kaydıysa, link ekle
+    if (!content || !content.trim()) {
+        if (haber._source === 'hero') {
+            return `<p><strong>${escapeHtml(getTitle(haber))}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
+                    <p><a href="../index.html" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>`
+        }
+        return `<p>İçerik bulunamadı.</p>`
+    }
+    
+    return content
+}
+
 // ============================================================
 // VERİ ÇEKME FONKSİYONLARI
 // ============================================================
 
-// Hero haberlerini çek
 async function fetchHeroHaberleri() {
     console.log('🔍 Hero tablosu sorgulanıyor...')
     try {
@@ -189,7 +225,6 @@ async function fetchHeroHaberleri() {
     }
 }
 
-// Dernek haberlerini çek
 async function fetchDernekHaberleri() {
     console.log('🔍 Dernek Haberleri tablosu sorgulanıyor...')
     try {
@@ -212,7 +247,6 @@ async function fetchDernekHaberleri() {
     }
 }
 
-// Articles (Köşe Yazıları) çek
 async function fetchArticles() {
     console.log('🔍 Articles tablosu sorgulanıyor...')
     try {
