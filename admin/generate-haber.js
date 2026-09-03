@@ -78,15 +78,25 @@ function getSource(sourceTable) {
 
 function getImage(haber, sourceTable) {
     const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+    
+    console.log(`🔍 getImage çağrıldı: sourceTable=${sourceTable}, haber başlık=${getTitle(haber)}`)
+    
     if (sourceTable === 'dernek_haberleri') {
-        return haber.gorsel_url || haber.image_url || defaultImage
+        const img = haber.gorsel_url || haber.image_url || haber.resim || haber.foto || null
+        console.log(`   📸 dernek_haberleri resim: ${img || 'YOK'}`)
+        return img || defaultImage
     }
     if (sourceTable === 'hero') {
-        return haber.bg_image || haber.gorsel_url || defaultImage
+        const img = haber.bg_image || haber.gorsel_url || haber.image_url || haber.resim || null
+        console.log(`   📸 hero resim: ${img || 'YOK'}`)
+        return img || defaultImage
     }
     if (sourceTable === 'articles') {
-        return haber.featured_image || haber.image_url || defaultImage
+        const img = haber.featured_image || haber.image_url || haber.resim || haber.foto || null
+        console.log(`   📸 articles resim: ${img || 'YOK'}`)
+        return img || defaultImage
     }
+    console.log(`   📸 default resim kullanılıyor`)
     return defaultImage
 }
 
@@ -116,6 +126,7 @@ async function fetchHeroHaberleri() {
         console.error('❌ Hero tablosu hatası:', error)
         return []
     }
+    console.log(`✅ Hero: ${data?.length || 0} kayıt bulundu`)
     return data || []
 }
 
@@ -132,6 +143,7 @@ async function fetchDernekHaberleri() {
         console.error('❌ Dernek haberleri tablosu hatası:', error)
         return []
     }
+    console.log(`✅ Dernek Haberleri: ${data?.length || 0} kayıt bulundu`)
     return data || []
 }
 
@@ -148,6 +160,7 @@ async function fetchArticles() {
             console.error('❌ Articles tablosu hatası:', error)
             return []
         }
+        console.log(`✅ Articles: ${data?.length || 0} kayıt bulundu`)
         return data || []
     } catch (e) {
         console.log('ℹ️ Articles tablosu bulunamadı, atlanıyor...')
@@ -158,6 +171,7 @@ async function fetchArticles() {
 // Ana fonksiyon
 async function generateHaberPages() {
     console.log('🔄 Haber sayfaları oluşturuluyor...')
+    console.log('📁 Çalışma dizini:', __dirname)
     
     // Tüm verileri çek
     const [dernekHaberleri, heroHaberleri, articles] = await Promise.all([
@@ -183,7 +197,13 @@ async function generateHaberPages() {
     console.log(`📊 Toplam ${tümHaberler.length} aktif içerik bulundu.`)
     console.log(`   📰 Dernek: ${dernekHaberleri.length}, ⭐ Hero: ${heroHaberleri.length}, ✍️ Köşe Yazısı: ${articles.length}`)
     
+    if (tümHaberler.length === 0) {
+        console.log('⚠️ Hiç içerik bulunamadı!')
+        return
+    }
+    
     // Her haber için HTML oluştur
+    let createdCount = 0
     for (const haber of tümHaberler) {
         const slug = haber.slug || slugify(getTitle(haber))
         const sourceTable = haber._source || 'unknown'
@@ -196,6 +216,11 @@ async function generateHaberPages() {
         const date = formatDate(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
         const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
         const source = getSource(sourceTable)
+        
+        console.log(`\n📝 İşleniyor: ${title} (${sourceTable})`)
+        console.log(`   🖼️ Resim: ${imageUrl}`)
+        console.log(`   📅 Tarih: ${date}`)
+        console.log(`   🔗 Slug: ${slug}`)
         
         // ===== ALT BÖLÜMLERİ OLUŞTUR =====
         let authorPostsHTML = ''
@@ -347,14 +372,16 @@ async function generateHaberPages() {
         // Klasör yoksa oluştur
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true })
+            console.log(`📁 Klasör oluşturuldu: ${outputDir}`)
         }
         
         const outputPath = path.join(outputDir, `${slug}.html`)
         fs.writeFileSync(outputPath, html, 'utf-8')
         console.log(`✅ Oluşturuldu: ${sourceTable === 'articles' ? 'yazilar' : 'haber'}/${slug}.html`)
+        createdCount++
     }
     
-    console.log('🎉 Tüm sayfalar oluşturuldu!')
+    console.log(`\n🎉 ${createdCount} sayfa oluşturuldu!`)
 }
 
 // Script'i çalıştır
