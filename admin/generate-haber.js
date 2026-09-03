@@ -18,16 +18,16 @@ const template = fs.readFileSync(templatePath, 'utf-8')
 async function generateHaberPages() {
     console.log('🔄 Haber sayfaları oluşturuluyor...')
     
-    // 1. İki tablodan da verileri eşzamanlı (parallel) olarak çekiyoruz
+    // İki tablodan da sadece 'is_active' değeri true olanları çekiyoruz
     const [dernekRes, heroRes] = await Promise.all([
         supabase
             .from('dernek_haberleri')
             .select('*')
-            .eq('durum', 'yayinda'),
+            .eq('is_active', true),
         supabase
             .from('hero')
             .select('*')
-            .eq('durum', 'yayinda')
+            .eq('is_active', true)
     ])
 
     // Hata kontrolü
@@ -40,15 +40,15 @@ async function generateHaberPages() {
         return
     }
 
-    // 2. İki tablodan gelen verileri tek bir dizide birleştiriyoruz
+    // İki tablodan gelen verileri tek bir dizide birleştiriyoruz
     const dernekHaberleri = dernekRes.data || []
     const heroHaberleri = heroRes.data || []
     let tümHaberler = [...dernekHaberleri, ...heroHaberleri]
 
-    // 3. Haberleri tarihe göre yeniden sıralıyoruz (En yeni en üstte)
+    // Haberleri tarihe göre yeniden sıralıyoruz (En yeni en üstte)
     tümHaberler.sort((a, b) => new Date(b.tarih) - new Date(a.tarih))
     
-    console.log(`📊 Toplam ${tümHaberler.length} haber bulundu. (Dernek: ${dernekHaberleri.length}, Hero: ${heroHaberleri.length})`)
+    console.log(`📊 Toplam ${tümHaberler.length} aktif haber bulundu. (Dernek: ${dernekHaberleri.length}, Hero: ${heroHaberleri.length})`)
     
     // Her haber için HTML oluştur
     for (const haber of tümHaberler) {
@@ -69,7 +69,7 @@ async function generateHaberPages() {
         if (!haber.gorsel_url) {
             html = html.replace(
                 '{{image_url}}',
-                'https://senin-site.com/images/dernek-logosu.png'
+                'https://senin-site.com'
             )
         }
         
