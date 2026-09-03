@@ -1,61 +1,37 @@
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
+name: Haber Sayfalarını Güncelle
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+on:
+  workflow_dispatch:
 
-async function generateHaberler() {
-  console.log("🔄 Haber sayfaları oluşturuluyor...");
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
 
-  try {
-    // dernek_haberleri ve hero tablolarından paralel veri çekme
-    const [haberlerResult, heroResult] = await Promise.all([
-      supabase.from('dernek_haberleri').select('*'),
-      supabase.from('hero').select('*')
-    ]);
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
-    if (haberlerResult.error) throw haberlerResult.error;
-    if (heroResult.error) throw heroResult.error;
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22' 
 
-    // Değişken isimleri standartlaştırıldı (Boşluklar ve Türkçe karakterler kaldırıldı)
-    const haberlerVerisi = haberlerResult.data;
-    const heroVerisi = heroResult.data;
+      - run: npm install
 
-    console.log(`✅ Veriler çekildi: ${haberlerVerisi.length} haber, ${heroVerisi.length} hero içeriği.`);
+      - run: npm run generate
+        env:
+          SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
+          SUPABASE_ANON_KEY: "${{ secrets.SUPABASE_ANON_KEY }}"
 
-    const outputDir = path.join(process.cwd(), 'haberler');
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
-    haberlerVerisi.forEach((haber) => {
-      // Şablonunuza ait HTML içeriği
-      const htmlContent = `
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>${haber.baslik || 'Haber'}</title>
-</head>
-<body>
-    <h1>${haber.baslik}</h1>
-    <p>${haber.icerik}</p>
-</body>
-</html>
-      `;
-
-      const fileName = `${haber.id || Date.now()}.html`; 
-      fs.writeFileSync(path.join(outputDir, fileName), htmlContent);
-    });
-
-    console.log("🎉 Tüm haber sayfaları başarıyla oluşturuldu!");
-
-  } catch (error) {
-    console.error("❌ Supabase veya Dosya Hatası:", error.message || error);
-    process.exit(1);
-  }
-}
-
-generateHaberler();
+      - run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git pull origin main --rebase
+          
+          git add haberler/
+          git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
+          git push origin main
