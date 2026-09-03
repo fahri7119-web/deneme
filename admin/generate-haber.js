@@ -58,29 +58,35 @@ function getCategoryClass(category) {
     if (!category) return ''
     if (category === 'Dernek Haberi') return 'tag-dernek'
     if (category === 'Öne Çıkan') return 'tag-hero'
+    if (category === 'Köşe Yazısı') return 'tag-article'
     return ''
 }
 
 function getCategory(sourceTable) {
     if (sourceTable === 'dernek_haberleri') return 'Dernek Haberi'
     if (sourceTable === 'hero') return 'Öne Çıkan'
+    if (sourceTable === 'articles') return 'Köşe Yazısı'
     return 'Haber'
 }
 
 function getSource(sourceTable) {
     if (sourceTable === 'dernek_haberleri') return 'Dernek'
     if (sourceTable === 'hero') return 'Öne Çıkan'
+    if (sourceTable === 'articles') return 'Köşe Yazısı'
     return 'Haber'
 }
 
 function getImage(haber, sourceTable) {
     if (sourceTable === 'dernek_haberleri') {
-        return haber.gorsel_url || haber.image_url || '/images/default-haber.jpg'
+        return haber.gorsel_url || haber.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
     }
     if (sourceTable === 'hero') {
-        return haber.bg_image || haber.gorsel_url || '/images/default-haber.jpg'
+        return haber.bg_image || haber.gorsel_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
     }
-    return haber.gorsel_url || haber.image_url || '/images/default-haber.jpg'
+    if (sourceTable === 'articles') {
+        return haber.featured_image || haber.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+    }
+    return 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
 }
 
 function getContent(haber) {
@@ -97,7 +103,7 @@ function getDescription(haber) {
     return desc || getTitle(haber)
 }
 
-// Hero haberlerini çek (tekrar kullanım için)
+// Hero haberlerini çek
 async function fetchHeroHaberleri() {
     const { data, error } = await supabase
         .from('hero')
@@ -112,7 +118,7 @@ async function fetchHeroHaberleri() {
     return data || []
 }
 
-// Dernek haberlerini çek (tekrar kullanım için)
+// Dernek haberlerini çek
 async function fetchDernekHaberleri() {
     const { data, error } = await supabase
         .from('dernek_haberleri')
@@ -128,30 +134,53 @@ async function fetchDernekHaberleri() {
     return data || []
 }
 
+// Articles (Köşe Yazıları) çek
+async function fetchArticles() {
+    try {
+        const { data, error } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('is_published', true)
+            .order('pubDate', { ascending: false })
+        
+        if (error) {
+            console.error('❌ Articles tablosu hatası:', error)
+            return []
+        }
+        return data || []
+    } catch (e) {
+        console.log('ℹ️ Articles tablosu bulunamadı, atlanıyor...')
+        return []
+    }
+}
+
 // Ana fonksiyon
 async function generateHaberPages() {
     console.log('🔄 Haber sayfaları oluşturuluyor...')
     
     // Tüm verileri çek
-    const [dernekHaberleri, heroHaberleri] = await Promise.all([
+    const [dernekHaberleri, heroHaberleri, articles] = await Promise.all([
         fetchDernekHaberleri(),
-        fetchHeroHaberleri()
+        fetchHeroHaberleri(),
+        fetchArticles()
     ])
     
     // Her haber için kaynak tablosunu ekleyelim
     const taggedDernek = dernekHaberleri.map(h => ({ ...h, _source: 'dernek_haberleri' }))
     const taggedHero = heroHaberleri.map(h => ({ ...h, _source: 'hero' }))
+    const taggedArticles = articles.map(h => ({ ...h, _source: 'articles' }))
     
-    let tümHaberler = [...taggedDernek, ...taggedHero]
+    let tümHaberler = [...taggedDernek, ...taggedHero, ...taggedArticles]
 
     // Haberleri tarihe göre sıralıyoruz (en yeni en üstte)
     tümHaberler.sort((a, b) => {
-        const dateA = a.tarih || a.pub_date || a.created_at || 0
-        const dateB = b.tarih || b.pub_date || b.created_at || 0
+        const dateA = a.tarih || a.pub_date || a.created_at || a.pubDate || 0
+        const dateB = b.tarih || b.pub_date || b.created_at || b.pubDate || 0
         return new Date(dateB) - new Date(dateA)
     })
     
-    console.log(`📊 Toplam ${tümHaberler.length} aktif haber bulundu. (Dernek: ${dernekHaberleri.length}, Hero: ${heroHaberleri.length})`)
+    console.log(`📊 Toplam ${tümHaberler.length} aktif içerik bulundu.`)
+    console.log(`   📰 Dernek: ${dernekHaberleri.length}, ⭐ Hero: ${heroHaberleri.length}, ✍️ Köşe Yazısı: ${articles.length}`)
     
     // Her haber için HTML oluştur
     for (const haber of tümHaberler) {
@@ -163,8 +192,8 @@ async function generateHaberPages() {
         const content = getContent(haber)
         const title = getTitle(haber)
         const description = getDescription(haber)
-        const date = formatDate(haber.tarih || haber.pub_date || haber.created_at)
-        const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at)
+        const date = formatDate(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
+        const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
         const source = getSource(sourceTable)
         
         // ===== ALT BÖLÜMLERİ OLUŞTUR =====
@@ -182,13 +211,13 @@ async function generateHaberPages() {
         if (otherHero.length > 0) {
             let cards = ''
             otherHero.forEach(item => {
-                const img = item.bg_image || item.gorsel_url || '/images/default-haber.jpg'
+                const img = item.bg_image || item.gorsel_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
                 const itemSlug = item.slug || slugify(getTitle(item))
                 const link = `../haber/${itemSlug}.html`
                 const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
                 cards += `
                         <a href="${link}" class="extra-item">
-                            <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                             <div class="body">
                                 <span class="tag">Öne Çıkan</span>
                                 <h4>${escapeHtml(getTitle(item))}</h4>
@@ -216,13 +245,13 @@ async function generateHaberPages() {
         if (otherDernek.length > 0) {
             let cards = ''
             otherDernek.forEach(item => {
-                const img = item.gorsel_url || item.image_url || '/images/default-haber.jpg'
+                const img = item.gorsel_url || item.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
                 const itemSlug = item.slug || slugify(getTitle(item))
                 const link = `../haber/${itemSlug}.html`
                 const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
                 cards += `
                         <a href="${link}" class="extra-item">
-                            <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                             <div class="body">
                                 <span class="tag">Dernek Haberi</span>
                                 <h4>${escapeHtml(getTitle(item))}</h4>
@@ -242,47 +271,40 @@ async function generateHaberPages() {
                 `
         }
         
-        // 3) Köşe Yazıları (Articles) - sadece articles tablosundan
-        // Not: Şu anda articles tablosu yok, ama ileride eklenirse diye
-        try {
-            const { data: articlesData, error: articlesError } = await supabase
-                .from('articles')
-                .select('id, title, slug, pubDate, featured_image, summary, author_name')
-                .eq('is_published', true)
-                .order('pubDate', { ascending: false })
-                .limit(3)
-            
-            if (!articlesError && articlesData && articlesData.length > 0) {
-                let cards = ''
-                articlesData.forEach(item => {
-                    const img = item.featured_image || '/images/default-haber.jpg'
-                    const itemSlug = item.slug || slugify(item.title)
-                    const link = `../haber/${itemSlug}.html`
-                    const authorName = item.author_name || 'Yazar'
-                    cards += `
-                            <a href="${link}" class="extra-item">
-                                <img src="${img}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                                <div class="body">
-                                    <span class="tag">${escapeHtml(authorName)}</span>
-                                    <h4>${escapeHtml(item.title)}</h4>
-                                    ${item.summary ? `<div class="description">${escapeHtml(item.summary)}</div>` : ''}
-                                    <span class="date">${formatDate(item.pubDate)}</span>
-                                </div>
-                            </a>
-                        `
-                })
-                articlesSectionHTML = `
-                        <div class="extra-section">
-                            <div class="section-head">
-                                <h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>
-                                <a href="../haberler.html">Tümü →</a>
+        // 3) Köşe Yazıları (Articles)
+        const otherArticles = articles
+            .filter(a => a.id !== haber.id)
+            .slice(0, 3)
+        
+        if (otherArticles.length > 0) {
+            let cards = ''
+            otherArticles.forEach(item => {
+                const img = item.featured_image || item.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+                const itemSlug = item.slug || slugify(item.title)
+                const link = `../yazilar/${itemSlug}.html`
+                const authorName = item.author_name || item.author || 'Yazar'
+                const itemDate = formatDate(item.pubDate || item.created_at)
+                cards += `
+                        <a href="${link}" class="extra-item">
+                            <img src="${img}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
+                            <div class="body">
+                                <span class="tag">${escapeHtml(authorName)}</span>
+                                <h4>${escapeHtml(item.title)}</h4>
+                                ${item.summary ? `<div class="description">${escapeHtml(item.summary)}</div>` : ''}
+                                <span class="date">${itemDate}</span>
                             </div>
-                            <div class="extra-grid">${cards}</div>
-                        </div>
+                        </a>
                     `
-            }
-        } catch (e) {
-            // articles tablosu yoksa sessizce geç
+            })
+            articlesSectionHTML = `
+                    <div class="extra-section">
+                        <div class="section-head">
+                            <h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>
+                            <a href="../yazilar.html">Tümü →</a>
+                        </div>
+                        <div class="extra-grid">${cards}</div>
+                    </div>
+                `
         }
         
         // Eğer hiç alt bölüm yoksa
@@ -313,13 +335,25 @@ async function generateHaberPages() {
             .replace(/\{\{articles_section\}\}/g, articlesSectionHTML)
             .replace(/\{\{empty_section\}\}/g, emptySectionHTML)
         
-        // Dosyayı kaydet
-        const outputPath = path.join(__dirname, '../haber', `${slug}.html`)
+        // Dosyayı kaydet - Haberler haber/ klasörüne, köşe yazıları yazilar/ klasörüne
+        let outputDir
+        if (sourceTable === 'articles') {
+            outputDir = path.join(__dirname, '../yazilar')
+        } else {
+            outputDir = path.join(__dirname, '../haber')
+        }
+        
+        // Klasör yoksa oluştur
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true })
+        }
+        
+        const outputPath = path.join(outputDir, `${slug}.html`)
         fs.writeFileSync(outputPath, html, 'utf-8')
-        console.log(`✅ Oluşturuldu: haber/${slug}.html`)
+        console.log(`✅ Oluşturuldu: ${sourceTable === 'articles' ? 'yazilar' : 'haber'}/${slug}.html`)
     }
     
-    console.log('🎉 Tüm haber sayfaları oluşturuldu!')
+    console.log('🎉 Tüm sayfalar oluşturuldu!')
 }
 
 // Script'i çalıştır
