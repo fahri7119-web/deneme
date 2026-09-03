@@ -74,8 +74,12 @@ function getSource(sourceTable) {
 }
 
 function getImage(haber, sourceTable) {
-    if (sourceTable === 'dernek_haberleri') return haber.gorsel_url || haber.image_url || '/images/default-haber.jpg'
-    if (sourceTable === 'hero') return haber.bg_image || haber.gorsel_url || '/images/default-haber.jpg'
+    if (sourceTable === 'dernek_haberleri') {
+        return haber.gorsel_url || haber.image_url || '/images/default-haber.jpg'
+    }
+    if (sourceTable === 'hero') {
+        return haber.bg_image || haber.gorsel_url || '/images/default-haber.jpg'
+    }
     return haber.gorsel_url || haber.image_url || '/images/default-haber.jpg'
 }
 
@@ -93,33 +97,46 @@ function getDescription(haber) {
     return desc || getTitle(haber)
 }
 
+// Hero haberlerini çek (tekrar kullanım için)
+async function fetchHeroHaberleri() {
+    const { data, error } = await supabase
+        .from('hero')
+        .select('*')
+        .eq('is_active', true)
+        .order('order', { ascending: true })
+    
+    if (error) {
+        console.error('❌ Hero tablosu hatası:', error)
+        return []
+    }
+    return data || []
+}
+
+// Dernek haberlerini çek (tekrar kullanım için)
+async function fetchDernekHaberleri() {
+    const { data, error } = await supabase
+        .from('dernek_haberleri')
+        .select('*')
+        .eq('is_active', true)
+        .order('order', { ascending: true })
+        .order('pub_date', { ascending: false })
+    
+    if (error) {
+        console.error('❌ Dernek haberleri tablosu hatası:', error)
+        return []
+    }
+    return data || []
+}
+
 // Ana fonksiyon
 async function generateHaberPages() {
     console.log('🔄 Haber sayfaları oluşturuluyor...')
     
-    // İki tablodan da 'is_active' değeri true olanları çekiyoruz
-    const [dernekRes, heroRes] = await Promise.all([
-        supabase
-            .from('dernek_haberleri')
-            .select('*')
-            .eq('is_active', true),
-        supabase
-            .from('hero')
-            .select('*')
-            .eq('is_active', true)
+    // Tüm verileri çek
+    const [dernekHaberleri, heroHaberleri] = await Promise.all([
+        fetchDernekHaberleri(),
+        fetchHeroHaberleri()
     ])
-
-    if (dernekRes.error) {
-        console.error('❌ dernek_haberleri tablosu hatası:', dernekRes.error)
-        return
-    }
-    if (heroRes.error) {
-        console.error('❌ hero tablosu hatası:', heroRes.error)
-        return
-    }
-
-    const dernekHaberleri = dernekRes.data || []
-    const heroHaberleri = heroRes.data || []
     
     // Her haber için kaynak tablosunu ekleyelim
     const taggedDernek = dernekHaberleri.map(h => ({ ...h, _source: 'dernek_haberleri' }))
@@ -127,7 +144,7 @@ async function generateHaberPages() {
     
     let tümHaberler = [...taggedDernek, ...taggedHero]
 
-    // Haberleri tarihe göre sıralıyoruz
+    // Haberleri tarihe göre sıralıyoruz (en yeni en üstte)
     tümHaberler.sort((a, b) => {
         const dateA = a.tarih || a.pub_date || a.created_at || 0
         const dateB = b.tarih || b.pub_date || b.created_at || 0
@@ -150,27 +167,26 @@ async function generateHaberPages() {
         const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at)
         const source = getSource(sourceTable)
         
-        // Boş placeholder'lar
+        // ===== ALT BÖLÜMLERİ OLUŞTUR =====
         let authorPostsHTML = ''
         let heroSectionHTML = ''
         let dernekSectionHTML = ''
         let articlesSectionHTML = ''
         let emptySectionHTML = ''
         
-        // Hero bölümü için diğer hero haberlerini çekelim
-        if (sourceTable === 'hero' || true) {
-            const otherHero = heroHaberleri
-                .filter(h => h.id !== haber.id)
-                .slice(0, 3)
-            
-            if (otherHero.length > 0) {
-                let cards = ''
-                otherHero.forEach(item => {
-                    const img = item.bg_image || item.gorsel_url || '/images/default-haber.jpg'
-                    const itemSlug = item.slug || slugify(getTitle(item))
-                    const link = `/haber/${itemSlug}.html`
-                    const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
-                    cards += `
+        // 1) Öne Çıkan Haberler (Hero)
+        const otherHero = heroHaberleri
+            .filter(h => h.id !== haber.id)
+            .slice(0, 3)
+        
+        if (otherHero.length > 0) {
+            let cards = ''
+            otherHero.forEach(item => {
+                const img = item.bg_image || item.gorsel_url || '/images/default-haber.jpg'
+                const itemSlug = item.slug || slugify(getTitle(item))
+                const link = `../haber/${itemSlug}.html`
+                const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
+                cards += `
                         <a href="${link}" class="extra-item">
                             <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
                             <div class="body">
@@ -180,20 +196,19 @@ async function generateHaberPages() {
                             </div>
                         </a>
                     `
-                })
-                heroSectionHTML = `
+            })
+            heroSectionHTML = `
                     <div class="extra-section">
                         <div class="section-head">
                             <h2><i class="fas fa-star" style="color:var(--accent);"></i> Öne Çıkan Haberler</h2>
-                            <a href="index.html">Tümü →</a>
+                            <a href="../index.html">Tümü →</a>
                         </div>
                         <div class="extra-grid">${cards}</div>
                     </div>
                 `
-            }
         }
         
-        // Dernek haberleri bölümü
+        // 2) Dernek Haberleri
         const otherDernek = dernekHaberleri
             .filter(h => h.id !== haber.id)
             .slice(0, 3)
@@ -203,38 +218,81 @@ async function generateHaberPages() {
             otherDernek.forEach(item => {
                 const img = item.gorsel_url || item.image_url || '/images/default-haber.jpg'
                 const itemSlug = item.slug || slugify(getTitle(item))
-                const link = `/haber/${itemSlug}.html`
+                const link = `../haber/${itemSlug}.html`
                 const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
                 cards += `
-                    <a href="${link}" class="extra-item">
-                        <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                        <div class="body">
-                            <span class="tag">Dernek Haberi</span>
-                            <h4>${escapeHtml(getTitle(item))}</h4>
-                            <span class="date">${itemDate}</span>
-                        </div>
-                    </a>
-                `
+                        <a href="${link}" class="extra-item">
+                            <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Dernek Haberi</span>
+                                <h4>${escapeHtml(getTitle(item))}</h4>
+                                <span class="date">${itemDate}</span>
+                            </div>
+                        </a>
+                    `
             })
             dernekSectionHTML = `
-                <div class="extra-section">
-                    <div class="section-head">
-                        <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>
-                        <a href="dernekhaber.html">Tümü →</a>
+                    <div class="extra-section">
+                        <div class="section-head">
+                            <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>
+                            <a href="../dernekhaber.html">Tümü →</a>
+                        </div>
+                        <div class="extra-grid">${cards}</div>
                     </div>
-                    <div class="extra-grid">${cards}</div>
-                </div>
-            `
+                `
+        }
+        
+        // 3) Köşe Yazıları (Articles) - sadece articles tablosundan
+        // Not: Şu anda articles tablosu yok, ama ileride eklenirse diye
+        try {
+            const { data: articlesData, error: articlesError } = await supabase
+                .from('articles')
+                .select('id, title, slug, pubDate, featured_image, summary, author_name')
+                .eq('is_published', true)
+                .order('pubDate', { ascending: false })
+                .limit(3)
+            
+            if (!articlesError && articlesData && articlesData.length > 0) {
+                let cards = ''
+                articlesData.forEach(item => {
+                    const img = item.featured_image || '/images/default-haber.jpg'
+                    const itemSlug = item.slug || slugify(item.title)
+                    const link = `../haber/${itemSlug}.html`
+                    const authorName = item.author_name || 'Yazar'
+                    cards += `
+                            <a href="${link}" class="extra-item">
+                                <img src="${img}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                                <div class="body">
+                                    <span class="tag">${escapeHtml(authorName)}</span>
+                                    <h4>${escapeHtml(item.title)}</h4>
+                                    ${item.summary ? `<div class="description">${escapeHtml(item.summary)}</div>` : ''}
+                                    <span class="date">${formatDate(item.pubDate)}</span>
+                                </div>
+                            </a>
+                        `
+                })
+                articlesSectionHTML = `
+                        <div class="extra-section">
+                            <div class="section-head">
+                                <h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>
+                                <a href="../haberler.html">Tümü →</a>
+                            </div>
+                            <div class="extra-grid">${cards}</div>
+                        </div>
+                    `
+            }
+        } catch (e) {
+            // articles tablosu yoksa sessizce geç
         }
         
         // Eğer hiç alt bölüm yoksa
         if (!heroSectionHTML && !dernekSectionHTML && !articlesSectionHTML) {
             emptySectionHTML = `
-                <div style="text-align:center; padding:2rem 0; color:var(--text-muted);">
-                    <p>Diğer içerikler bulunmuyor.</p>
-                    <a href="index.html" style="display:inline-block; margin-top:1rem; background:var(--primary); color:#fff; padding:0.5rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none;">Ana Sayfa</a>
-                </div>
-            `
+                    <div style="text-align:center; padding:2rem 0; color:var(--text-muted);">
+                        <p>Diğer içerikler bulunmuyor.</p>
+                        <a href="../index.html" style="display:inline-block; margin-top:1rem; background:var(--primary); color:#fff; padding:0.5rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none;">Ana Sayfa</a>
+                    </div>
+                `
         }
         
         // Şablondaki yer tutucuları doldur
