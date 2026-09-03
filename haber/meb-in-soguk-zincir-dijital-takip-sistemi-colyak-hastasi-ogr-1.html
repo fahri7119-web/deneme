@@ -23,6 +23,7 @@
     <meta name="twitter:url" content="https://www.kirikkalecolyak.org.tr/haber/meb-in-soguk-zincir-dijital-takip-sistemi-colyak-hastasi-ogr-1.html">
     <meta name="twitter:image" content="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/manset-5.jpg">
     <meta name="twitter:image:alt" content="MEB’in Soğuk Zincir Dijital Takip Sistemi Çölyak Hastası Öğrencileri de Kapsamalı">
+    
     <script id="articleStructuredData" type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -53,15 +54,16 @@
         "datePublished": "2026-06-25T20:29:59.101Z"
     }
     </script>
+    
     <link rel="icon" href="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <!-- ===== SITE.CSS (detay.html ile aynı) ===== -->
     <link rel="stylesheet" href="../assets/css/site.css">
+    
     <style>
         /* ===== HABER DETAY ÖZEL STİLLERİ ===== */
-        /* Bu stiller site.css'de olmayan, sadece haber detayına özel stillerdir */
-
         .page-content {
             padding: 1.5rem 0 3rem;
         }
@@ -108,6 +110,7 @@
             font-family: var(--font-display);
         }
 
+        /* ===== FLOAT ELEMANLARI ===== */
         .float-element {
             float: left;
             margin-right: 20px;
@@ -168,6 +171,7 @@
             }
         }
 
+        /* ===== DETAY BODY ===== */
         .detail-body {
             font-size: 1.05rem;
             line-height: 1.8;
@@ -185,6 +189,22 @@
             box-shadow: var(--shadow-md);
             max-width: 100%;
             height: auto;
+        }
+        .detail-body figure {
+            margin: 1.2rem 0;
+        }
+        .detail-body figure img {
+            margin: 0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            max-width: 100%;
+            height: auto;
+        }
+        .detail-body figure figcaption {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0.3rem;
         }
         @media (max-width: 640px) {
             .detail-body p { text-align: left; }
@@ -382,12 +402,14 @@
             .extra-grid { grid-template-columns: 1fr; }
         }
 
+        /* ===== LOADING & ERROR ===== */
         .loading-placeholder {
             padding: 3rem 1rem;
             text-align: center;
             color: var(--text-secondary);
         }
         .loading-placeholder i { color: var(--primary); }
+        
         .error-placeholder {
             padding: 3rem 1rem;
             text-align: center;
@@ -419,7 +441,7 @@
             transform: translateY(-2px);
         }
 
-        /* Dark mode için ek düzeltmeler */
+        /* ===== DARK MODE EK STILLER ===== */
         body.dark-mode .detail-hero,
         body.dark-mode .author-posts-section,
         body.dark-mode .extra-section {
@@ -456,6 +478,54 @@
         body.dark-mode .author-posts-section .section-head h2,
         body.dark-mode .extra-section .section-head h2 {
             color: #F3F4F6 !important;
+        }
+        body.dark-mode .detail-body img:not(.detail-float-img):not(.author-photo) {
+            border-color: rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .detail-body figure figcaption {
+            color: #6B7280 !important;
+        }
+
+        /* ===== SCROLL TOP ===== */
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 16px rgba(26, 122, 90, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            z-index: 100;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        body.dark-mode .scroll-top {
+            background: #4ade80 !important;
+            color: #111827 !important;
+            box-shadow: 0 4px 16px rgba(74, 222, 128, 0.4) !important;
+        }
+        body.dark-mode .scroll-top:hover {
+            background: #34d399 !important;
         }
     </style>
 </head>
@@ -697,38 +767,38 @@
         function updateDate() {
             const now = new Date();
             const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-            document.getElementById('currentDate').textContent = now.getDate() + ' ' + months[now.getMonth()];
+            const el = document.getElementById('currentDate');
+            if (el) el.textContent = now.getDate() + ' ' + months[now.getMonth()];
         }
         updateDate();
 
         // ============================================================
         // 2. DARK MODE (site.css ile uyumlu)
         // ============================================================
-        document.getElementById('darkModeToggle')?.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            var isDark = document.body.classList.contains('dark-mode');
-            var icon = this.querySelector('i');
-            if (icon) {
-                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            }
-            localStorage.setItem('darkMode', isDark);
-        });
+        const darkToggle = document.getElementById('darkModeToggle');
+        if (darkToggle) {
+            darkToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                const icon = this.querySelector('i');
+                if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                localStorage.setItem('darkMode', isDark);
+            });
+        }
 
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
-            var toggle = document.getElementById('darkModeToggle');
-            var icon = toggle?.querySelector('i');
-            if (icon) {
-                icon.className = 'fas fa-sun';
-            }
+            const toggle = document.getElementById('darkModeToggle');
+            const icon = toggle?.querySelector('i');
+            if (icon) icon.className = 'fas fa-sun';
         }
 
         // ============================================================
         // 3. HAMBURGER MENU (site.css ile uyumlu)
         // ============================================================
-        var hamburgerBtn = document.getElementById('hamburgerBtn');
-        var mainNav = document.getElementById('mainNav');
-        var navOverlay = document.getElementById('navOverlay');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mainNav = document.getElementById('mainNav');
+        const navOverlay = document.getElementById('navOverlay');
 
         function closeMenu() {
             if (mainNav) mainNav.classList.remove('open');
@@ -741,7 +811,7 @@
 
         function toggleMenu() {
             if (!mainNav || !hamburgerBtn) return;
-            var isOpen = mainNav.classList.contains('open');
+            const isOpen = mainNav.classList.contains('open');
             if (isOpen) {
                 closeMenu();
             } else {
@@ -752,16 +822,20 @@
             }
         }
 
-        hamburgerBtn?.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleMenu();
-        });
+        if (hamburgerBtn) {
+            hamburgerBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleMenu();
+            });
+        }
 
-        navOverlay?.addEventListener('click', closeMenu);
+        if (navOverlay) {
+            navOverlay.addEventListener('click', closeMenu);
+        }
 
         document.addEventListener('click', function(e) {
             if (window.innerWidth <= 768 && mainNav?.classList.contains('open')) {
-                var target = e.target;
+                const target = e.target;
                 if (!mainNav.contains(target) && !hamburgerBtn?.contains(target)) {
                     closeMenu();
                 }
@@ -779,25 +853,27 @@
         // ============================================================
         // 4. SCROLL TOP
         // ============================================================
-        var scrollTopBtn = document.getElementById('scrollTop');
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 400) {
-                scrollTopBtn?.classList.add('visible');
-            } else {
-                scrollTopBtn?.classList.remove('visible');
-            }
-        });
-        scrollTopBtn?.addEventListener('click', function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        const scrollTopBtn = document.getElementById('scrollTop');
+        if (scrollTopBtn) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 400) {
+                    scrollTopBtn.classList.add('visible');
+                } else {
+                    scrollTopBtn.classList.remove('visible');
+                }
+            });
+            scrollTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
 
         // ============================================================
         // 5. MODAL (site.css ile uyumlu)
         // ============================================================
-        var modalOverlay = document.getElementById('modalOverlay');
-        var modalCloseBtn = document.getElementById('modalCloseBtn');
-        var modalTitle = document.getElementById('genelModalTitle');
-        var modalBody = document.getElementById('modalBody');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalTitle = document.getElementById('genelModalTitle');
+        const modalBody = document.getElementById('modalBody');
 
         function openModal(title, content) {
             if (modalTitle) modalTitle.innerHTML = title;
@@ -811,10 +887,12 @@
             document.body.style.overflow = '';
         }
 
-        modalCloseBtn?.addEventListener('click', closeModal);
-        modalOverlay?.addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+        }
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeModal();
         });
@@ -822,9 +900,8 @@
         document.querySelectorAll('[data-modal]').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                var type = this.dataset.modal;
-                var title = '',
-                    content = '';
+                const type = this.dataset.modal;
+                let title = '', content = '';
                 if (type === 'bagis') {
                     title = '<i class="fas fa-hand-holding-heart"></i> Bağış Yap';
                     content = `
@@ -870,9 +947,9 @@
 
         // IBAN Kopyalama
         document.addEventListener('click', function(e) {
-            var copyBtn = e.target.closest('.modal-iban-copy-btn');
+            const copyBtn = e.target.closest('.modal-iban-copy-btn');
             if (copyBtn) {
-                var iban = copyBtn.dataset.iban || 'TR33 0001 0003 1698 0774 5750 01';
+                const iban = copyBtn.dataset.iban || 'TR33 0001 0003 1698 0774 5750 01';
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(iban).then(function() {
                         alert('IBAN kopyalandı!');
