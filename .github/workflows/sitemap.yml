@@ -23,9 +23,9 @@ jobs:
         
       - name: Create .env file
         run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          echo "SITE=${{ secrets.SITE }}" >> .env
+          echo "SUPABASE_URL=${{ https://tmtdpykzmdvxszxwyege.supabase.co  }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F }}" >> .env
+          echo "SITE=${{ https://www.kirikkalecolyak.org.tr }}" >> .env
           
       - name: Generate sitemap
         run: npm run sitemap
