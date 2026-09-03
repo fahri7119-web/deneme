@@ -30,8 +30,8 @@ jobs:
       - name: 🚀 Haber sayfalarını oluştur
         run: npm run generate
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ https://tmtdpykzmdvxszxwyege.supabase.co }}
+          SUPABASE_ANON_KEY: ${{ sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F }}
       
       - name: 📤 Değişiklikleri kaydet
         if: success()
