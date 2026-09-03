@@ -77,16 +77,17 @@ function getSource(sourceTable) {
 }
 
 function getImage(haber, sourceTable) {
+    const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
     if (sourceTable === 'dernek_haberleri') {
-        return haber.gorsel_url || haber.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+        return haber.gorsel_url || haber.image_url || defaultImage
     }
     if (sourceTable === 'hero') {
-        return haber.bg_image || haber.gorsel_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+        return haber.bg_image || haber.gorsel_url || defaultImage
     }
     if (sourceTable === 'articles') {
-        return haber.featured_image || haber.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+        return haber.featured_image || haber.image_url || defaultImage
     }
-    return 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+    return defaultImage
 }
 
 function getContent(haber) {
@@ -211,7 +212,7 @@ async function generateHaberPages() {
         if (otherHero.length > 0) {
             let cards = ''
             otherHero.forEach(item => {
-                const img = item.bg_image || item.gorsel_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+                const img = getImage(item, 'hero')
                 const itemSlug = item.slug || slugify(getTitle(item))
                 const link = `../haber/${itemSlug}.html`
                 const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
@@ -245,7 +246,7 @@ async function generateHaberPages() {
         if (otherDernek.length > 0) {
             let cards = ''
             otherDernek.forEach(item => {
-                const img = item.gorsel_url || item.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+                const img = getImage(item, 'dernek_haberleri')
                 const itemSlug = item.slug || slugify(getTitle(item))
                 const link = `../haber/${itemSlug}.html`
                 const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
@@ -279,7 +280,7 @@ async function generateHaberPages() {
         if (otherArticles.length > 0) {
             let cards = ''
             otherArticles.forEach(item => {
-                const img = item.featured_image || item.image_url || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
+                const img = getImage(item, 'articles')
                 const itemSlug = item.slug || slugify(item.title)
                 const link = `../yazilar/${itemSlug}.html`
                 const authorName = item.author_name || item.author || 'Yazar'
