@@ -1,155 +1,28 @@
-import { createClient } from '@supabase/supabase-js'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+name: Haber Sayfalarını Güncelle
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+on:
+  workflow_dispatch:
 
-// Supabase bağlantısı
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-console.log('🚀 Script başladı...')
-console.log(`📂 Çalışma dizini: ${__dirname}`)
-console.log(`📡 SUPABASE_URL: ${supabaseUrl ? '✅ Var' : '❌ Eksik'}`)
-console.log(`🔑 SUPABASE_ANON_KEY: ${supabaseKey ? '✅ Var' : '❌ Eksik'}`)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ SUPABASE_URL ve SUPABASE_ANON_KEY ortam değişkenleri gerekli!')
-    process.exit(1)
-}
+      - run: npm install
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+      - run: npm run generate
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
-// Şablon dosyasını oku
-const templatePath = path.join(__dirname, '../templates/haber-template.html')
-console.log(`📄 Şablon yolu: ${templatePath}`)
-
-let template
-try {
-    template = fs.readFileSync(templatePath, 'utf-8')
-    console.log('✅ Şablon okundu')
-} catch (error) {
-    console.error('❌ Şablon dosyası bulunamadı:', templatePath)
-    console.error('Hata:', error.message)
-    process.exit(1)
-}
-
-// Haber klasörünü kontrol et
-const haberDir = path.join(__dirname, '../haber')
-if (!fs.existsSync(haberDir)) {
-    console.log(`📁 Haber klasörü oluşturuluyor: ${haberDir}`)
-    fs.mkdirSync(haberDir, { recursive: true })
-}
-
-async function generateHaberPages() {
-    console.log('🔄 Haber sayfaları oluşturuluyor...')
-    
-    try {
-        // Supabase'den tüm haberleri çek
-        console.log('📡 Supabase\'den haberler çekiliyor...')
-        console.log('📋 Tablo: haberler, Filtre: durum = yayinda')
-        
-        const { data: haberler, error } = await supabase
-            .from('haberler')
-            .select('*')
-            .eq('durum', 'yayinda')
-            .order('tarih', { ascending: false })
-        
-        if (error) {
-            console.error('❌ Supabase hatası:', error.message)
-            console.error('Detay:', error)
-            process.exit(1)
-        }
-        
-        if (!haberler || haberler.length === 0) {
-            console.log('⚠️ Yayında haber bulunamadı.')
-            console.log('💡 Supabase\'de "durum = yayinda" olan haber var mı?')
-            return
-        }
-        
-        console.log(`📊 ${haberler.length} haber bulundu.`)
-        console.log('📝 İlk haber:', haberler[0].baslik || 'Başlık yok')
-        
-        // Her haber için HTML oluştur
-        let successCount = 0
-        for (const haber of haberler) {
-            try {
-                console.log(`📝 İşleniyor: ${haber.baslik || 'İsimsiz haber'}`)
-                const slug = haber.slug || slugify(haber.baslik || 'haber')
-                const content = haber.icerik || haber.ozet || ''
-                const siteUrl = 'https://kirkkalecolyak.org'
-                
-                let html = template
-                    .replace(/\{\{title\}\}/g, escapeHtml(haber.baslik || 'Haber'))
-                    .replace(/\{\{description\}\}/g, escapeHtml(haber.ozet || haber.baslik || 'Haber'))
-                    .replace(/\{\{image_url\}\}/g, haber.gorsel_url || `${siteUrl}/images/dernek-logosu.png`)
-                    .replace(/\{\{slug\}\}/g, slug)
-                    .replace(/\{\{date\}\}/g, formatDate(haber.tarih))
-                    .replace(/\{\{category\}\}/g, haber.kategori || 'Haber')
-                    .replace(/\{\{content\}\}/g, content)
-                    .replace(/\{\{site_url\}\}/g, siteUrl)
-                
-                const outputPath = path.join(haberDir, `${slug}.html`)
-                fs.writeFileSync(outputPath, html, 'utf-8')
-                console.log(`✅ Oluşturuldu: haber/${slug}.html`)
-                successCount++
-            } catch (err) {
-                console.error(`❌ Hata: ${haber.baslik || 'Haber'} oluşturulamadı:`, err.message)
-            }
-        }
-        
-        console.log(`🎉 ${successCount}/${haberler.length} haber sayfası oluşturuldu!`)
-    } catch (err) {
-        console.error('❌ Beklenmeyen hata:', err)
-        console.error('Stack trace:', err.stack)
-        process.exit(1)
-    }
-}
-
-// Yardımcı fonksiyonlar
-function slugify(text) {
-    if (!text) return 'haber'
-    return text
-        .toString()
-        .toLowerCase()
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ı/g, 'i')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c')
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-]/g, '')
-        .replace(/\-\-+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '')
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return 'Tarih belirtilmemiş'
-    try {
-        const date = new Date(dateStr)
-        return date.toLocaleDateString('tr-TR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        })
-    } catch {
-        return dateStr
-    }
-}
-
-function escapeHtml(text) {
-    if (!text) return ''
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')
-}
-
-// Script'i çalıştır
-generateHaberPages()
+      - run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add haber/
+          git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
+          git push
