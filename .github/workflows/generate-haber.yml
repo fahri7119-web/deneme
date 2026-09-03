@@ -13,12 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Tüm geçmişi çekerek rebase işleminin sorunsuz olmasını sağlar
           fetch-depth: 0 
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20' # Node sürümünü de güncelledik
+          node-version: '22' # Sürümü 22 yaparak WebSocket hatasını çözüyoruz
 
       - run: npm install
 
@@ -31,11 +30,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Depodaki son değişiklikleri çekerek çakışmayı önler:
           git pull origin main --rebase
           
-          # Doğru klasörü (haberler/) ekliyoruz:
           git add haberler/
-          
           git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
           git push origin main
