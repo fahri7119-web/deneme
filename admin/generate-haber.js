@@ -18,22 +18,40 @@ const template = fs.readFileSync(templatePath, 'utf-8')
 async function generateHaberPages() {
     console.log('🔄 Haber sayfaları oluşturuluyor...')
     
-    // Supabase'den tüm haberleri çek
-    const { data: haberler, error } = await supabase
-        .from('haberler')
-        .select('*')
-        .eq('durum', 'yayinda')
-        .order('tarih', { ascending: false })
-    
-    if (error) {
-        console.error('❌ Supabase hatası:', error)
+    // 1. İki tablodan da verileri eşzamanlı (parallel) olarak çekiyoruz
+    const [dernekRes, heroRes] = await Promise.all([
+        supabase
+            .from('dernek_haberleri')
+            .select('*')
+            .eq('durum', 'yayinda'),
+        supabase
+            .from('hero')
+            .select('*')
+            .eq('durum', 'yayinda')
+    ])
+
+    // Hata kontrolü
+    if (dernekRes.error) {
+        console.error('❌ dernek_haberleri tablosu hatası:', dernekRes.error)
         return
     }
+    if (heroRes.error) {
+        console.error('❌ hero tablosu hatası:', heroRes.error)
+        return
+    }
+
+    // 2. İki tablodan gelen verileri tek bir dizide birleştiriyoruz
+    const dernekHaberleri = dernekRes.data || []
+    const heroHaberleri = heroRes.data || []
+    let tümHaberler = [...dernekHaberleri, ...heroHaberleri]
+
+    // 3. Haberleri tarihe göre yeniden sıralıyoruz (En yeni en üstte)
+    tümHaberler.sort((a, b) => new Date(b.tarih) - new Date(a.tarih))
     
-    console.log(`📊 ${haberler.length} haber bulundu.`)
+    console.log(`📊 Toplam ${tümHaberler.length} haber bulundu. (Dernek: ${dernekHaberleri.length}, Hero: ${heroHaberleri.length})`)
     
     // Her haber için HTML oluştur
-    for (const haber of haberler) {
+    for (const haber of tümHaberler) {
         const slug = haber.slug || slugify(haber.baslik)
         const content = haber.icerik || haber.ozet || ''
         
@@ -66,6 +84,7 @@ async function generateHaberPages() {
 
 // Yardımcı fonksiyonlar
 function slugify(text) {
+    if (!text) return ''
     return text
         .toString()
         .toLowerCase()
@@ -77,6 +96,7 @@ function slugify(text) {
 }
 
 function formatDate(dateStr) {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     return date.toLocaleDateString('tr-TR', {
         day: 'numeric',
