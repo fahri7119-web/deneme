@@ -7,8 +7,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Supabase bağlantısı
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY
+const supabaseUrl = process.env.https://tmtdpykzmdvxszxwyege.supabase.co
+const supabaseKey = process.env.sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Şablon dosyasını oku
