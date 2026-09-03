@@ -7,16 +7,18 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     
-    # GitHub Actions botuna yazma ve push izni verir:
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Tüm geçmişi çekerek rebase işleminin sorunsuz olmasını sağlar
+          fetch-depth: 0 
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20' # Node sürümünü de güncelledik
 
       - run: npm install
 
@@ -28,6 +30,12 @@ jobs:
       - run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add haber/
+          
+          # Depodaki son değişiklikleri çekerek çakışmayı önler:
+          git pull origin main --rebase
+          
+          # Doğru klasörü (haberler/) ekliyoruz:
+          git add haberler/
+          
           git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
-          git push
+          git push origin main
