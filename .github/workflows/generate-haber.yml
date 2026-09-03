@@ -30,8 +30,14 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
+          # 1. Kodumuz 'haber' klasörüne yazdığı için burayı 'haber/' yaptık
+          git add haber/
+          
+          # 2. Eğer değişiklik varsa commit et, yoksa geç
+          git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
+          
+          # 3. Push yapmadan hemen önce uzak sunucudaki güncel değişiklikleri çek ve birleştir
           git pull origin main --rebase
           
-          git add haberler/
-          git diff --staged --quiet || git commit -m "Update haber pages [skip ci]"
+          # 4. Değişiklikleri ana depoya gönder
           git push origin main
