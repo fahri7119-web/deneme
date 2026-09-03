@@ -57,7 +57,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== CSS DEĞİŞKENLERİ ===== */
+        /* ===== TÜM STİLLER - detay.html ile aynı ===== */
         :root {
             --primary: #1A7A5A;
             --primary-light: #2A9D7A;
@@ -82,7 +82,6 @@
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; overflow-y: scroll; scroll-padding-top: 140px; }
         body {
@@ -110,7 +109,6 @@
         }
         .skip-link:focus { top: 0; }
 
-        /* ===== SITE WRAPPER ===== */
         .site-wrapper {
             max-width: 960px;
             margin: 1.5rem auto;
@@ -205,7 +203,6 @@
         .header-info i { color: var(--primary); width: 14px; }
         @media (max-width: 560px) { .header-info { display: none; } }
 
-        /* ===== HAMBURGER ===== */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -358,7 +355,6 @@
             font-family: var(--font-display);
         }
 
-        /* ===== FLOAT ELEMENTS ===== */
         .float-element {
             float: left;
             margin-right: 20px;
@@ -419,7 +415,6 @@
             }
         }
 
-        /* ===== DETAIL BODY ===== */
         .detail-body {
             font-size: 1.05rem;
             line-height: 1.8;
@@ -502,7 +497,6 @@
             text-decoration: underline;
         }
 
-        /* ===== AUTHOR POST LIST ===== */
         .author-post-list {
             list-style: none;
             padding: 0;
@@ -552,7 +546,6 @@
             transform: translateX(3px);
         }
 
-        /* ===== EXTRA GRID ===== */
         .extra-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -823,7 +816,6 @@
         .modal-close:hover { background: var(--bg-elevated); color: var(--text); }
         .modal-body { padding: 1.5rem; }
 
-        /* ===== MODAL IBAN ===== */
         .modal-iban-box {
             text-align: center;
             padding: 0.5rem 0;
@@ -956,7 +948,6 @@
         body.dark-mode .detail-meta { color: #9CA3AF !important; }
         body.dark-mode .detail-meta .tag { background: #4ade80 !important; color: #111827 !important; }
 
-        /* ===== UTILITY ===== */
         .loading-placeholder {
             padding: 3rem 1rem;
             text-align: center;
@@ -999,10 +990,10 @@
     <div class="site-wrapper">
         <a class="skip-link" href="#main">İçeriğe geç</a>
 
-        <!-- ===== HEADER ===== -->
+        <!-- ===== HEADER - Tüm linkler ../ ile root'a yönlendirir ===== -->
         <header>
             <div class="header-top">
-                <a href="index.html" class="logo" aria-label="Kırıkkale Çölyak Derneği Ana Sayfa">
+                <a href="../index.html" class="logo" aria-label="Kırıkkale Çölyak Derneği Ana Sayfa">
                     <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" alt="Kırıkkale Çölyak Derneği Logo">
                     <div class="logo-text">
                         <span class="city">Kırıkkale</span>
@@ -1026,15 +1017,15 @@
             <div class="nav-overlay" id="navOverlay"></div>
             <nav class="main-nav" id="mainNav" aria-label="Ana navigasyon">
                 <div class="nav-left">
-                    <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
-                    <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
-                    <a href="haberler.html" class="active"><i class="fas fa-newspaper"></i> Haberler</a>
-                    <a href="colyak-rehberi.html"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
-                    <a href="isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
+                    <a href="../index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <a href="../dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                    <a href="../haberler.html" class="active"><i class="fas fa-newspaper"></i> Haberler</a>
+                    <a href="../colyak-rehberi.html"><i class="fas fa-leaf"></i> Çölyak Rehberi</a>
+                    <a href="../isletmeler.html"><i class="fas fa-utensils"></i> İşletmeler</a>
                 </div>
                 <div class="nav-right">
-                    <a href="gida-stok-durumu.html"><i class="fas fa-boxes"></i> Gıda Stok Durumu</a>
-                    <a href="uyelik.html" class="nav-cta"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                    <a href="../gida-stok-durumu.html"><i class="fas fa-boxes"></i> Gıda Stok Durumu</a>
+                    <a href="../uyelik.html" class="nav-cta"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
                 </div>
             </nav>
         </header>
@@ -1060,7 +1051,7 @@
 
                 <!-- ===== ALT BÖLÜMLER ===== -->
                 <div class="extra-sections">
-                    <!-- Yazarın Diğer Yazıları (sadece articles için doldurulur) -->
+                    <!-- Yazarın Diğer Yazıları -->
                     
 
                     <!-- Öne Çıkan Haberler -->
@@ -1068,33 +1059,33 @@
                     <div class="extra-section">
                         <div class="section-head">
                             <h2><i class="fas fa-star" style="color:var(--accent);"></i> Öne Çıkan Haberler</h2>
-                            <a href="index.html">Tümü →</a>
+                            <a href="../index.html">Tümü →</a>
                         </div>
                         <div class="extra-grid">
-                        <a href="/haber/meb-in-soguk-zincir-dijital-takip-sistemi-colyak-hastasi-ogr-1.html" class="extra-item">
-                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/manset-5.jpg" alt="MEB’in Soğuk Zincir Dijital Takip Sistemi Çölyak Hastası Öğrencileri de Kapsamalı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                            <div class="body">
-                                <span class="tag">Öne Çıkan</span>
-                                <h4>MEB’in Soğuk Zincir Dijital Takip Sistemi Çölyak Hastası Öğrencileri de Kapsamalı</h4>
-                                <span class="date">25 Haziran 2026</span>
-                            </div>
-                        </a>
-                    
-                        <a href="/haber/onursal-baskanimiz-prof-dr-hacer-fulya-gulerman.html" class="extra-item">
-                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/manset-2.jpg" alt="Onursal Başkanımız Prof. Dr. Hacer Fulya Gülerman" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                            <div class="body">
-                                <span class="tag">Öne Çıkan</span>
-                                <h4>Onursal Başkanımız Prof. Dr. Hacer Fulya Gülerman</h4>
-                                <span class="date">11 Mayıs 2026</span>
-                            </div>
-                        </a>
-                    
-                        <a href="/haber/gecmise-donuk-SUT-fark-odemeleri.html" class="extra-item">
+                        <a href="../haber/gecmise-donuk-SUT-fark-odemeleri.html" class="extra-item">
                             <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/sgk-logo-1.png" alt="Çölyak Hastalarının Hak Kayıplarına Karşı Derneğimizden Önemli İdari Girişim" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
                             <div class="body">
                                 <span class="tag">Öne Çıkan</span>
                                 <h4>Çölyak Hastalarının Hak Kayıplarına Karşı Derneğimizden Önemli İdari Girişim</h4>
                                 <span class="date">1 Eylül 2026</span>
+                            </div>
+                        </a>
+                    
+                        <a href="../haber/baciyanlar-dernegi-baskani-karapolat-tan-colyak-hastalari-ic-1.html" class="extra-item">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/manset-6.jpg" alt="Bacıyanlar Derneği Başkanı Karapolat’tan Çölyak Hastaları İçin Anlamlı Çağrı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Öne Çıkan</span>
+                                <h4>Bacıyanlar Derneği Başkanı Karapolat’tan Çölyak Hastaları İçin Anlamlı Çağrı</h4>
+                                <span class="date">29 Haziran 2026</span>
+                            </div>
+                        </a>
+                    
+                        <a href="../haber/17-ulusal-cocuk-gastroenteroloji-hepatoloji-ve-beslenme-kong.html" class="extra-item">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/manset/manset-4.jpg" alt="17. Ulusal Çocuk Gastroenteroloji, Hepatoloji ve Beslenme Kongresi Isparta&#039;da Gerçekleşti" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Öne Çıkan</span>
+                                <h4>17. Ulusal Çocuk Gastroenteroloji, Hepatoloji ve Beslenme Kongresi Isparta&#039;da Gerçekleşti</h4>
+                                <span class="date">15 Haziran 2026</span>
                             </div>
                         </a>
                     </div>
@@ -1103,43 +1094,82 @@
 
                     <!-- Dernek Haberleri -->
                     
-                <div class="extra-section">
-                    <div class="section-head">
-                        <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>
-                        <a href="dernekhaber.html">Tümü →</a>
+                    <div class="extra-section">
+                        <div class="section-head">
+                            <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>
+                            <a href="../dernekhaber.html">Tümü →</a>
+                        </div>
+                        <div class="extra-grid">
+                        <a href="../haber/usak-colyak-derneginden-glutensiz-urun-satan-isletmelere-uyari.html" class="extra-item">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_2.jpeg" alt="Uşak Çölyak Derneği&#039;nden Glutensiz Ürün Satan İşletmelere Uyarı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Dernek Haberi</span>
+                                <h4>Uşak Çölyak Derneği&#039;nden Glutensiz Ürün Satan İşletmelere Uyarı</h4>
+                                <span class="date">28 Temmuz 2026</span>
+                            </div>
+                        </a>
+                    
+                        <a href="../haber/colyak-ve-pku-farkindaligi-icin-527-kilometre-pedal-cevirdiler.html" class="extra-item">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_1.jpg" alt="Çölyak ve PKU Farkındalığı İçin 527 Kilometre Pedal Çevirdiler" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Dernek Haberi</span>
+                                <h4>Çölyak ve PKU Farkındalığı İçin 527 Kilometre Pedal Çevirdiler</h4>
+                                <span class="date">12 Temmuz 2026</span>
+                            </div>
+                        </a>
+                    
+                        <a href="../haber/usak-colyak-pku-el-ele-derneginden-anlamli-dostluk-maci.html" class="extra-item">
+                            <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_4.jpg" alt="Uşak Çölyak PKU El Ele Derneği&#039;nden Anlamlı Dostluk Maçı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                            <div class="body">
+                                <span class="tag">Dernek Haberi</span>
+                                <h4>Uşak Çölyak PKU El Ele Derneği&#039;nden Anlamlı Dostluk Maçı</h4>
+                                <span class="date">4 Temmuz 2026</span>
+                            </div>
+                        </a>
                     </div>
-                    <div class="extra-grid">
-                    <a href="/haber/colyak-ve-pku-farkindaligi-icin-527-kilometre-pedal-cevirdiler.html" class="extra-item">
-                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_1.jpg" alt="Çölyak ve PKU Farkındalığı İçin 527 Kilometre Pedal Çevirdiler" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                        <div class="body">
-                            <span class="tag">Dernek Haberi</span>
-                            <h4>Çölyak ve PKU Farkındalığı İçin 527 Kilometre Pedal Çevirdiler</h4>
-                            <span class="date">12 Temmuz 2026</span>
-                        </div>
-                    </a>
+                    </div>
                 
-                    <a href="/haber/usak-colyak-derneginden-glutensiz-urun-satan-isletmelere-uyari.html" class="extra-item">
-                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_2.jpeg" alt="Uşak Çölyak Derneği&#039;nden Glutensiz Ürün Satan İşletmelere Uyarı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                        <div class="body">
-                            <span class="tag">Dernek Haberi</span>
-                            <h4>Uşak Çölyak Derneği&#039;nden Glutensiz Ürün Satan İşletmelere Uyarı</h4>
-                            <span class="date">28 Temmuz 2026</span>
-                        </div>
-                    </a>
-                
-                    <a href="/haber/usak-colyak-pku-el-ele-derneginden-anlamli-dostluk-maci.html" class="extra-item">
-                        <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/dernek_haberleri/haber_4.jpg" alt="Uşak Çölyak PKU El Ele Derneği&#039;nden Anlamlı Dostluk Maçı" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
-                        <div class="body">
-                            <span class="tag">Dernek Haberi</span>
-                            <h4>Uşak Çölyak PKU El Ele Derneği&#039;nden Anlamlı Dostluk Maçı</h4>
-                            <span class="date">4 Temmuz 2026</span>
-                        </div>
-                    </a>
-                </div>
-                </div>
-            
 
                     <!-- Köşe Yazıları -->
+                    
+                        <div class="extra-section">
+                            <div class="section-head">
+                                <h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>
+                                <a href="../haberler.html">Tümü →</a>
+                            </div>
+                            <div class="extra-grid">
+                            <a href="../haber/gectigimiz-ayin-ardindan-26.html" class="extra-item">
+                                <img src="/images/default-haber.jpg" alt="Geçtiğimiz ayın ardından" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                                <div class="body">
+                                    <span class="tag">Prof. Dr. Hacer Fulya Gülerman</span>
+                                    <h4>Geçtiğimiz ayın ardından</h4>
+                                    <div class="description">Mayıs ayı, bizim için çölyak hastalığını hatırlamak, anlamak ve çevremizdeki herkesi bu konuda bilinçlendirmek adına çok özel bir zaman dilimiydi</div>
+                                    <span class="date">2 Haziran 2026</span>
+                                </div>
+                            </a>
+                        
+                            <a href="../haber/9-mayis-i-kutladik-ama-asil-soru-su-ya-sonrasi-23.html" class="extra-item">
+                                <img src="/images/default-haber.jpg" alt="9 Mayıs&#039;ı Kutladık Ama Asıl Soru Şu: Ya Sonrası?" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                                <div class="body">
+                                    <span class="tag">Fahri TÜRKOĞLU</span>
+                                    <h4>9 Mayıs&#039;ı Kutladık Ama Asıl Soru Şu: Ya Sonrası?</h4>
+                                    <div class="description">Dünya Çölyak Günü olan 9 Mayıs, bu yıl Kırıkkale&#039;de dolu dolu bir etkinlik programıyla anlam kazandı. 9-12 Mayıs tarihleri arasında düzenlediğimiz programlarda bir aradaydık;</div>
+                                    <span class="date">22 Mayıs 2026</span>
+                                </div>
+                            </a>
+                        
+                            <a href="../haber/9-mayis-dunya-colyak-gunu-colyaklilar-icin-glutensiz-yasam-bir-tercih-degil-zorunluluktur-19.html" class="extra-item">
+                                <img src="/images/default-haber.jpg" alt="9 Mayıs Dünya Çölyak Günü: Çölyaklılar için Glutensiz Yaşam Bir Tercih Değil, Zorunluluktur" loading="lazy" onerror="this.src='/images/default-haber.jpg'">
+                                <div class="body">
+                                    <span class="tag">Uzm.Dyt. Ayşenur Arslan</span>
+                                    <h4>9 Mayıs Dünya Çölyak Günü: Çölyaklılar için Glutensiz Yaşam Bir Tercih Değil, Zorunluluktur</h4>
+                                    <div class="description">&#039;FARKINDALIK HAYAT KURTARIR: ÇÖLYAĞI TANI&#039;
+&#039;FARK ET, DESTEK OL, BİRLİKTE GÜÇLÜYÜZ&#039;</div>
+                                    <span class="date">27 Nisan 2026</span>
+                                </div>
+                            </a>
+                        </div>
+                        </div>
                     
 
                     <!-- Boş durum -->
@@ -1148,7 +1178,7 @@
             </div>
         </main>
 
-        <!-- ===== FOOTER ===== -->
+        <!-- ===== FOOTER - Tüm linkler ../ ile root'a yönlendirir ===== -->
         <footer class="footer">
             <div class="footer-container">
                 <img src="https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png" class="footer-logo" alt="Kırıkkale Çölyak Derneği Logo">
@@ -1157,9 +1187,9 @@
                     Çölyaklı bireylerin yaşam kalitesini artırmak, glutensiz yaşama erişimi kolaylaştırmak ve ihtiyaç sahibi ailelere düzenli gıda desteği sağlamak amacıyla faaliyet gösteriyoruz.
                 </p>
                 <div class="footer-menu">
-                    <a href="dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
+                    <a href="../dernegimiz.html"><i class="fas fa-building"></i> Derneğimiz</a>
                     <a href="#" data-modal="bagis"><i class="fas fa-hand-holding-heart"></i> Bağış Yap</a>
-                    <a href="uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
+                    <a href="../uyelik.html"><i class="fas fa-user-plus"></i> Üye Ol / Destek Al</a>
                     <a href="#" data-modal="iletisim"><i class="fas fa-envelope"></i> İletişim</a>
                 </div>
                 <div class="footer-social">
@@ -1170,9 +1200,9 @@
                 <div class="footer-bottom">
                     <p>© 2026 Kırıkkale Çölyak Derneği<br>Tüm hakları saklıdır.</p>
                     <div class="footer-links">
-                        <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
-                        <a href="kullanim-kosullari.html">Kullanım Koşulları</a>
-                        <a href="kunye.html">Künye</a>
+                        <a href="../gizlilik-politikasi.html">Gizlilik Politikası</a>
+                        <a href="../kullanim-kosullari.html">Kullanım Koşulları</a>
+                        <a href="../kunye.html">Künye</a>
                     </div>
                 </div>
             </div>
@@ -1184,7 +1214,7 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <!-- ===== GENEL MODAL (Bağış & İletişim) ===== -->
+    <!-- ===== GENEL MODAL ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -1207,7 +1237,7 @@
         updateDate();
 
         // ============================================================
-        // 2. HAMBURGER MENU
+        // 2. DARK MODE
         // ============================================================
         document.getElementById('darkModeToggle')?.addEventListener('click', function() {
             document.body.classList.toggle('dark-mode');
@@ -1228,6 +1258,9 @@
             }
         }
 
+        // ============================================================
+        // 3. HAMBURGER MENU
+        // ============================================================
         var hamburgerBtn = document.getElementById('hamburgerBtn');
         var mainNav = document.getElementById('mainNav');
         var navOverlay = document.getElementById('navOverlay');
@@ -1261,7 +1294,6 @@
 
         navOverlay?.addEventListener('click', closeMenu);
 
-        // Menü dışına tıklama ile kapatma
         document.addEventListener('click', function(e) {
             if (window.innerWidth <= 768 && mainNav?.classList.contains('open')) {
                 var target = e.target;
@@ -1271,18 +1303,16 @@
             }
         });
 
-        // ESC ile kapatma
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeMenu();
         });
 
-        // Pencere boyutu değişince kapat
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) closeMenu();
         });
 
         // ============================================================
-        // 3. SCROLL TOP
+        // 4. SCROLL TOP
         // ============================================================
         var scrollTopBtn = document.getElementById('scrollTop');
         window.addEventListener('scroll', function() {
@@ -1297,7 +1327,7 @@
         });
 
         // ============================================================
-        // 4. MODAL (Bağış & İletişim)
+        // 5. MODAL
         // ============================================================
         var modalOverlay = document.getElementById('modalOverlay');
         var modalCloseBtn = document.getElementById('modalCloseBtn');
