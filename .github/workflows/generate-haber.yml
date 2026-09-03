@@ -1,4 +1,4 @@
-name: Haber Sayfalarını Güncelle
+name: Haber Sayfalarn G�ncelle
 
 on:
   schedule:
@@ -7,7 +7,6 @@ on:
   push:
     branches: [ main, master ]
 
-# 🔑 BUNU EKLE - Yazma izni ver
 permissions:
   contents: write
 
@@ -16,28 +15,28 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Repository'yi indir
+      - name:  Repository'yi indir
         uses: actions/checkout@v4
       
-      - name: 🔧 Node.js kurulumu
+      - name:  Node.js kurulumu
         uses: actions/setup-node@v4
         with:
           node-version: '18'
       
-      - name: 📦 Bağımlılıkları yükle
+      - name:  Bamllklar y�kle
         run: npm install
       
-      - name: 🚀 Haber sayfalarını oluştur
+      - name:  Haber sayfalarn olutur
         run: npm run generate
         env:
-          SUPABASE_URL: ${{ https://tmtdpykzmdvxszxwyege.supabase.co }}
-          SUPABASE_ANON_KEY: ${{ sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       
-      - name: 📤 Değişiklikleri kaydet
+      - name:  Deiiklikleri kaydet
         if: success()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add haber/
-          git diff --staged --quiet || git commit -m "🔄 Haber sayfaları otomatik güncellendi [skip ci]"
+          git diff --staged --quiet || git commit -m " Haber sayfalar otomatik g�ncellendi [skip ci]"
           git push
