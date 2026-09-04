@@ -21,12 +21,12 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ============================================================
-// PROJE KÖK DİZİNİ - DÜZELTİLDİ
+// PROJE KÖK DİZİNİ
 // ============================================================
 const projectRoot = path.join(__dirname, '..')
 
 // ============================================================
-// ŞABLON DOSYASINI OKU - DÜZELTİLDİ
+// ŞABLON DOSYASINI OKU
 // ============================================================
 const templatePath = path.join(projectRoot, 'templates', 'haber-template.html')
 
@@ -458,6 +458,80 @@ function createAuthorPostsSection(articles, currentHaber) {
 }
 
 // ============================================================
+// SITEMAP.XML OLUŞTURMA
+// ============================================================
+async function generateSitemap(tümHaberler) {
+    console.log('\n🗺️ Sitemap.xml oluşturuluyor...')
+    
+    const baseUrl = 'https://www.kirikkalecolyak.org.tr'
+    const today = new Date().toISOString().split('T')[0]
+    
+    // Ana sayfalar (statik)
+    const staticPages = [
+        { url: '/', priority: '1.0', changefreq: 'daily' },
+        { url: '/index.html', priority: '1.0', changefreq: 'daily' },
+        { url: '/haberler.html', priority: '0.9', changefreq: 'daily' },
+        { url: '/dernegimiz.html', priority: '0.8', changefreq: 'monthly' },
+        { url: '/colyak-rehberi.html', priority: '0.8', changefreq: 'monthly' },
+        { url: '/isletmeler.html', priority: '0.8', changefreq: 'weekly' },
+        { url: '/gida-stok-durumu.html', priority: '0.7', changefreq: 'weekly' },
+        { url: '/uyelik.html', priority: '0.7', changefreq: 'monthly' },
+        { url: '/gizlilik-politikasi.html', priority: '0.3', changefreq: 'yearly' },
+        { url: '/kullanim-kosullari.html', priority: '0.3', changefreq: 'yearly' },
+        { url: '/kunye.html', priority: '0.3', changefreq: 'yearly' }
+    ]
+    
+    // Dinamik haber sayfaları
+    const dynamicPages = []
+    
+    tümHaberler.forEach(haber => {
+        const slug = haber.slug || slugify(getTitle(haber))
+        const sourceTable = haber._source || 'unknown'
+        const folder = sourceTable === 'articles' ? 'yazilar' : 'haber'
+        const url = `/${folder}/${slug}.html`
+        const date = haber.tarih || haber.pub_date || haber.created_at || haber.pubDate || today
+        const dateStr = new Date(date).toISOString().split('T')[0]
+        
+        dynamicPages.push({
+            url: url,
+            priority: '0.6',
+            changefreq: 'weekly',
+            lastmod: dateStr
+        })
+    })
+    
+    // Tüm sayfaları birleştir
+    const allPages = [...staticPages, ...dynamicPages]
+    
+    // XML oluştur
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    allPages.forEach(page => {
+        xml += '  <url>\n'
+        xml += `    <loc>${baseUrl}${page.url}</loc>\n`
+        if (page.lastmod) {
+            xml += `    <lastmod>${page.lastmod}</lastmod>\n`
+        } else {
+            xml += `    <lastmod>${today}</lastmod>\n`
+        }
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`
+        xml += `    <priority>${page.priority}</priority>\n`
+        xml += '  </url>\n'
+    })
+    
+    xml += '</urlset>'
+    
+    // Dosyayı kaydet
+    const sitemapPath = path.join(projectRoot, 'sitemap.xml')
+    fs.writeFileSync(sitemapPath, xml, 'utf-8')
+    
+    console.log(`✅ sitemap.xml oluşturuldu (${allPages.length} sayfa)`)
+    
+    return { success: true, count: allPages.length }
+}
+
+// ============================================================
 // ANA FONKSİYON
 // ============================================================
 async function generateHaberPages() {
@@ -542,7 +616,7 @@ async function generateHaberPages() {
                 .replace(/\{\{articles_section\}\}/g, articlesSectionHTML)
                 .replace(/\{\{empty_section\}\}/g, emptySectionHTML)
             
-            // DOSYA KAYDET - DÜZELTİLDİ
+            // DOSYA KAYDET
             let outputDir
             if (sourceTable === 'articles') {
                 outputDir = path.join(projectRoot, 'yazilar')
@@ -567,6 +641,9 @@ async function generateHaberPages() {
             errors.push({ title: getTitle(haber), error: err.message })
         }
     }
+    
+    // ===== SITEMAP OLUŞTUR =====
+    await generateSitemap(tümHaberler)
     
     console.log('\n📊 =========================================')
     console.log(`📊 ${createdCount} sayfa başarıyla oluşturuldu!`)
