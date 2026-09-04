@@ -21,9 +21,16 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ============================================================
-// ŞABLON DOSYASINI OKU
+// PROJE KÖK DİZİNİ - DÜZELTİLDİ
 // ============================================================
-const templatePath = path.join(__dirname, '../templates/haber-template.html')
+const projectRoot = path.join(__dirname, '..')
+
+// ============================================================
+// ŞABLON DOSYASINI OKU - DÜZELTİLDİ
+// ============================================================
+const templatePath = path.join(projectRoot, 'templates', 'haber-template.html')
+
+console.log(`📄 Şablon yolu: ${templatePath}`)
 
 if (!fs.existsSync(templatePath)) {
     console.error(`❌ Şablon dosyası bulunamadı: ${templatePath}`)
@@ -141,9 +148,7 @@ function getDescription(haber) {
     return clean || getTitle(haber)
 }
 
-// ===== GÜNCELLENMİŞ getContent() — detay.html ile aynı float yerleşimi =====
 function getContent(haber) {
-    // Mevcut içeriği al
     let content = haber.icerik ||
                   haber.fullContent ||
                   haber.content ||
@@ -156,7 +161,6 @@ function getContent(haber) {
     const sourceTable = haber._source || 'unknown'
     const title = getTitle(haber)
 
-    // Kaynak tablosuna göre ana görsel (detay.html ile aynı alanlar)
     let newsImage = null
     if (sourceTable === 'dernek_haberleri') {
         newsImage = haber.image_url || haber.gorsel_url || null
@@ -166,7 +170,6 @@ function getContent(haber) {
         newsImage = haber.featured_image || haber.image_url || null
     }
 
-    // İçerik boşsa hero için yönlendirme metni
     if (!content || !content.trim()) {
         if (sourceTable === 'hero') {
             content = `<p><strong>${escapeHtml(title)}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
@@ -176,11 +179,8 @@ function getContent(haber) {
         }
     }
 
-    // ===== FLOAT ELEMANLARI (detay.html ile aynı) =====
-    // Metin etrafında sola yüzen resim / yazar kutusu — max-width %40
     let floatElements = ''
 
-    // Köşe yazılarında yazar kutusu (solda float)
     if (sourceTable === 'articles') {
         const authorName = haber.author_name || haber.author || null
         const authorAvatar = haber.author_avatar || null
@@ -200,8 +200,6 @@ function getContent(haber) {
         }
     }
 
-    // Ana haber görseli — sola float, max %40 (detay.html: detail-float-img)
-    // İçerikte zaten aynı görsel yoksa ekle
     if (newsImage) {
         const alreadyHasThisImage = content.includes(newsImage)
         const hasFloatImg = /class=["'][^"']*detail-float-img/.test(content)
@@ -408,7 +406,6 @@ function createEmptySection() {
         `
 }
 
-// Yazarın diğer yazıları — detay.html ile aynı liste yapısı (sadece articles için)
 function createAuthorPostsSection(articles, currentHaber) {
     if (currentHaber._source !== 'articles') return ''
 
@@ -468,9 +465,9 @@ async function generateHaberPages() {
     console.log('🚀 HABER SAYFALARI OLUŞTURULUYOR')
     console.log('🚀 =========================================\n')
     console.log(`📁 Çalışma dizini: ${__dirname}`)
+    console.log(`📁 Proje kökü: ${projectRoot}`)
     console.log(`📄 Şablon: ${templatePath}\n`)
     
-    // Tüm verileri çek
     console.log('📡 Veritabanı sorgulanıyor...\n')
     
     const [dernekHaberleri, heroHaberleri, articles] = await Promise.all([
@@ -484,14 +481,12 @@ async function generateHaberPages() {
     console.log(`   ⭐ Öne Çıkan (Hero): ${heroHaberleri.length}`)
     console.log(`   ✍️ Köşe Yazıları: ${articles.length}`)
     
-    // Her haber için kaynak tablosunu ekleyelim
     const taggedDernek = dernekHaberleri.map(h => ({ ...h, _source: 'dernek_haberleri' }))
     const taggedHero = heroHaberleri.map(h => ({ ...h, _source: 'hero' }))
     const taggedArticles = articles.map(h => ({ ...h, _source: 'articles' }))
     
     let tümHaberler = [...taggedDernek, ...taggedHero, ...taggedArticles]
 
-    // Haberleri tarihe göre sıralıyoruz (en yeni en üstte)
     tümHaberler.sort((a, b) => {
         const dateA = a.tarih || a.pub_date || a.created_at || a.pubDate || 0
         const dateB = b.tarih || b.pub_date || b.created_at || b.pubDate || 0
@@ -505,7 +500,6 @@ async function generateHaberPages() {
         return
     }
     
-    // Her haber için HTML oluştur
     let createdCount = 0
     const errors = []
     
@@ -523,7 +517,6 @@ async function generateHaberPages() {
             const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
             const source = getSource(sourceTable)
             
-            // ALT BÖLÜMLER
             const authorPostsHTML = createAuthorPostsSection(articles, haber)
             const heroSectionHTML = createHeroSection(heroHaberleri, haber)
             const dernekSectionHTML = createDernekSection(dernekHaberleri, haber)
@@ -531,7 +524,6 @@ async function generateHaberPages() {
             const emptySectionHTML = (authorPostsHTML || heroSectionHTML || dernekSectionHTML || articlesSectionHTML) ? '' : createEmptySection()
             const urlPath = sourceTable === 'articles' ? 'yazilar' : 'haber'
             
-            // Şablondaki yer tutucuları doldur
             let html = template
                 .replace(/\{\{title\}\}/g, title)
                 .replace(/\{\{description\}\}/g, description)
@@ -550,15 +542,14 @@ async function generateHaberPages() {
                 .replace(/\{\{articles_section\}\}/g, articlesSectionHTML)
                 .replace(/\{\{empty_section\}\}/g, emptySectionHTML)
             
-            // Dosyayı kaydet
+            // DOSYA KAYDET - DÜZELTİLDİ
             let outputDir
             if (sourceTable === 'articles') {
-                outputDir = path.join(__dirname, '../yazilar')
+                outputDir = path.join(projectRoot, 'yazilar')
             } else {
-                outputDir = path.join(__dirname, '../haber')
+                outputDir = path.join(projectRoot, 'haber')
             }
             
-            // Klasör yoksa oluştur
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true })
                 console.log(`📁 Klasör oluşturuldu: ${path.basename(outputDir)}/`)
