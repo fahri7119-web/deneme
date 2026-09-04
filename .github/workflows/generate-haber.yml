@@ -6,38 +6,42 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22' 
+          node-version: '22'
+          cache: 'npm'
 
-      - run: npm install
+      - name: Install dependencies
+        run: npm ci
+        timeout-minutes: 5
 
-      - run: npm run generate
+      - name: Generate pages
+        run: npm run generate
         env:
-          SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
-          SUPABASE_ANON_KEY: "${{ secrets.SUPABASE_ANON_KEY }}"
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        timeout-minutes: 3
 
-      - run: |
+      - name: Commit and push
+        run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
-          # Hem 'haber' hem de 'yazilar' klasöründeki tüm yeni ve güncellenmiş dosyaları Git'e ekliyoruz
+
           git add haber/ yazilar/
-          
-          # Eğer değişiklik varsa commit et, yoksa geç
-          git diff --staged --quiet || git commit -m "Update haber and yazilar pages [skip ci]"
-          
-          # Push yapmadan hemen önce uzak sunucudaki güncel değişiklikleri çek ve birleştir
-          git pull origin main --rebase
-          
-          # Değişiklikleri ana depoya gönder
-          git push origin main
+
+          if git diff --staged --quiet; then
+            echo "Değişiklik yok, commit atlanıyor."
+          else
+            git commit -m "Update haber and yazilar pages [skip ci]"
+            git pull origin main --rebase
+            git push origin main
+          fi
