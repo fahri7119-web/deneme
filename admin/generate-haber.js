@@ -316,7 +316,7 @@ function createHeroSection(heroHaberleri, currentHaber) {
             <div class="extra-section">
                 <div class="section-head">
                     <h2><i class="fas fa-star" style="color:var(--accent);"></i> Öne Çıkan Haberler</h2>
-                    <a href="../index.html">Tümü →</a>
+                    <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
             </div>
@@ -352,7 +352,7 @@ function createDernekSection(dernekHaberleri, currentHaber) {
             <div class="extra-section">
                 <div class="section-head">
                     <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Dernek Haberleri</h2>
-                    <a href="../dernekhaber.html">Tümü →</a>
+                    <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
             </div>
@@ -390,7 +390,7 @@ function createArticlesSection(articles, currentHaber) {
             <div class="extra-section">
                 <div class="section-head">
                     <h2><i class="fas fa-feather-alt" style="color:var(--primary);"></i> Köşe Yazıları</h2>
-                    <a href="../yazilar.html">Tümü →</a>
+                    <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
             </div>
