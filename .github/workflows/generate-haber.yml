@@ -26,18 +26,21 @@ jobs:
           SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
           SUPABASE_ANON_KEY: "${{ secrets.SUPABASE_ANON_KEY }}"
 
-      - run: |
+      - name: Commit and push changes
+        run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Hem 'haber' hem de 'yazilar' klasöründeki tüm yeni ve güncellenmiş dosyaları Git'e ekliyoruz
+          # Değişiklikleri ekle
           git add haber/ yazilar/
           
-          # Eğer değişiklik varsa commit et, yoksa geç
-          git diff --staged --quiet || git commit -m "Update haber and yazilar pages [skip ci]"
+          # Eğer değişiklik varsa commit et
+          if ! git diff --staged --quiet; then
+            git commit -m "Update haber and yazilar pages [skip ci]"
+          fi
           
-          # Push yapmadan hemen önce uzak sunucudaki güncel değişiklikleri çek ve birleştir
-          git pull origin main --rebase
+          # Önce uzaktaki değişiklikleri çek (rebase yok)
+          git pull origin main --no-rebase --ff-only || true
           
-          # Değişiklikleri ana depoya gönder
+          # Değişiklikleri pushla
           git push origin main
