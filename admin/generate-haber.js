@@ -141,62 +141,79 @@ function getDescription(haber) {
     return clean || getTitle(haber)
 }
 
-// ===== GÜNCELLENMİŞ getContent() =====
+// ===== GÜNCELLENMİŞ getContent() — detay.html ile aynı float yerleşimi =====
 function getContent(haber) {
-    const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
-    
     // Mevcut içeriği al
-    let content = haber.icerik || 
-                  haber.fullContent || 
-                  haber.content || 
-                  haber.full_description || 
-                  haber.description || 
-                  haber.ozet || 
-                  haber.summary || 
+    let content = haber.icerik ||
+                  haber.fullContent ||
+                  haber.content ||
+                  haber.full_description ||
+                  haber.description ||
+                  haber.ozet ||
+                  haber.summary ||
                   ''
-    
-    // Kaynak tablosuna göre ana görseli al
-    let mainImage = null
+
     const sourceTable = haber._source || 'unknown'
-    
+    const title = getTitle(haber)
+
+    // Kaynak tablosuna göre ana görsel (detay.html ile aynı alanlar)
+    let newsImage = null
     if (sourceTable === 'dernek_haberleri') {
-        mainImage = haber.image_url || haber.gorsel_url || null
+        newsImage = haber.image_url || haber.gorsel_url || null
     } else if (sourceTable === 'hero') {
-        mainImage = haber.bg_image || haber.gorsel_url || null
+        newsImage = haber.bg_image || haber.gorsel_url || null
     } else if (sourceTable === 'articles') {
-        mainImage = haber.featured_image || haber.image_url || haber.author_avatar || null
+        newsImage = haber.featured_image || haber.image_url || null
     }
-    
-    // Eğer ana görsel varsa ve içerikte bu görsel yoksa, içeriğin başına ekle
-    if (mainImage) {
-        // İçerikte zaten bir resim var mı kontrol et (img etiketi var mı?)
-        const hasImage = /<img[^>]*>/i.test(content)
-        
-        // Eğer içerikte resim yoksa veya içerik boşsa, görseli ekle
-        if (!hasImage || !content.trim()) {
-            const imageHtml = `<figure class="haber-gorsel">
-                <img src="${mainImage}" alt="${escapeHtml(getTitle(haber))}" loading="lazy" onerror="this.src='${defaultImage}'">
-                <figcaption>${escapeHtml(getTitle(haber))}</figcaption>
-            </figure>`
-            
-            // İçerik varsa başına ekle, yoksa sadece resmi göster
-            if (content && content.trim()) {
-                content = imageHtml + content
-            } else {
-                content = imageHtml
-            }
-        }
-    }
-    
-    // Eğer içerik hala boşsa ve hero kaydıysa, link ekle
+
+    // İçerik boşsa hero için yönlendirme metni
     if (!content || !content.trim()) {
-        if (haber._source === 'hero') {
-            return `<p><strong>${escapeHtml(getTitle(haber))}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
+        if (sourceTable === 'hero') {
+            content = `<p><strong>${escapeHtml(title)}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
                     <p><a href="../index.html" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>`
+        } else {
+            content = `<p>İçerik bulunamadı.</p>`
         }
-        return `<p>İçerik bulunamadı.</p>`
     }
-    
+
+    // ===== FLOAT ELEMANLARI (detay.html ile aynı) =====
+    // Metin etrafında sola yüzen resim / yazar kutusu — max-width %40
+    let floatElements = ''
+
+    // Köşe yazılarında yazar kutusu (solda float)
+    if (sourceTable === 'articles') {
+        const authorName = haber.author_name || haber.author || null
+        const authorAvatar = haber.author_avatar || null
+        const authorTitle = haber.author_title || 'Köşe Yazarı'
+        const authorEmail = haber.author_email || null
+
+        if (authorName || authorAvatar) {
+            floatElements += `<div class="float-element author-float">`
+            floatElements += `<img src="${authorAvatar || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'}" alt="${escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
+            floatElements += `<div class="author-name">${escapeHtml(authorName || 'Yazar')}`
+            floatElements += `<div class="author-title-small">${escapeHtml(authorTitle)}</div>`
+            floatElements += `</div>`
+            if (authorEmail) {
+                floatElements += `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.2rem;">${escapeHtml(authorEmail)}</div>`
+            }
+            floatElements += `</div>`
+        }
+    }
+
+    // Ana haber görseli — sola float, max %40 (detay.html: detail-float-img)
+    // İçerikte zaten aynı görsel yoksa ekle
+    if (newsImage) {
+        const alreadyHasThisImage = content.includes(newsImage)
+        const hasFloatImg = /class=["'][^"']*detail-float-img/.test(content)
+        if (!alreadyHasThisImage && !hasFloatImg) {
+            floatElements += `<img src="${newsImage}" alt="${escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
+        }
+    }
+
+    if (floatElements) {
+        content = floatElements + content
+    }
+
     return content
 }
 
@@ -391,6 +408,58 @@ function createEmptySection() {
         `
 }
 
+// Yazarın diğer yazıları — detay.html ile aynı liste yapısı (sadece articles için)
+function createAuthorPostsSection(articles, currentHaber) {
+    if (currentHaber._source !== 'articles') return ''
+
+    const authorName = currentHaber.author_name || currentHaber.author || null
+    const authorEmail = currentHaber.author_email || null
+    if (!authorName && !authorEmail) return ''
+
+    let otherPosts = articles.filter(a => a.id !== currentHaber.id)
+
+    if (authorEmail) {
+        otherPosts = otherPosts.filter(a => a.author_email === authorEmail)
+    } else if (authorName) {
+        otherPosts = otherPosts.filter(a => (a.author_name || a.author) === authorName)
+    }
+
+    otherPosts = otherPosts
+        .sort((a, b) => new Date(b.pubDate || b.created_at || 0) - new Date(a.pubDate || a.created_at || 0))
+        .slice(0, 10)
+
+    if (otherPosts.length === 0) return ''
+
+    let postList = ''
+    otherPosts.forEach((p, index) => {
+        const itemSlug = p.slug || slugify(p.title)
+        const link = `../yazilar/${itemSlug}.html`
+        postList += `
+                            <li>
+                                <span class="post-index">${String(index + 1).padStart(2, '0')}</span>
+                                <span class="post-date">${formatDate(p.pubDate || p.created_at)}</span>
+                                <a href="${link}">${escapeHtml(p.title)}</a>
+                                <span class="post-arrow"><i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        `
+    })
+
+    return `
+                        <div class="author-posts-section">
+                            <div class="section-head">
+                                <h2>
+                                    <i class="fas fa-feather-alt"></i>
+                                    ${escapeHtml(authorName || 'Yazar')}'ın Diğer Yazıları
+                                    <span class="author-name-badge">${otherPosts.length} yazı</span>
+                                </h2>
+                            </div>
+                            <ul class="author-post-list">
+                                ${postList}
+                            </ul>
+                        </div>
+                    `
+}
+
 // ============================================================
 // ANA FONKSİYON
 // ============================================================
@@ -455,10 +524,12 @@ async function generateHaberPages() {
             const source = getSource(sourceTable)
             
             // ALT BÖLÜMLER
+            const authorPostsHTML = createAuthorPostsSection(articles, haber)
             const heroSectionHTML = createHeroSection(heroHaberleri, haber)
             const dernekSectionHTML = createDernekSection(dernekHaberleri, haber)
             const articlesSectionHTML = createArticlesSection(articles, haber)
-            const emptySectionHTML = (heroSectionHTML || dernekSectionHTML || articlesSectionHTML) ? '' : createEmptySection()
+            const emptySectionHTML = (authorPostsHTML || heroSectionHTML || dernekSectionHTML || articlesSectionHTML) ? '' : createEmptySection()
+            const urlPath = sourceTable === 'articles' ? 'yazilar' : 'haber'
             
             // Şablondaki yer tutucuları doldur
             let html = template
@@ -466,13 +537,14 @@ async function generateHaberPages() {
                 .replace(/\{\{description\}\}/g, description)
                 .replace(/\{\{image_url\}\}/g, imageUrl)
                 .replace(/\{\{slug\}\}/g, slug)
+                .replace(/\{\{url_path\}\}/g, urlPath)
                 .replace(/\{\{date\}\}/g, date)
                 .replace(/\{\{date_iso\}\}/g, dateISO)
                 .replace(/\{\{category\}\}/g, category)
                 .replace(/\{\{category_class\}\}/g, categoryClass)
                 .replace(/\{\{source\}\}/g, source)
                 .replace(/\{\{content\}\}/g, content)
-                .replace(/\{\{author_posts\}\}/g, '')
+                .replace(/\{\{author_posts\}\}/g, authorPostsHTML)
                 .replace(/\{\{hero_section\}\}/g, heroSectionHTML)
                 .replace(/\{\{dernek_section\}\}/g, dernekSectionHTML)
                 .replace(/\{\{articles_section\}\}/g, articlesSectionHTML)
