@@ -1079,9 +1079,12 @@
             width: 100%;
             max-width: 100%;
             overflow: hidden;
+            box-sizing: border-box;
         }
-        .gida-card *{
-            max-width: 100%;
+        .gida-card *,
+        .gida-card *::before,
+        .gida-card *::after{
+            box-sizing: border-box;
         }
         .gida-card-header{
             display: flex;
@@ -1199,6 +1202,8 @@
             border-radius: 14px;
             padding: 0.8rem 1rem;
             border: 1px solid rgba(0,0,0,0.03);
+            overflow: hidden;
+            min-width: 0;
         }
         .gida-donors-header{
             display: flex;
@@ -1235,10 +1240,14 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.4rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
+            padding: 0.45rem 0.55rem;
+            margin-bottom: 0.25rem;
+            border-radius: 10px;
+            min-width: 0;
+            width: 100%;
+            overflow: hidden;
         }
-        .gida-donor-item:last-child{ border-bottom: none; }
+        .gida-donor-item:last-child{ margin-bottom: 0; }
         .gida-donor-avatar{
             width: 28px;
             height: 28px;
@@ -1248,12 +1257,12 @@
             align-items: center;
             justify-content: center;
             color: #1A7A5A;
-            font-size: 0.65rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
         }
-        .gida-donor-info{ flex: 1; min-width: 0; }
+        .gida-donor-info{ flex: 1 1 auto; min-width: 0; overflow: hidden; }
         .gida-donor-info .name{
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: #1A2626;
             white-space: nowrap;
@@ -1265,11 +1274,35 @@
             color: #6B8E7E;
         }
         .gida-donor-amount{
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             font-weight: 800;
             color: #1A7A5A;
             white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 0.35rem;
+            max-width: 40%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: right;
         }
+        .gida-donor-item.rank-1{
+            background: rgba(255, 215, 0, 0.12);
+            border-left: 4px solid #FFD700;
+        }
+        .gida-donor-item.rank-2{
+            background: rgba(192, 192, 192, 0.12);
+            border-left: 4px solid #C0C0C0;
+        }
+        .gida-donor-item.rank-3{
+            background: rgba(205, 127, 50, 0.12);
+            border-left: 4px solid #CD7F32;
+        }
+        .gida-donor-item.rank-1 .gida-donor-avatar{ background: #FFD700; color: #fff; }
+        .gida-donor-item.rank-2 .gida-donor-avatar{ background: #E0E0E0; color: #333; }
+        .gida-donor-item.rank-3 .gida-donor-avatar{ background: #D2A679; color: #fff; }
+        .gida-donor-item.rank-1 .gida-donor-amount{ color: #B8860B; }
+        .gida-donor-item.rank-2 .gida-donor-amount{ color: #555; }
+        .gida-donor-item.rank-3 .gida-donor-amount{ color: #8B4513; }
         .gida-stock-section{
             background: #F6F8F7;
             border-radius: 14px;
@@ -1971,22 +2004,47 @@
                 font-size: 0.5rem;
                 display: none;
             }
+            .gida-card{
+                padding: 1rem 0.85rem;
+            }
             .gida-donor-item{
-                padding: 0.3rem 0;
+                padding: 0.4rem 0.45rem;
+                gap: 0.4rem;
             }
             .gida-donor-avatar{
                 width: 24px;
                 height: 24px;
-                font-size: 0.55rem;
+                font-size: 0.75rem;
+            }
+            .gida-donor-info{
+                min-width: 0;
+                flex: 1 1 auto;
+                overflow: hidden;
             }
             .gida-donor-info .name{
-                font-size: 0.65rem;
+                font-size: 0.68rem;
             }
             .gida-donor-info .date{
-                font-size: 0.5rem;
+                font-size: 0.48rem;
             }
             .gida-donor-amount{
-                font-size: 0.65rem;
+                font-size: 0.7rem !important;
+                max-width: 36%;
+            }
+            .gida-donors-section,
+            .gida-stock-section{
+                overflow: hidden;
+                min-width: 0;
+                padding: 0.65rem 0.7rem;
+            }
+            .gida-stat-card{
+                min-width: 0;
+                overflow: hidden;
+            }
+            .gida-stat-info .value{
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .gida-stock-legend{
                 font-size: 0.5rem;
@@ -2315,7 +2373,7 @@
                                     <div style="flex:0 0 100%;text-align:center;padding:0.5rem;color:#6B8E7E;font-size:0.7rem;">Stok bilgileri yükleniyor...</div>
                                 </div>
                                 <div class="gida-stock-legend">
-                                    <span class="legend-item"><span class="dot green"></span> Yeterli (2+ ay)</span>
+                                    <span class="legend-item"><span class="dot green"></span> Stokta Var (2+ ay)</span>
                                     <span class="legend-item"><span class="dot orange"></span> Az (1-2 ay)</span>
                                     <span class="legend-item"><span class="dot red"></span> Düşük (1 ay altı)</span>
                                     <span class="legend-item" style="opacity:0.6;font-size:0.5rem;">*Çölyaklı sayısına göre hesaplanır</span>
@@ -2507,6 +2565,11 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Dernek yönetim paneli (dernekpanelv1) veritabanı — gıda/stok/bağış
+        const DERNEK_SUPABASE_URL = 'https://hbmfjrapdhhkieirbaxy.supabase.co';
+        const DERNEK_SUPABASE_ANON_KEY = 'sb_publishable_1tWiT5MtJ5KzAY6VLdFo_A_Rql4c8qh';
+        const dernekDb = supabase.createClient(DERNEK_SUPABASE_URL, DERNEK_SUPABASE_ANON_KEY);
+
         $(document).ready(function() {
             // ===== TARİH =====
             function updateDate() {
@@ -2579,8 +2642,9 @@
                     mansetSlider.find('.manset-slide').remove();
                     
                     heroSlidesData.forEach((s, i) => {
-                        const linkParam = s.slug ? `slug=${encodeURIComponent(s.slug)}` : `id=${s.id}`;
-                        const link = `detay.html?${linkParam}`;
+                        // === DEĞİŞTİRİLDİ: detay.html → haber/slug.html ===
+                        const slug = s.slug || `hero-${s.id}`;
+                        const link = `haber/${slug}.html`;
                         const target = '_self';
                         
                         mansetSlider.append(`
@@ -2763,8 +2827,9 @@
                     
                     sliderNews.forEach((n, i) => {
                         const imageUrl = n.image_url || 'img/dernek-haber-placeholder.jpg';
+                        // === DEĞİŞTİRİLDİ: detay.html → haber/slug.html ===
                         const slug = n.slug || `dernek-haber-${n.id}`;
-                        const link = `detay.html?slug=${encodeURIComponent(slug)}`;
+                        const link = `haber/${slug}.html`;
                         
                         dernekTrack.append(`
                             <div class="dernek-card">
@@ -2937,7 +3002,9 @@
                         
                         let articlesHtml = '';
                         articles.forEach(art => {
-                            const artLink = art.slug ? `detay.html?slug=${encodeURIComponent(art.slug)}` : `detay.html?id=${art.id}`;
+                            // === DEĞİŞTİRİLDİ: detay.html → yazilar/slug.html ===
+                            const slug = art.slug || `yazi-${art.id}`;
+                            const artLink = `yazilar/${slug}.html`;
                             articlesHtml += `
                                 <div class="yazi-item" onclick="window.location.href='${artLink}'">
                                     <div class="yazi-icon"><i class="far fa-file-alt"></i></div>
@@ -3020,7 +3087,9 @@
                     
                     let html = '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
                     data.forEach(art => {
-                        const artLink = art.slug ? `detay.html?slug=${encodeURIComponent(art.slug)}` : `detay.html?id=${art.id}`;
+                        // === DEĞİŞTİRİLDİ: detay.html → yazilar/slug.html ===
+                        const slug = art.slug || `yazi-${art.id}`;
+                        const artLink = `yazilar/${slug}.html`;
                         const date = art.pubDate ? new Date(art.pubDate).toLocaleDateString('tr-TR') : '';
                         html += `
                             <a href="${artLink}" target="_blank" style="display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0.8rem;background:#f8fafc;border-radius:10px;text-decoration:none;color:var(--text);transition:all 0.2s ease;border-left:3px solid var(--primary);" onmouseover="this.style.background='#e8f0ec'" onmouseout="this.style.background='#f8fafc'">
@@ -3127,96 +3196,12 @@
                 return div.innerHTML;
             }
 
-            // ===== 6. GIDA TEDARİĞİ (GÜNCELLENDİ - EN ÇOK BAĞIŞ YAPANLAR) =====
+            // ===== 6. GIDA TEDARİĞİ — kamuya açık tablolar =====
+            // kamu_bagislari: bagis_yapan, bagis_tarihi, bagis_miktari
+            // kamu_dagitimlari: dagitim_tarihi, alicilar, urun_ozeti
+            // dagitim_urun_toplamlari: urun_adi, birim, dagitilan_miktar, dagitim_sayisi
+            // stok_durumlari / stok_lot_durumlari / stok_girisleri
             let celiacCount = 0;
-
-            // gıda-stok-durumu.html ile aynı FIFO hesaplama yardımcıları.
-            function getDistributionItems(distribution) {
-                const rawItems = distribution && distribution.items;
-                if (Array.isArray(rawItems)) return rawItems;
-                if (typeof rawItems === 'string' && rawItems.trim()) {
-                    try {
-                        const parsed = JSON.parse(rawItems);
-                        return Array.isArray(parsed) ? parsed : [];
-                    } catch (e) {
-                        return [];
-                    }
-                }
-                return [];
-            }
-
-            function computeFifoRemainingFromData(stockItems, distributions) {
-                const fifoMap = {};
-                const stockRows = Array.isArray(stockItems) ? stockItems : [];
-
-                stockRows.forEach((stock, index) => {
-                    const received = Math.max(0, Number(stock.received_quantity) || 0);
-                    fifoMap[stock.id] = {
-                        ...stock,
-                        _fifo_index: index,
-                        _computed_remaining: received
-                    };
-                });
-
-                const distributedByProduct = new Map();
-                (Array.isArray(distributions) ? distributions : []).forEach(distribution => {
-                    getDistributionItems(distribution).forEach(item => {
-                        const productName = String(
-                            item.productName ?? item.product_name ?? item.name ?? ''
-                        ).trim();
-                        const quantity = Math.max(0, Number(item.quantity) || 0);
-                        if (!productName || quantity <= 0) return;
-                        distributedByProduct.set(
-                            productName,
-                            (distributedByProduct.get(productName) || 0) + quantity
-                        );
-                    });
-                });
-
-                const fifoRows = Object.values(fifoMap).sort((a, b) => {
-                    const dateDifference = new Date(a.entry_date || 0) - new Date(b.entry_date || 0);
-                    if (dateDifference !== 0) return dateDifference;
-                    const createdDifference = new Date(a.created_at || 0) - new Date(b.created_at || 0);
-                    return createdDifference !== 0 ? createdDifference : a._fifo_index - b._fifo_index;
-                });
-
-                distributedByProduct.forEach((distributedQuantity, productName) => {
-                    let remainingToApply = distributedQuantity;
-                    fifoRows
-                        .filter(stock => String(stock.product_name || '').trim() === productName)
-                        .forEach(stock => {
-                            if (remainingToApply <= 0) return;
-                            const deduction = Math.min(stock._computed_remaining, remainingToApply);
-                            stock._computed_remaining -= deduction;
-                            remainingToApply -= deduction;
-                        });
-                });
-
-                Object.values(fifoMap).forEach(stock => {
-                    stock._computed_remaining = Math.max(0, stock._computed_remaining);
-                    delete stock._fifo_index;
-                });
-
-                return fifoMap;
-            }
-
-            function getDistributedByProduct(distributions) {
-                const distributedMap = new Map();
-                (Array.isArray(distributions) ? distributions : []).forEach(distribution => {
-                    getDistributionItems(distribution).forEach(item => {
-                        const productName = String(
-                            item.productName ?? item.product_name ?? item.name ?? ''
-                        ).trim();
-                        const quantity = Math.max(0, Number(item.quantity) || 0);
-                        if (!productName || quantity <= 0) return;
-                        distributedMap.set(
-                            productName,
-                            (distributedMap.get(productName) || 0) + quantity
-                        );
-                    });
-                });
-                return distributedMap;
-            }
 
             function getStockStatus(received, remaining) {
                 const receivedAmount = Number(received) || 0;
@@ -3228,161 +3213,177 @@
                     ? Math.max(0, Math.min(100, Math.round((remainingAmount / receivedAmount) * 100)))
                     : 0;
                 if (receivedAmount > 0 && remainingAmount / receivedAmount > 0.5) {
-                    return { className: 'green', text: 'Yeterli', percent };
+                    return { className: 'green', text: 'Stokta Var', percent };
                 }
                 return { className: 'orange', text: 'Azalıyor', percent };
-            }
-
-            // Birincil stok kaynağı: Supabase trigger’ının stock tablosuna yazdığı anlık alanlar.
-            // SQL henüz uygulanmamışsa eski alanlara kontrollü geri dönüş sağlar.
-            function getLiveStockValues(stock) {
-                const received = Math.max(0, Number(stock?.received_quantity) || 0);
-                const hasLiveRemaining = stock?.anlik_kalan_miktar !== null
-                    && stock?.anlik_kalan_miktar !== undefined
-                    && stock?.anlik_kalan_miktar !== '';
-                const hasLiveDistributed = stock?.anlik_dagitilan_miktar !== null
-                    && stock?.anlik_dagitilan_miktar !== undefined
-                    && stock?.anlik_dagitilan_miktar !== '';
-                const fallbackRemaining = stock?._computed_remaining ?? stock?.remaining_quantity ?? 0;
-                const remaining = Math.max(
-                    0,
-                    Number(hasLiveRemaining ? stock.anlik_kalan_miktar : fallbackRemaining) || 0
-                );
-                const distributed = Math.max(
-                    0,
-                    Number(hasLiveDistributed
-                        ? stock.anlik_dagitilan_miktar
-                        : Math.max(0, received - remaining)) || 0
-                );
-                return { received, remaining, distributed };
             }
 
             async function loadDistributionInfo() {
                 try {
                     const now = new Date();
                     const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-                    const day = now.getDate();
-                    const month = months[now.getMonth()];
-                    const year = now.getFullYear();
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    $('#gidaUpdateTime').text(`${day} ${month} ${year}, ${hours}:${minutes}`);
+                    $('#gidaUpdateTime').text(
+                        `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+                    );
 
-                    const { data: summaryData, error: summaryError } = await supabaseClient
-                        .from('Toplam')
-                        .select('toplam_aile, bagis_yapan')
-                        .eq('id', 1)
-                        .single();
+                    const [
+                        publicDistRes,
+                        productTotalsRes,
+                        liveSummaryRes,
+                        liveLotsRes,
+                        stockRes,
+                        donorsRes
+                    ] = await Promise.all([
+                        dernekDb.from('kamu_dagitimlari').select('dagitim_tarihi, alicilar, urun_ozeti').order('dagitim_tarihi', { ascending: false }),
+                        dernekDb.from('dagitim_urun_toplamlari').select('urun_adi, birim, dagitilan_miktar, dagitim_sayisi'),
+                        dernekDb.from('stok_durumlari').select('*').order('urun_adi'),
+                        dernekDb.from('stok_lot_durumlari').select('*').order('giris_tarihi', { ascending: false }),
+                        dernekDb.from('stok_girisleri').select('urun_adi, birim, giris_tarihi, alinan_miktar, gorsel_url').order('giris_tarihi', { ascending: false }),
+                        dernekDb.from('kamu_bagislari').select('bagis_yapan, bagis_tarihi, bagis_miktari').order('bagis_miktari', { ascending: false })
+                    ]);
 
-                    if (!summaryError && summaryData) {
-                        celiacCount = summaryData.toplam_aile || 0;
-                        $('#statCeliacCount').text(celiacCount.toLocaleString('tr-TR'));
-                    }
+                    // Konsola teşhis (RLS / izin sorunları)
+                    [
+                        ['kamu_dagitimlari', publicDistRes],
+                        ['dagitim_urun_toplamlari', productTotalsRes],
+                        ['stok_durumlari', liveSummaryRes],
+                        ['stok_lot_durumlari', liveLotsRes],
+                        ['stok_girisleri', stockRes],
+                        ['kamu_bagislari', donorsRes]
+                    ].forEach(([label, res]) => {
+                        if (res?.error) console.warn('[gida]', label, res.error.message || res.error);
+                    });
 
-                    // Birincil kaynak: Supabase trigger’ının stock tablosuna yazdığı anlık alanlar.
-                    // Böylece index.html ile gıda-stok-durumu.html aynı bakiyeyi gösterir.
-                    const { data: stockData, error: stockError } = await supabaseClient
-                        .from('stock')
-                        .select('*')
-                        .order('entry_date', { ascending: false });
-
-                    if (stockError) throw stockError;
-
-                    const latestLiveCalculation = (stockData || [])
-                        .map(stock => stock.anlik_hesaplama_tarihi)
-                        .filter(Boolean)
-                        .sort((a, b) => new Date(b) - new Date(a))[0];
-                    if (latestLiveCalculation) {
-                        $('#gidaUpdateTime').text(new Date(latestLiveCalculation).toLocaleString('tr-TR', {
-                            day: '2-digit', month: '2-digit', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit'
-                        }));
-                    }
-
-                    const stockMap = new Map();
+                    // ----- Toplam dağıtılan: dagitim_urun_toplamlari.dagitilan_miktar -----
                     let totalDistributed = 0;
-
-                    (stockData || []).forEach(stock => {
-                        const name = stock.product_name || 'Bilinmeyen Ürün';
-                        const live = getLiveStockValues(stock);
-                        const existing = stockMap.get(name) || {
-                            received: 0,
-                            distributed: 0,
-                            remaining: 0,
-                            unit: stock.unit || 'Adet'
-                        };
-
-                        existing.received += live.received;
-                        existing.distributed += live.distributed;
-                        existing.remaining += live.remaining;
-                        existing.unit = existing.unit || stock.unit || 'Adet';
-                        stockMap.set(name, existing);
-                        totalDistributed += live.distributed;
-                    });
-
-                    $('#statTotalProduct').text(totalDistributed.toLocaleString('tr-TR'));
-
-                    if (stockError) {
-                        console.error('Stok verisi yüklenemedi:', stockError);
-                        $('#statStockProduct').text('—');
-                    } else {
-                        const totalRemainingStock = Array.from(stockMap.values())
-                            .reduce((total, stockSummary) => total + stockSummary.remaining, 0);
-                        $('#statStockProduct').text(totalRemainingStock.toLocaleString('tr-TR'));
+                    if (!productTotalsRes.error && Array.isArray(productTotalsRes.data)) {
+                        productTotalsRes.data.forEach(row => {
+                            totalDistributed += Math.max(0, Number(row.dagitilan_miktar) || 0);
+                        });
                     }
 
-                    // ===== EN ÇOK BAĞIŞ YAPANLAR =====
+                    // ----- Çölyaklı / alıcı sayısı: kamu_dagitimlari.alicilar (benzersiz) -----
+                    const recipientSet = new Set();
+                    if (!publicDistRes.error && Array.isArray(publicDistRes.data)) {
+                        publicDistRes.data.forEach(row => {
+                            String(row.alicilar || '')
+                                .split(/[;,\n]+/)
+                                .map(s => s.trim())
+                                .filter(Boolean)
+                                .forEach(name => recipientSet.add(name.toLocaleLowerCase('tr')));
+                        });
+                    }
+                    celiacCount = recipientSet.size;
+
+                    // ----- Stok haritası -----
+                    const stockMap = new Map();
+                    function addStock(name, received, remaining, distributed, unit, imageUrl) {
+                        const key = String(name || '').trim();
+                        if (!key) return;
+                        const prev = stockMap.get(key) || { received: 0, distributed: 0, remaining: 0, unit: unit || 'Adet', image_url: '' };
+                        prev.received += Math.max(0, Number(received) || 0);
+                        prev.remaining += Math.max(0, Number(remaining) || 0);
+                        prev.distributed += Math.max(0, Number(distributed) || 0);
+                        prev.unit = unit || prev.unit || 'Adet';
+                        const img = String(imageUrl || '').trim();
+                        if (img && !prev.image_url) prev.image_url = img;
+                        stockMap.set(key, prev);
+                    }
+
+                    if (!liveSummaryRes.error && Array.isArray(liveSummaryRes.data) && liveSummaryRes.data.length) {
+                        liveSummaryRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            const remaining = Number(row.kalan_miktar) || 0;
+                            const distributed = Number(row.dagitilan_miktar) || Math.max(0, received - remaining);
+                            addStock(row.urun_adi, received, remaining, distributed, row.birim || 'Adet');
+                        });
+                    } else if (!liveLotsRes.error && Array.isArray(liveLotsRes.data) && liveLotsRes.data.length) {
+                        liveLotsRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            const remaining = Number(row.kalan_miktar) || 0;
+                            const distributed = Number(row.dagitilan_miktar) || Math.max(0, received - remaining);
+                            addStock(row.urun_adi, received, remaining, distributed, row.birim || 'Adet');
+                        });
+                    } else if (!stockRes.error && Array.isArray(stockRes.data)) {
+                        // Yalnız girişler varsa kalan = alınan (dağıtım düşülmeden)
+                        stockRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            addStock(row.urun_adi, received, received, 0, row.birim || 'Adet');
+                        });
+                        // dagitim_urun_toplamlari ile dağıtılanı düş
+                        if (!productTotalsRes.error && Array.isArray(productTotalsRes.data)) {
+                            productTotalsRes.data.forEach(row => {
+                                const name = String(row.urun_adi || '').trim();
+                                if (!name || !stockMap.has(name)) return;
+                                const prev = stockMap.get(name);
+                                const dist = Math.max(0, Number(row.dagitilan_miktar) || 0);
+                                prev.distributed = dist;
+                                prev.remaining = Math.max(0, prev.received - dist);
+                                if (row.birim) prev.unit = row.birim;
+                            });
+                        }
+                    }
+
+                    // Ürün toplamlarından stok kartına dağıtılan bilgisi ekle (görünümde yoksa)
+                    if (!productTotalsRes.error && Array.isArray(productTotalsRes.data)) {
+                        productTotalsRes.data.forEach(row => {
+                            const name = String(row.urun_adi || '').trim();
+                            if (!name) return;
+                            if (!stockMap.has(name)) {
+                                const dist = Math.max(0, Number(row.dagitilan_miktar) || 0);
+                                addStock(name, dist, 0, dist, row.birim || 'Adet');
+                            }
+                        });
+                    }
+
+                    let totalRemaining = 0;
+                    stockMap.forEach(v => { totalRemaining += v.remaining; });
+
+                    $('#statCeliacCount').text(Number(celiacCount || 0).toLocaleString('tr-TR'));
+                    $('#statTotalProduct').text(Number(totalDistributed || 0).toLocaleString('tr-TR'));
+                    $('#statStockProduct').text(Number(totalRemaining || 0).toLocaleString('tr-TR'));
+
+                    // ----- En büyük destekçiler: kamu_bagislari -----
                     const donorsContainer = $('#gidaDonorsList');
-                    const { data: publicDonors, error: publicDonorError } = await supabaseClient
-                        .from('public_donations')
-                        .select('public_id, payer_name_masked, amount')
-                        .order('amount', { ascending: false })
-                        .order('public_id', { ascending: false });
-
-                    if (publicDonorError) throw publicDonorError;
-
-                    // Aynı maskeli isme ait kayıtları toplam bağış tutarına göre grupla.
                     const donorMap = new Map();
-                    (publicDonors || []).forEach(donor => {
-                        const name = donor.payer_name_masked || 'Anonim';
-                        const amount = Number(donor.amount) || 0;
-                        donorMap.set(name, (donorMap.get(name) || 0) + amount);
-                    });
+                    if (!donorsRes.error && Array.isArray(donorsRes.data)) {
+                        donorsRes.data.forEach(row => {
+                            const amount = Math.max(0, Number(row.bagis_miktari) || 0);
+                            if (amount <= 0) return;
+                            const name = String(row.bagis_yapan || '').trim() || 'Anonim';
+                            donorMap.set(name, (donorMap.get(name) || 0) + amount);
+                        });
+                    }
 
-                    const sortedDonors = Array.from(donorMap, ([name, totalAmount]) => ({ name, totalAmount }))
-                        .sort((a, b) => b.totalAmount - a.totalAmount);
-                    const topDonors = sortedDonors.slice(0, 3);
+                    const topDonors = Array.from(donorMap, ([name, totalAmount]) => ({ name, totalAmount }))
+                        .sort((a, b) => b.totalAmount - a.totalAmount)
+                        .slice(0, 3);
                     const medalEmojis = ['🥇', '🥈', '🥉'];
-
-                    let donorHtml = '';
-                    topDonors.forEach((donor, index) => {
-                        const medal = medalEmojis[index] || '🏅';
-                        donorHtml += `
-                            <div class="gida-donor-item" style="background: ${index === 0 ? 'rgba(255, 215, 0, 0.1)' : index === 1 ? 'rgba(192, 192, 192, 0.1)' : index === 2 ? 'rgba(205, 127, 50, 0.1)' : 'transparent'}; border-radius: 10px; padding: 0.5rem 0.7rem; margin-bottom: 0.2rem; border-left: 4px solid ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'transparent'};">
-                                <div class="gida-donor-avatar" style="background: ${index === 0 ? '#FFD700' : index === 1 ? '#E0E0E0' : index === 2 ? '#D2A679' : '#E8F0EC'}; color: ${index === 1 ? '#333' : '#fff'}; font-size: 0.9rem;">
-                                    <span style="font-size: 1.2rem;">${medal}</span>
-                                </div>
-                                <div class="gida-donor-info">
-                                    <div class="name" style="font-size: 0.9rem;">${escapeHtml(donor.name)}</div>
-                                    <div class="date" style="font-size: 0.6rem; color: #0F5A3E; font-weight: 700;">🏆 En Büyük Destekçi</div>
-                                </div>
-                                <div class="gida-donor-amount" style="font-size: 1.1rem; color: ${index === 0 ? '#B8860B' : index === 1 ? '#555' : index === 2 ? '#8B4513' : ''};">
-                                    ${formatMoney(donor.totalAmount)}
-                                </div>
-                            </div>
-                        `;
-                    });
 
                     if (topDonors.length === 0) {
                         donorsContainer.html('<div style="text-align:center;padding:0.5rem;color:#6B8E7E;font-size:0.7rem;">Henüz bağışçı bilgisi bulunmuyor.</div>');
                     } else {
+                        let donorHtml = '';
+                        topDonors.forEach((donor, index) => {
+                            const medal = medalEmojis[index] || '🏅';
+                            const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+                            donorHtml += `
+                                <div class="gida-donor-item ${rankClass}">
+                                    <div class="gida-donor-avatar"><span>${medal}</span></div>
+                                    <div class="gida-donor-info">
+                                        <div class="name">${escapeHtml(donor.name)}</div>
+                                        <div class="date">En Büyük Destekçi</div>
+                                    </div>
+                                    <div class="gida-donor-amount">${formatMoney(donor.totalAmount)}</div>
+                                </div>
+                            `;
+                        });
                         donorsContainer.html(donorHtml);
                     }
 
-                    // ===== STOK BİLGİLERİ =====
+                    // ----- Stok kartları -----
                     const stockScroll = $('#gidaStockScroll');
-
-                    if (stockError || !stockData || stockData.length === 0) {
+                    if (stockMap.size === 0) {
                         stockScroll.html('<div style="flex:0 0 100%;text-align:center;padding:0.5rem;color:#6B8E7E;font-size:0.7rem;">Stok bilgisi bulunmuyor.</div>');
                         return;
                     }
@@ -3399,50 +3400,61 @@
                     };
 
                     let html = '';
-                    stockMap.forEach((stockSummary, name) => {
-                        const received = stockSummary.received;
-                        const remaining = stockSummary.remaining;
-                        const encodedName = encodeURIComponent(name);
-                        const imageUrl = `stokresim/${encodedName}.jpg`;
-                        const iconClass = productIcons[name] || 'fa-box';
-                        const stockStatus = getStockStatus(received, remaining);
-                        const statusClass = stockStatus.className;
-                        const statusText = stockStatus.text;
-                        const percent = stockStatus.percent;
+                    // Ürün görselleri: stok_girisleri.gorsel_url (en güncel giriş öncelikli)
+                    if (!stockRes.error && Array.isArray(stockRes.data)) {
+                        stockRes.data.forEach(row => {
+                            const key = String(row.urun_adi || '').trim();
+                            const img = String(row.gorsel_url || '').trim();
+                            if (!key || !img) return;
+                            const prev = stockMap.get(key);
+                            if (prev && !prev.image_url) {
+                                prev.image_url = img;
+                                stockMap.set(key, prev);
+                            }
+                        });
+                    }
 
-                        html += `
-                            <div class="gida-product-card">
-                                <img src="${imageUrl}" class="product-img" alt="${escapeHtml(name)}" 
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                <div style="width:70px;height:70px;border-radius:8px;background:#E8F0EC;display:none;align-items:center;justify-content:center;margin:0 auto 0.3rem;">
-                                    <i class="fas ${iconClass}" style="font-size:1.2rem;color:#1A7A5A;"></i>
+                    Array.from(stockMap.entries())
+                        .sort((a, b) => (b[1].remaining - a[1].remaining) || a[0].localeCompare(b[0], 'tr'))
+                        .forEach(([name, stockSummary]) => {
+                            const received = stockSummary.received;
+                            const remaining = stockSummary.remaining;
+                            const imageUrl = (stockSummary.image_url || '').trim();
+                            const iconClass = productIcons[name] || 'fa-box';
+                            const stockStatus = getStockStatus(received, remaining);
+                            const statusClass = stockStatus.className;
+                            const statusText = stockStatus.text;
+                            const percent = stockStatus.percent;
+
+                            html += `
+                                <div class="gida-product-card">
+                                    <img src="${imageUrl}" class="product-img" alt="${escapeHtml(name)}"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div style="width:70px;height:70px;border-radius:8px;background:#E8F0EC;display:none;align-items:center;justify-content:center;margin:0 auto 0.3rem;">
+                                        <i class="fas ${iconClass}" style="font-size:1.2rem;color:#1A7A5A;"></i>
+                                    </div>
+                                    <div class="product-name">${escapeHtml(name)}</div>
+                                    <div class="product-qty">${remaining} ${stockSummary.unit || 'Adet'}</div>
+                                    <div class="progress-track"><div class="progress-fill ${statusClass}" style="width:${Math.min(100, Math.max(0, percent))}%"></div></div>
+                                    <div class="product-status">
+                                        <span class="percent ${statusClass}">%${Math.min(100, Math.max(0, percent))}</span>
+                                        <span class="label ${statusClass}">${statusText}</span>
+                                    </div>
                                 </div>
-                                <div class="product-name">${escapeHtml(name)}</div>
-                                <div class="product-qty">${remaining} ${stockSummary.unit || 'Adet'}</div>
-                                <div class="progress-track"><div class="progress-fill ${statusClass}" style="width:${Math.min(100, Math.max(0, percent))}%"></div></div>
-                                <div class="product-status">
-                                    <span class="percent ${statusClass}">%${Math.min(100, Math.max(0, percent))}</span>
-                                    <span class="label ${statusClass}">${statusText}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
+                            `;
+                        });
 
                     stockScroll.html(html);
 
                     $('#stockScrollLeft').off('click').on('click', function(e) {
                         e.preventDefault();
                         const container = document.getElementById('gidaStockScroll');
-                        if (container) {
-                            container.scrollBy({ left: -180, behavior: 'smooth' });
-                        }
+                        if (container) container.scrollBy({ left: -180, behavior: 'smooth' });
                     });
                     $('#stockScrollRight').off('click').on('click', function(e) {
                         e.preventDefault();
                         const container = document.getElementById('gidaStockScroll');
-                        if (container) {
-                            container.scrollBy({ left: 180, behavior: 'smooth' });
-                        }
+                        if (container) container.scrollBy({ left: 180, behavior: 'smooth' });
                     });
 
                 } catch (e) {
@@ -3761,34 +3773,36 @@
             let donorRefreshTimer = null;
             let donorRefreshInProgress = false;
             function subscribeToLiveStock() {
-                supabaseClient
-                    .channel('public-stock-live-index')
-                    .on('postgres_changes', {
-                        event: '*',
-                        schema: 'public',
-                        table: 'stock'
-                    }, () => {
-                        clearTimeout(stockRefreshTimer);
-                        stockRefreshTimer = setTimeout(async () => {
-                            if (stockRefreshInProgress) return;
-                            stockRefreshInProgress = true;
-                            try {
-                                await loadDistributionInfo();
-                            } finally {
-                                stockRefreshInProgress = false;
-                            }
-                        }, 200);
-                    })
-                    .subscribe();
+                ['stok_girisleri', 'stok_durumlari', 'kamu_dagitimlari'].forEach((table, i) => {
+                    dernekDb
+                        .channel('dernek-public-stock-' + i)
+                        .on('postgres_changes', {
+                            event: '*',
+                            schema: 'public',
+                            table
+                        }, () => {
+                            clearTimeout(stockRefreshTimer);
+                            stockRefreshTimer = setTimeout(async () => {
+                                if (stockRefreshInProgress) return;
+                                stockRefreshInProgress = true;
+                                try {
+                                    await loadDistributionInfo();
+                                } finally {
+                                    stockRefreshInProgress = false;
+                                }
+                            }, 250);
+                        })
+                        .subscribe();
+                });
             }
 
             function subscribeToLiveDonations() {
-                supabaseClient
-                    .channel('public-donations-live-index')
+                dernekDb
+                    .channel('dernek-public-donations')
                     .on('postgres_changes', {
                         event: '*',
                         schema: 'public',
-                        table: 'public_donations'
+                        table: 'kamu_bagislari'
                     }, () => {
                         clearTimeout(donorRefreshTimer);
                         donorRefreshTimer = setTimeout(async () => {
@@ -3799,7 +3813,7 @@
                             } finally {
                                 donorRefreshInProgress = false;
                             }
-                        }, 200);
+                        }, 250);
                     })
                     .subscribe();
             }

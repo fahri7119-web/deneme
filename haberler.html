@@ -1309,8 +1309,12 @@
 
                 allItems = [];
 
-                // Site haberleri
+                // Site haberleri (dernek_haberleri)
                 (siteRes.data || []).forEach(item => {
+                    // === DEĞİŞTİRİLDİ: detay.html → haber/slug.html ===
+                    const slug = item.slug || 'site-' + item.id;
+                    const link = 'haber/' + encodeURIComponent(slug) + '.html';
+                    
                     allItems.push({
                         id: 'site_' + item.id,
                         title: item.title || 'Başlıksız',
@@ -1321,13 +1325,13 @@
                         category: 'Çölyak Haberleri',
                         type: 'site',
                         subType: 'dernek_haberleri',
-                        link: 'detay.html?slug=' + encodeURIComponent(item.slug || 'site-' + item.id),
+                        link: link,
                         target: '_self',
                         isVideo: false
                     });
                 });
 
-                // Dış haberler
+                // Dış haberler (news - basında biz)
                 (distRes.data || []).forEach(item => {
                     allItems.push({
                         id: 'dist_' + item.id,
@@ -1366,6 +1370,10 @@
 
                 // Hero manşet
                 (heroRes.data || []).forEach(item => {
+                    // === DEĞİŞTİRİLDİ: detay.html → haber/slug.html ===
+                    const slug = item.slug || 'hero-' + item.id;
+                    const link = 'haber/' + encodeURIComponent(slug) + '.html';
+                    
                     allItems.push({
                         id: 'hero_' + item.id,
                         title: item.title || 'Manşet',
@@ -1376,7 +1384,7 @@
                         category: 'Çölyak Haberleri',
                         type: 'hero',
                         subType: 'hero_slide',
-                        link: 'detay.html?slug=' + encodeURIComponent(item.slug || 'hero-' + item.id),
+                        link: link,
                         target: '_self',
                         isVideo: false,
                         mediaType: item.media_type || 'Haber'
@@ -1451,25 +1459,28 @@
             const isVideo = featured.isVideo;
             const playBtn = isVideo ? '<div class="featured-play"><i class="fas fa-play"></i></div>' : '';
 
-            const html = `
-                <div class="featured-img-wrap">
-                    <img src="${escapeHtml(featured.image)}" alt="${escapeHtml(featured.title)}" onerror="this.src='img/haber-placeholder.jpg'">
-                    <span class="featured-badge ${badgeClass}">${typeLabel}</span>
-                    ${playBtn}
-                </div>
-                <div class="featured-body">
-                    <div class="featured-meta">
-                        <span class="featured-date"><i class="far fa-calendar-alt"></i> ${formatDate(featured.date)}</span>
-                        <span class="featured-source">${escapeHtml(featured.source)}</span>
-                    </div>
-                    <h2 class="featured-title">${escapeHtml(featured.title)}</h2>
-                    <p class="featured-desc">${escapeHtml(featured.description)}</p>
-                    <a href="${isVideo ? '#' : escapeHtml(featured.link)}" class="featured-link" ${isVideo ? 'onclick="openVideoModal(\'' + escapeHtml(featured.link) + '\',\'' + escapeHtml(featured.videoTitle || featured.title) + '\'); return false;"' : 'target="' + featured.target + '"'}>
-                        ${isVideo ? '<i class="fas fa-play"></i>' : '<i class="fas fa-arrow-right"></i>'}
-                        ${isVideo ? 'Videoyu İzle' : 'Haberi Oku'}
-                    </a>
-                </div>
-            `;
+            const linkUrl = isVideo ? '#' : escapeHtml(featured.link);
+const linkTarget = isVideo ? '' : (featured.type === 'dist' ? 'target="_blank"' : 'target="' + featured.target + '"');
+
+const html = `
+    <div class="featured-img-wrap" onclick="${isVideo ? 'openVideoModal(\'' + escapeHtml(featured.link) + '\',\'' + escapeHtml(featured.videoTitle || featured.title) + '\');' : 'window.location.href=\'' + escapeHtml(featured.link) + '\''}" style="cursor:pointer;">
+        <img src="${escapeHtml(featured.image)}" alt="${escapeHtml(featured.title)}" onerror="this.src='img/haber-placeholder.jpg'">
+        <span class="featured-badge ${badgeClass}">${typeLabel}</span>
+        ${playBtn}
+    </div>
+    <div class="featured-body" onclick="${isVideo ? 'openVideoModal(\'' + escapeHtml(featured.link) + '\',\'' + escapeHtml(featured.videoTitle || featured.title) + '\');' : 'window.location.href=\'' + escapeHtml(featured.link) + '\''}" style="cursor:pointer;">
+        <div class="featured-meta">
+            <span class="featured-date"><i class="far fa-calendar-alt"></i> ${formatDate(featured.date)}</span>
+            <span class="featured-source">${escapeHtml(featured.source)}</span>
+        </div>
+        <h2 class="featured-title">${escapeHtml(featured.title)}</h2>
+        <p class="featured-desc">${escapeHtml(featured.description)}</p>
+        <a href="${linkUrl}" class="featured-link" ${isVideo ? 'onclick="openVideoModal(\'' + escapeHtml(featured.link) + '\',\'' + escapeHtml(featured.videoTitle || featured.title) + '\'); return false;"' : linkTarget} onclick="${isVideo ? 'event.stopPropagation(); openVideoModal(\'' + escapeHtml(featured.link) + '\',\'' + escapeHtml(featured.videoTitle || featured.title) + '\'); return false;' : 'event.stopPropagation();'}">
+            ${isVideo ? '<i class="fas fa-play"></i>' : '<i class="fas fa-arrow-right"></i>'}
+            ${isVideo ? 'Videoyu İzle' : 'Haberi Oku'}
+        </a>
+    </div>
+`;
             $('#featuredCard').html(html);
             $('#featuredCard').off('click');
             if (isVideo) {
@@ -1547,32 +1558,36 @@
                     ? 'data-video="' + escapeHtml(link) + '" data-title="' + escapeHtml(item.videoTitle || item.title) + '"'
                     : '';
 
-                html += `
-                    <article class="news-card" ${dataAttrs}>
-                        <div class="news-card-img">
-                            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='img/haber-placeholder.jpg'">
-                            <div class="news-card-overlay"></div>
-                            <span class="news-card-badge ${badgeClass}">${typeLabel}</span>
-                            ${playBtn}
-                        </div>
-                        <div class="news-card-body">
-                            <div class="news-card-meta">
-                                <span class="news-card-date"><i class="far fa-calendar"></i> ${formatDate(item.date)}</span>
-                                <span class="news-card-category">${escapeHtml(item.category)}</span>
-                            </div>
-                            <h3 class="news-card-title">${escapeHtml(item.title)}</h3>
-                            <div class="news-card-footer">
-                                <span class="news-card-source"><i class="fas fa-tag"></i> ${escapeHtml(item.source || 'Kaynak')}</span>
-                                ${isVideo
-                                    ? '<span class="news-card-action"><i class="fas fa-play"></i> İzle</span>'
-                                    : item.type === 'dist'
-                                        ? '<a href="' + escapeHtml(link) + '" target="_blank" class="news-card-action"><i class="fas fa-external-link-alt"></i> Oku</a>'
-                                        : '<a href="' + escapeHtml(link) + '" class="news-card-action" target="' + item.target + '"><i class="fas fa-arrow-right"></i> Detay</a>'
-                                }
-                            </div>
-                        </div>
-                    </article>
-                `;
+                // Link'i belirle
+const linkUrl = isVideo ? '#' : escapeHtml(link);
+const linkTarget = isVideo ? '' : (item.type === 'dist' ? 'target="_blank"' : 'target="' + item.target + '"');
+
+html += `
+    <article class="news-card" ${dataAttrs} onclick="${isVideo ? 'openVideoModal(\'' + escapeHtml(link) + '\',\'' + escapeHtml(item.videoTitle || item.title) + '\');' : 'window.location.href=\'' + escapeHtml(link) + '\''}">
+        <div class="news-card-img">
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='img/haber-placeholder.jpg'">
+            <div class="news-card-overlay"></div>
+            <span class="news-card-badge ${badgeClass}">${typeLabel}</span>
+            ${playBtn}
+        </div>
+        <div class="news-card-body">
+            <div class="news-card-meta">
+                <span class="news-card-date"><i class="far fa-calendar"></i> ${formatDate(item.date)}</span>
+                <span class="news-card-category">${escapeHtml(item.category)}</span>
+            </div>
+            <h3 class="news-card-title">${escapeHtml(item.title)}</h3>
+            <div class="news-card-footer">
+                <span class="news-card-source"><i class="fas fa-tag"></i> ${escapeHtml(item.source || 'Kaynak')}</span>
+                ${isVideo
+                    ? '<span class="news-card-action"><i class="fas fa-play"></i> İzle</span>'
+                    : item.type === 'dist'
+                        ? '<a href="' + escapeHtml(link) + '" target="_blank" class="news-card-action" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> Oku</a>'
+                        : '<a href="' + escapeHtml(link) + '" class="news-card-action" target="' + item.target + '" onclick="event.stopPropagation();"><i class="fas fa-arrow-right"></i> Detay</a>'
+                }
+            </div>
+        </div>
+    </article>
+`;
             });
 
             grid.html(html);

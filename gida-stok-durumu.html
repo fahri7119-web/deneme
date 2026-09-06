@@ -1170,7 +1170,9 @@ a:focus-visible,
             color: #1a2626;
             border: 1px solid #dce8e4;
             transition: 0.2s;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
+            max-width: 100%;
         }
         .product-tag:hover{
             background: #eef2f1;
@@ -1593,7 +1595,7 @@ a:focus-visible,
                     <div class="ozet-stat-card">
                         <span class="stat-icon"><i class="fas fa-wallet" style="color:#1d4ed8;"></i></span>
                         <div class="stat-value" id="statCashBalance">—</div>
-                        <div class="stat-label">Kasa Bakiyesi</div>
+                        <div class="stat-label">Toplam Bakiye</div>
                     </div>
                 </div>
 
@@ -1797,6 +1799,11 @@ a:focus-visible,
         const SUPABASE_ANON_KEY = 'sb_publishable_3S4Qryj5TCI4IDASoxisVw_Y9eoso2F';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Yönetim paneli veritabanı — gıda/stok/bağış (kamuya açık tablolar)
+        const DERNEK_SUPABASE_URL = 'https://hbmfjrapdhhkieirbaxy.supabase.co';
+        const DERNEK_SUPABASE_ANON_KEY = 'sb_publishable_1tWiT5MtJ5KzAY6VLdFo_A_Rql4c8qh';
+        const dernekDb = supabase.createClient(DERNEK_SUPABASE_URL, DERNEK_SUPABASE_ANON_KEY);
+
         // globalDonors daima veritabanından gelen listenin tamamını tutar.
         // Ana tabloda yalnızca ilk 10 kayıt gösterilir; modal bu tam listeyi kullanır.
         let globalDonors = [];
@@ -1905,7 +1912,7 @@ a:focus-visible,
                 ? Math.max(0, Math.min(100, Math.round((remainingAmount / receivedAmount) * 100)))
                 : 0;
             if (receivedAmount > 0 && remainingAmount / receivedAmount > 0.5) {
-                return { className: 'green', text: 'Yeterli', detailText: 'Stokta Var', percent };
+                return { className: 'green', text: 'Stokta Var', detailText: 'Stokta Var', percent };
             }
             return { className: 'orange', text: 'Azalıyor', detailText: 'Azalıyor', percent };
         }
@@ -1936,10 +1943,13 @@ a:focus-visible,
 
         function truncateProductName(name) {
             if (!name) return '';
-            if (name.length <= 30) return name;
-            const left = name.substring(0, 30);
-            const right = name.substring(name.length - 3);
-            return left + '…' + right;
+            // Miktarlardaki gereksiz ondalıkları temizle: 2.00 → 2, 1.50 → 1.5
+            let cleaned = String(name)
+                .replace(/(\d+)\.0+(?=\s|$|adet|kg|Kg|KG|g\b)/gi, '$1')
+                .replace(/(\d+\.[1-9]*)0+(?=\s|$|adet|kg|Kg|KG|g\b)/gi, '$1');
+            // Uzun isimleri kısaltma; etiketlerde tam görünsün
+            if (cleaned.length <= 60) return cleaned;
+            return cleaned.substring(0, 57) + '…';
         }
 
         // İsim kısaltma - 12 karakter sınırı
@@ -2060,54 +2070,136 @@ a:focus-visible,
                 requestAnimationFrame(frame);
             }
 
+            // Admin kontrol fonksiyonu
+            async function checkIsAdmin() {
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (!session) return false;
+                    
+                    const userMetadata = session.user?.user_metadata || {};
+                    const role = userMetadata.role || session.user?.role || '';
+                    
+                    return role === 'admin';
+                } catch (e) {
+                    console.error('Admin kontrolü başarısız:', e);
+                    return false;
+                }
+            }
+
+            // --- GÜNCELLENMİŞ loadSummaryAndDonors FONKSİYONU ---
+            // Artık admin kontrolü ile public view veya tam tablo kullanıyor
             async function loadSummaryAndDonors() {
                 try {
-                    const { data, error } = await supabaseClient
-                        .from('Toplam')
-                        .select('*')
-                        .eq('id', 1)
-                        .single();
+                    // Admin kontrolü
+                    const isAdmin = await checkIsAdmin();
+                    const tableName = isAdmin ? 'mali_islemler' : 'mali_islemler_public';
+                    
+                    const [
+                        donorsRes,
+                        distRes,
+                        financeRes
+                    ] = await Promise.all([
+                        dernekDb.from('kamu_bagislari')
+                            .select('bagis_yapan, bagis_tarihi, bagis_miktari')
+                            .order('bagis_tarihi', { ascending: false }),
+                        dernekDb.from('kamu_dagitimlari')
+                            .select('dagitim_tarihi, alicilar, urun_ozeti'),
+                        // Admin kontrolü ile tablo seçimi
+                        dernekDb.from(tableName)
+                            .select('islem_turu, tutar, kategori, aciklama') // odeme_yontemi sadece admin'de var
+                    ]);
 
-                    if (error) throw error;
-
-                    if (data) {
-                        celiacCount = data.toplam_aile || 0;
-                        totalIncome = data.toplam_gelir || 0;
-                        totalExpense = data.toplam_gider || 0;
-                        const cashBalance = totalIncome - totalExpense;
-
-                        animateCounter('#statCeliacCount', celiacCount, false);
-                        animateCounter('#statTotalIncome', totalIncome, true);
-                        animateCounter('#statTotalExpense', totalExpense, true);
-                        animateCounter('#statCashBalance', cashBalance, true);
-
-                        // Bağışçı adları ve tutarları yalnızca maskeli public tablodan okunur.
-                        const { data: publicDonors, error: publicDonorError } = await supabaseClient
-                            .from('public_donations')
-                            .select('public_id, donation_date, payer_name_masked, amount')
-                            .order('donation_date', { ascending: false })
-                            .order('public_id', { ascending: false });
-
-                        if (publicDonorError) throw publicDonorError;
-
-                        const donors = (publicDonors || []).map(donor => ({
-                            bagisci: donor.payer_name_masked || 'Anonim',
-                            tarih: donor.donation_date || '—',
-                            miktar: Number(donor.amount) || 0
-                        }));
-                        globalDonors = donors; // Tam maskeli liste modal için saklanır.
-                        renderDonors(globalDonors.slice(0, 10)); // Ana alanda yalnızca son 10.
-                        $('#donorCountBadge').text(globalDonors.length + ' bağışçı');
-                    } else {
-                        globalDonors = [];
-                        renderDonors([]);
-                        $('#donorCountBadge').text('0 bağışçı');
+                    if (donorsRes.error) throw donorsRes.error;
+                    if (distRes.error) console.warn('[gida-stok] kamu_dagitimlari', distRes.error);
+                    if (financeRes.error) {
+                        throw new Error(`Mali işlemler yüklenemedi: ${financeRes.error.message}`);
                     }
+
+                    // --- Mali verileri hesapla ---
+                    let totalIncome = 0;
+                    let totalExpense = 0;
+                    let bankBalance = 0;
+                    let cashBalance = 0;
+
+                    const financeData = financeRes.data || [];
+
+                    financeData.forEach(item => {
+                        // Transfer kontrolü: kategori veya açıklama transfer içeriyorsa
+                        const isTransfer = 
+                            String(item.kategori || '').trim().toLowerCase() === 'transfer' ||
+                            String(item.aciklama || '').includes('[TRANSFER]');
+
+                        const tutar = Number(item.tutar) || 0;
+                        const islemTuru = String(item.islem_turu || '').trim().toLowerCase();
+                        
+                        // Ödeme yöntemi: Admin ise gerçek değer, değilse varsayılan 'Banka'
+                        let odemeYontemi = 'Banka';
+                        if (isAdmin && item.odeme_yontemi) {
+                            odemeYontemi = item.odeme_yontemi;
+                        }
+                        
+                        const d = (islemTuru === 'gelir' ? 1 : -1) * tutar;
+
+                        if (isTransfer) {
+                            // Transferler toplam gelir/gidere dahil EDİLMEZ
+                            // Ancak banka ve kasa bakiyelerine yansıtılır
+                            if (odemeYontemi === 'Banka') bankBalance += d;
+                            else if (odemeYontemi === 'Makbuz') cashBalance += d;
+                            return;
+                        }
+
+                        // Transfer DEĞİLSE normal gelir/gider hesaplaması
+                        if (odemeYontemi === 'Banka') bankBalance += d;
+                        else if (odemeYontemi === 'Makbuz') cashBalance += d;
+
+                        if (islemTuru === 'gelir') {
+                            totalIncome += tutar;
+                        } else if (islemTuru === 'gider') {
+                            totalExpense += tutar;
+                        }
+                    });
+
+                    const totalBalance = bankBalance + cashBalance;
+
+                    // --- ÇÖLYAKLI SAYISI ---
+                    const recipientSet = new Set();
+                    (distRes.data || []).forEach(row => {
+                        String(row.alicilar || '')
+                            .split(/[;,\n]+/)
+                            .map(s => s.trim())
+                            .filter(Boolean)
+                            .forEach(name => recipientSet.add(name.toLocaleLowerCase('tr')));
+                    });
+                    const celiacCount = recipientSet.size;
+
+                    // --- EKRANDA GÖSTER ---
+                    animateCounter('#statCeliacCount', celiacCount, false);
+                    animateCounter('#statTotalIncome', totalIncome, true);
+                    animateCounter('#statTotalExpense', totalExpense, true);
+                    animateCounter('#statCashBalance', totalBalance, true);
+
+                    // --- BAĞIŞÇI LİSTESİ ---
+                    const donors = (donorsRes.data || []).map(donor => ({
+                        bagisci: donor.bagis_yapan || 'Anonim',
+                        tarih: donor.bagis_tarihi || '—',
+                        miktar: Number(donor.bagis_miktari) || 0
+                    }));
+                    globalDonors = donors;
+                    renderDonors(globalDonors.slice(0, 10));
+                    $('#donorCountBadge').text(globalDonors.length + ' bağışçı');
+
+                    console.log(`[gida-stok] Mali hesaplama -> Gelir: ${totalIncome}, Gider: ${totalExpense}, Banka: ${bankBalance}, Kasa: ${cashBalance}, Toplam: ${totalBalance}`);
+
                 } catch (e) {
                     console.error('Özet veriler yüklenemedi:', e);
                     globalDonors = [];
                     renderDonors([]);
                     $('#donorCountBadge').text('0 bağışçı');
+                    $('#statCeliacCount').text('—');
+                    $('#statTotalIncome').text('—');
+                    $('#statTotalExpense').text('—');
+                    $('#statCashBalance').text('—');
+                    showToast('Mali veriler yüklenirken bir sorun oluştu. Lütfen sayfayı yenileyin.');
                 }
             }
 
@@ -2163,122 +2255,189 @@ a:focus-visible,
                 const grid = $('#stockGridContainer');
                 const detailWrap = $('#stockDetailWrap');
                 try {
-                    const { data: stockData, error: stockError } = await supabaseClient
-                        .from('stock')
-                        .select('*')
-                        .order('entry_date', { ascending: false });
+                    const [summaryRes, lotsRes, entriesRes, productTotalsRes] = await Promise.all([
+                        dernekDb.from('stok_durumlari').select('*').order('urun_adi'),
+                        dernekDb.from('stok_lot_durumlari').select('*').order('giris_tarihi', { ascending: false }),
+                        dernekDb.from('stok_girisleri').select('id, urun_adi, birim, giris_tarihi, alinan_miktar, gorsel_url').order('giris_tarihi', { ascending: false }),
+                        dernekDb.from('dagitim_urun_toplamlari').select('urun_adi, birim, dagitilan_miktar, dagitim_sayisi')
+                    ]);
 
-                    if (stockError) throw stockError;
-
-                    globalStockData = stockData || [];
-
-                    const latestLiveCalculation = globalStockData
-                        .map(stock => stock.anlik_hesaplama_tarihi)
-                        .filter(Boolean)
-                        .sort((a, b) => new Date(b) - new Date(a))[0];
-                    if (latestLiveCalculation) {
-                        $('#gidaUpdateTime').text(new Date(latestLiveCalculation).toLocaleString('tr-TR', {
-                            day: '2-digit', month: '2-digit', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit'
-                        }));
-                    }
-
-                    // Birincil kaynak: Supabase trigger’ının stock tablosuna yazdığı anlık sütunlar.
-                    // distributions sorgusu yalnızca bu değerler oluşmadan önceki eski sürüm için
-                    // yedek olarak tutulur; normal durumda tekrar FIFO hesabı yapılmaz.
-                    globalStockItems = globalStockData.map(stock => ({
-                        ...stock,
-                        ...getLiveStockValues(stock)
-                    }));
+                    [
+                        ['stok_durumlari', summaryRes],
+                        ['stok_lot_durumlari', lotsRes],
+                        ['stok_girisleri', entriesRes],
+                        ['dagitim_urun_toplamlari', productTotalsRes]
+                    ].forEach(([label, res]) => {
+                        if (res?.error) console.warn('[gida-stok]', label, res.error.message || res.error);
+                    });
 
                     const productMap = new Map();
-                    globalStockItems.forEach(s => {
-                        const name = s.product_name || 'Bilinmeyen Ürün';
-                        const live = getLiveStockValues(s);
-                        const unit = s.unit || 'Adet';
-                        const existing = productMap.get(name) || {
-                            received: 0,
-                            distributed: 0,
-                            remaining: 0,
-                            unit: unit
-                        };
-                        existing.received += live.received;
-                        existing.distributed += live.distributed;
-                        existing.remaining += live.remaining;
-                        existing.unit = existing.unit || unit;
-                        productMap.set(name, existing);
-                    });
-                    globalProductMap = productMap;
+                    const detailItems = [];
 
-                    grid.empty();
+                    function addProduct(name, received, remaining, distributed, unit, imageUrl) {
+                        const key = String(name || '').trim();
+                        if (!key) return;
+                        const prev = productMap.get(key) || { received: 0, remaining: 0, distributed: 0, unit: unit || 'Adet', image_url: '' };
+                        prev.received += Math.max(0, Number(received) || 0);
+                        prev.remaining += Math.max(0, Number(remaining) || 0);
+                        prev.distributed += Math.max(0, Number(distributed) || 0);
+                        prev.unit = unit || prev.unit || 'Adet';
+                        const img = String(imageUrl || '').trim();
+                        if (img && !prev.image_url) prev.image_url = img;
+                        productMap.set(key, prev);
+                    }
+                    // Özet kartlar: stok_durumlari (ürün bazlı)
+                    if (!summaryRes.error && Array.isArray(summaryRes.data) && summaryRes.data.length) {
+                        summaryRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            const remaining = Number(row.kalan_miktar) || 0;
+                            const distributed = Number(row.dagitilan_miktar) || Math.max(0, received - remaining);
+                            addProduct(row.urun_adi, received, remaining, distributed, row.birim || 'Adet');
+                        });
+                    } else if (!lotsRes.error && Array.isArray(lotsRes.data) && lotsRes.data.length) {
+                        lotsRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            const remaining = Number(row.kalan_miktar) || 0;
+                            const distributed = Number(row.dagitilan_miktar) || Math.max(0, received - remaining);
+                            addProduct(row.urun_adi, received, remaining, distributed, row.birim || 'Adet');
+                        });
+                    } else if (!entriesRes.error && Array.isArray(entriesRes.data)) {
+                        const distByProduct = new Map();
+                        if (!productTotalsRes.error && Array.isArray(productTotalsRes.data)) {
+                            productTotalsRes.data.forEach(row => {
+                                distByProduct.set(String(row.urun_adi || '').trim(), Math.max(0, Number(row.dagitilan_miktar) || 0));
+                            });
+                        }
+                        entriesRes.data.forEach(row => {
+                            const name = String(row.urun_adi || '').trim();
+                            const received = Math.max(0, Number(row.alinan_miktar) || 0);
+                            addProduct(name, received, received, 0, row.birim || 'Adet');
+                        });
+                        distByProduct.forEach((dist, name) => {
+                            if (!productMap.has(name)) return;
+                            const prev = productMap.get(name);
+                            prev.distributed = dist;
+                            prev.remaining = Math.max(0, prev.received - dist);
+                        });
+                    }
+
+                    // Detay satırları: giris_tarihi olan kaynaklar (lot > giris)
+                    if (!lotsRes.error && Array.isArray(lotsRes.data) && lotsRes.data.length) {
+                        lotsRes.data.forEach(row => {
+                            const received = Number(row.alinan_miktar) || 0;
+                            const remaining = Number(row.kalan_miktar) || 0;
+                            const distributed = Number(row.dagitilan_miktar) || Math.max(0, received - remaining);
+                            detailItems.push({
+                                product_name: row.urun_adi,
+                                entry_date: row.giris_tarihi || '',
+                                received_quantity: received,
+                                remaining_quantity: remaining,
+                                distributed_quantity: distributed,
+                                anlik_kalan_miktar: remaining,
+                                anlik_dagitilan_miktar: distributed,
+                                unit: row.birim || 'Adet'
+                            });
+                        });
+                    } else if (!entriesRes.error && Array.isArray(entriesRes.data) && entriesRes.data.length) {
+                        const distByProduct = new Map();
+                        if (!productTotalsRes.error && Array.isArray(productTotalsRes.data)) {
+                            productTotalsRes.data.forEach(row => {
+                                distByProduct.set(String(row.urun_adi || '').trim(), Math.max(0, Number(row.dagitilan_miktar) || 0));
+                            });
+                        }
+                        entriesRes.data.forEach(row => {
+                            const name = String(row.urun_adi || '').trim();
+                            const received = Math.max(0, Number(row.alinan_miktar) || 0);
+                            const dist = distByProduct.get(name) || 0;
+                            // Tek lot varsayımı: tüm dağıtımı bu satıra yazma; sadece alınan göster, dağıtılan 0 bırak
+                            // (ürün toplamı lot bazında değil)
+                            detailItems.push({
+                                product_name: name,
+                                entry_date: row.giris_tarihi || '',
+                                received_quantity: received,
+                                remaining_quantity: received,
+                                distributed_quantity: 0,
+                                anlik_kalan_miktar: received,
+                                anlik_dagitilan_miktar: 0,
+                                unit: row.birim || 'Adet'
+                            });
+                        });
+                    }
+
+                    // Ürün görselleri: stok_girisleri.gorsel_url (en güncel giriş öncelikli; entries tarih desc)
+                    if (!entriesRes.error && Array.isArray(entriesRes.data)) {
+                        entriesRes.data.forEach(row => {
+                            const key = String(row.urun_adi || '').trim();
+                            const img = String(row.gorsel_url || '').trim();
+                            if (!key || !img) return;
+                            const prev = productMap.get(key);
+                            if (prev) {
+                                if (!prev.image_url) { prev.image_url = img; productMap.set(key, prev); }
+                            }
+                        });
+                    }
+
+                    globalProductMap = productMap;
+                    globalStockData = detailItems;
+                    globalStockItems = detailItems.map(s => ({
+                        ...s,
+                        ...getLiveStockValues(s)
+                    }));
 
                     if (productMap.size === 0) {
                         grid.html(`<div class="stock-empty">Henüz stok bilgisi bulunmuyor.</div>`);
                         $('#stockCountBadge').text('0 ürün');
-                        detailWrap.html(`<div class="stock-empty">Henüz stok bilgisi bulunmuyor.</div>`);
+                        detailWrap.html(`<div class="stock-empty">Henüz stok detayı bulunmuyor.</div>`);
                         $('#stockDetailCount').text('0 ürün');
                         return;
                     }
 
-                    // 6 kart göster (2 sütun)
-                    const products = Array.from(productMap.entries()).slice(0, 6);
-                    let cardHtml = '';
-                    products.forEach(([name, val]) => {
-                        const received = val.received;
-                        const remaining = val.remaining;
-                        const distributed = val.distributed || 0;
 
-                        const stockStatus = getStockStatus(received, remaining);
-                        const statusClass = stockStatus.className;
-                        const statusText = stockStatus.text;
-                        const percent = stockStatus.percent;
+                    // Ana sayfada kalan stoku en fazla olan en fazla 6 ürün
+                    const remainingProducts = Array.from(productMap.entries())
+                        .filter(([, val]) => (Number(val.remaining) || 0) > 0)
+                        .sort((a, b) => (b[1].remaining - a[1].remaining) || a[0].localeCompare(b[0], 'tr'))
+                        .slice(0, 6);
 
-                        const encodedName = encodeURIComponent(name);
-                        const imageUrl = `stokresim/${encodedName}.jpg`;
+                    let html = '';
+                    remainingProducts.forEach(([name, val]) => {
+                            const received = Math.round(Number(val.received) || 0);
+                            const remaining = Math.round(Number(val.remaining) || 0);
+                            const distributed = Math.round(Number(val.distributed) || 0);
+                            const stockStatus = getStockStatus(received, remaining);
+                            const statusClass = stockStatus.className;
+                            const statusText = stockStatus.text;
+                            const percent = stockStatus.percent;
+                            const imageUrl = (val.image_url || '').trim();
 
-                        cardHtml += `
-                            <div class="stock-card-horizontal">
-                                <div class="stock-img">
-                                    <img src="${imageUrl}" alt="${escapeHtml(name)}" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-box fallback-icon\\'></i>'">
-                                </div>
-                                <div class="stock-info">
-                                    <div class="stock-name">${escapeHtml(name)}</div>
-                                    <div class="stock-detail">
-                                        <strong>${remaining}</strong> ${val.unit || 'Adet'} kaldı
-                                    </div>
-                                    <div class="stock-bar">
-                                        <div class="bar-fill ${statusClass}" style="width:${Math.min(100, Math.max(0, percent))}%;"></div>
-                                    </div>
-                                    <div class="stock-status">
-                                        <span class="status-label ${statusClass}">${statusText}</span>
-                                        <span>%${Math.min(100, Math.max(0, percent))}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    // 6 karttan az varsa boş kartlarla doldur
-                    const totalCards = products.length;
-                    if (totalCards < 6) {
-                        for (let i = totalCards; i < 6; i++) {
-                            cardHtml += `
-                                <div class="stock-card-horizontal" style="opacity:0.4;border-style:dashed;">
-                                    <div class="stock-img" style="background:#f0f4f2;">
-                                        <i class="fas fa-plus" style="color:#9ca3af;font-size:1rem;"></i>
+                            html += `
+                                <div class="stock-card-horizontal">
+                                    <div class="stock-img">
+                                        <img src="${imageUrl}" alt="${escapeHtml(name)}" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-box fallback-icon\\'></i>'">
                                     </div>
                                     <div class="stock-info">
-                                        <div class="stock-name" style="color:#9ca3af;">Stok eklenecek</div>
-                                        <div class="stock-detail" style="color:#9ca3af;">—</div>
+                                        <div class="stock-name">${escapeHtml(name)}</div>
+                                        <div class="stock-detail">
+                                            <span>Alınan: <strong>${received}</strong></span>
+                                            <span>Dağıtılan: <strong style="color:#d97706;">${distributed}</strong></span>
+                                            <span>Kalan: <strong>${remaining}</strong> ${escapeHtml(val.unit || 'Adet')}</span>
+                                        </div>
+                                        <div class="stock-bar"><div class="bar-fill ${statusClass}" style="width:${Math.min(100, Math.max(0, percent))}%;"></div></div>
+                                        <div class="stock-status">
+                                            <span class="status-label ${statusClass}">${statusText}</span>
+                                            <span>%${Math.min(100, Math.max(0, percent))}</span>
+                                        </div>
                                     </div>
                                 </div>
                             `;
-                        }
+                        });
+                    if (!html) {
+                        html = `<div class="stock-empty">Henüz kalan stok bulunmuyor.</div>`;
                     }
+                    grid.html(html);
+                    $('#stockCountBadge').text(remainingProducts.length + ' ürün');
 
-                    grid.html(cardHtml);
-                    $('#stockCountBadge').text(productMap.size + ' ürün');
-
+                    // Ana sayfada yalnızca kalan stoku olan kayıtlar; sütunlar: Ürün Adı, Giriş Tarihi, Alınan, Dağıtılan
                     let detailHtml = `
                         <table class="stock-detail-table">
                             <thead>
@@ -2287,24 +2446,23 @@ a:focus-visible,
                                     <th>Giriş Tarihi</th>
                                     <th>Alınan</th>
                                     <th>Dağıtılan</th>
-                                    <th>Kalan</th>
-                                    <th>Durum</th>
                                 </tr>
                             </thead>
                             <tbody>
                     `;
-
-                    const detailItems = globalStockItems.slice(0, 6);
-                    detailItems.forEach(item => {
+                    const sortedDetail = detailItems
+                        .slice()
+                        .filter(item => {
+                            const live = getLiveStockValues(item);
+                            return Math.round(Number(live.remaining) || 0) > 0;
+                        })
+                        .sort((a, b) => String(b.entry_date||'').localeCompare(String(a.entry_date||'')));
+                    sortedDetail.forEach(item => {
                         const name = item.product_name || 'Bilinmeyen';
                         const live = getLiveStockValues(item);
-                        const received = live.received;
-                        const remaining = live.remaining;
-                        const distributed = live.distributed;
+                        const received = Math.round(Number(live.received) || 0);
+                        const distributed = Math.round(Number(live.distributed) || 0);
                         const entryDate = item.entry_date || '';
-                        const stockStatus = getStockStatus(received, remaining);
-                        const statusClass = `status-${stockStatus.className}`;
-                        const statusText = stockStatus.detailText;
 
                         detailHtml += `
                             <tr>
@@ -2312,27 +2470,25 @@ a:focus-visible,
                                 <td>${escapeHtml(formatDate(entryDate))}</td>
                                 <td class="stock-detail-received">${received}</td>
                                 <td class="stock-detail-distributed" style="color:#d97706;">${distributed}</td>
-                                <td class="stock-detail-remaining">${remaining}</td>
-                                <td><span class="stock-detail-status ${statusClass}">${statusText}</span></td>
                             </tr>
                         `;
                     });
-
-                    const currentRows = detailItems.length;
-                    if (currentRows < 6) {
-                        for (let i = currentRows; i < 6; i++) {
-                            detailHtml += `
-                                <tr style="opacity:0.3;">
-                                    <td colspan="6" style="text-align:center;color:#9ca3af;">—</td>
-                                </tr>
-                            `;
-                        }
+                    if (sortedDetail.length === 0) {
+                        detailHtml += `
+                            <tr>
+                                <td colspan="4" style="text-align:center;padding:1rem;color:var(--text-light);">Henüz kalan stok kaydı bulunmuyor.</td>
+                            </tr>
+                        `;
                     }
-
                     detailHtml += `</tbody></table>`;
                     detailWrap.html(detailHtml);
-                    $('#stockDetailCount').text(globalStockData.length + ' ürün');
+                    $('#stockDetailCount').text(sortedDetail.length + ' kayıt');
 
+                    const now = new Date();
+                    $('#gidaUpdateTime').text(now.toLocaleString('tr-TR', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    }));
                 } catch (e) {
                     console.error('Stok verileri yüklenemedi:', e);
                     grid.html(`<div class="stock-empty">Stok bilgileri yüklenirken hata oluştu.</div>`);
@@ -2346,31 +2502,44 @@ a:focus-visible,
             async function loadDistributions() {
                 const container = $('#distGridContainer');
                 try {
-                    const { data, error } = await supabaseClient
-                        .from('public_distributions')
-                        .select('*')
-                        .order('receipt_sort_order', { ascending: false })
+                    const { data, error } = await dernekDb
+                        .from('kamu_dagitimlari')
+                        .select('dagitim_tarihi, alicilar, urun_ozeti')
+                        .order('dagitim_tarihi', { ascending: false })
                         .limit(3);
 
                     if (error) throw error;
 
-                    globalDistributions = data || [];
+                    // Modal için tam liste ayrıca yüklenecek; burada özet
+                    const rows = data || [];
+                    globalDistributions = rows.map((d, idx) => {
+                        const alicilar = String(d.alicilar || '').trim();
+                        const names = alicilar.split(/[;,\n]+/).map(s => s.trim()).filter(Boolean);
+                        return {
+                            receipt_number: '—',
+                            distribution_date: d.dagitim_tarihi || '',
+                            celiac_name_short: names[0] || 'Bilinmeyen',
+                            celiac_count: names.length || 0,
+                            items_list: d.urun_ozeti || '',
+                            alicilar: alicilar,
+                            urun_ozeti: d.urun_ozeti || ''
+                        };
+                    });
 
-                    if (!data || data.length === 0) {
+                    if (!rows.length) {
                         container.html(`<div class="dist-empty"><i class="fas fa-box-open"></i> Henüz dağıtım kaydı bulunmuyor.</div>`);
                         $('#distCountBadge').text('0 dağıtım');
                         return;
                     }
 
                     let html = '';
-
-                    data.forEach(d => {
-                        const receipt = d.receipt_number || '—';
+                    globalDistributions.forEach(d => {
                         const date = d.distribution_date || '';
                         const name = d.celiac_name_short || 'Bilinmeyen';
                         const count = d.celiac_count || 0;
                         const itemsRaw = d.items_list || '';
-                        const itemsArray = itemsRaw.split(', ').map(s => s.trim()).filter(s => s);
+                        // Virgülden sonra boşluk veya noktalı virgül ile ayır; "0,5" gibi ondalık virgülleri bölme
+                        const itemsArray = itemsRaw.split(/,\s+|;\s*/).map(s => s.trim()).filter(s => s);
 
                         let productTags = '';
                         if (itemsArray.length > 0) {
@@ -2385,10 +2554,9 @@ a:focus-visible,
                             <div class="dist-card-new">
                                 <div class="dist-row-header">
                                     <div class="dist-row">
-                                        <span class="dist-field"><strong>Makbuz no:</strong> ${escapeHtml(receipt)}</span>
                                         <span class="dist-field"><strong>Tarih:</strong> ${escapeHtml(date)}</span>
-                                        <span class="dist-field"><strong>Çölyaklının Adı:</strong> ${escapeHtml(name)}</span>
-                                        <span class="dist-field"><strong>Ailedeki Çölyaklı sayısı:</strong> ${count} çölyaklı</span>
+                                        <span class="dist-field"><strong>Teslim alan:</strong> ${escapeHtml(name)}</span>
+                                        <span class="dist-field"><strong>Çölyaklı sayısı:</strong> ${count} çölyaklı</span>
                                     </div>
                                 </div>
                                 <div class="dist-products-section">
@@ -2404,7 +2572,7 @@ a:focus-visible,
                     });
 
                     container.html(html);
-                    $('#distCountBadge').text(data.length + ' dağıtım');
+                    $('#distCountBadge').text(rows.length + '+ dağıtım');
 
                 } catch (e) {
                     console.error('Dağıtım verileri yüklenemedi:', e);
@@ -2526,13 +2694,23 @@ a:focus-visible,
             // Modal için tüm dağıtımları yükle
             async function loadAllDistributionsForModal() {
                 try {
-                    const { data, error } = await supabaseClient
-                        .from('public_distributions')
-                        .select('*')
-                        .order('receipt_sort_order', { ascending: false });
+                    const { data, error } = await dernekDb
+                        .from('kamu_dagitimlari')
+                        .select('dagitim_tarihi, alicilar, urun_ozeti')
+                        .order('dagitim_tarihi', { ascending: false });
 
                     if (error) throw error;
-                    globalDistributions = data || [];
+                    globalDistributions = (data || []).map(d => {
+                        const alicilar = String(d.alicilar || '').trim();
+                        const names = alicilar.split(/[;,\n]+/).map(s => s.trim()).filter(Boolean);
+                        return {
+                            receipt_number: '—',
+                            distribution_date: d.dagitim_tarihi || '',
+                            celiac_name_short: names[0] || 'Bilinmeyen',
+                            celiac_count: names.length || 0,
+                            items_list: d.urun_ozeti || ''
+                        };
+                    });
                 } catch (e) {
                     console.error('Modal dağıtım verileri yüklenemedi:', e);
                     globalDistributions = [];
@@ -2540,18 +2718,17 @@ a:focus-visible,
             }
 
             async function loadAllDonorsForModal() {
-                const { data, error } = await supabaseClient
-                    .from('public_donations')
-                    .select('public_id, donation_date, payer_name_masked, amount')
-                    .order('donation_date', { ascending: false })
-                    .order('public_id', { ascending: false });
+                const { data, error } = await dernekDb
+                    .from('kamu_bagislari')
+                    .select('bagis_yapan, bagis_tarihi, bagis_miktari')
+                    .order('bagis_tarihi', { ascending: false });
 
                 if (error) throw error;
 
                 const allDonors = (data || []).map(donor => ({
-                    bagisci: donor.payer_name_masked || 'Anonim',
-                    tarih: donor.donation_date || '—',
-                    miktar: Number(donor.amount) || 0
+                    bagisci: donor.bagis_yapan || 'Anonim',
+                    tarih: donor.bagis_tarihi || '—',
+                    miktar: Number(donor.bagis_miktari) || 0
                 }));
                 globalDonors = allDonors;
                 return renderAllDonors(allDonors);
@@ -2595,19 +2772,20 @@ a:focus-visible,
 
                 let html = `<div class="stock-grid-right" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">`;
                 
-                const products = Array.from(globalProductMap.entries());
+                // Modalda tüm ürünler (kalan 0 olanlar dahil)
+                const products = Array.from(globalProductMap.entries())
+                    .sort((a, b) => (b[1].remaining - a[1].remaining) || a[0].localeCompare(b[0], 'tr'));
                 products.forEach(([name, val]) => {
-                    const received = val.received;
-                    const remaining = val.remaining;
-                    const distributed = val.distributed || 0;
+                    const received = Math.round(Number(val.received) || 0);
+                    const remaining = Math.round(Number(val.remaining) || 0);
+                    const distributed = Math.round(Number(val.distributed) || 0);
 
                     const stockStatus = getStockStatus(received, remaining);
                     const statusClass = stockStatus.className;
                     const statusText = stockStatus.text;
                     const percent = stockStatus.percent;
 
-                    const encodedName = encodeURIComponent(name);
-                    const imageUrl = `https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/stok_resim/${encodedName}.jpg`;
+                    const imageUrl = (val.image_url || '').trim();
                     
                     html += `
                         <div class="stock-card-horizontal" style="min-height:110px; flex-direction:column; align-items:flex-start; gap:0.2rem; padding:0.8rem;">
@@ -2655,12 +2833,12 @@ a:focus-visible,
                 }
                 let html = '';
                 globalDistributions.forEach(d => {
-                    const receipt = d.receipt_number || '—';
                     const date = d.distribution_date || '';
                     const name = d.celiac_name_short || 'Bilinmeyen';
                     const count = d.celiac_count || 0;
                     const itemsRaw = d.items_list || '';
-                    const itemsArray = itemsRaw.split(', ').map(s => s.trim()).filter(s => s);
+                    // Virgülden sonra boşluk veya noktalı virgül ile ayır; "0,5" gibi ondalık virgülleri bölme
+                    const itemsArray = itemsRaw.split(/,\s+|;\s*/).map(s => s.trim()).filter(s => s);
 
                     let productTags = '';
                     if (itemsArray.length > 0) {
@@ -2675,7 +2853,6 @@ a:focus-visible,
                         <div class="dist-card-new" style="margin:0.4rem 0;">
                             <div class="dist-row-header">
                                 <div class="dist-row">
-                                    <span class="dist-field"><strong>Makbuz no:</strong> ${escapeHtml(receipt)}</span>
                                     <span class="dist-field"><strong>Tarih:</strong> ${escapeHtml(date)}</span>
                                     <span class="dist-field"><strong>Teslim alan:</strong> ${escapeHtml(name)}</span>
                                     <span class="dist-field"><strong>Çölyaklı sayısı:</strong> ${count} çölyaklı</span>
@@ -2712,9 +2889,9 @@ a:focus-visible,
                 globalStockItems.forEach(item => {
                     const name = item.product_name || 'Bilinmeyen';
                     const live = getLiveStockValues(item);
-                    const received = live.received;
-                    const remaining = live.remaining;
-                    const distributed = live.distributed;
+                    const received = Math.round(Number(live.received) || 0);
+                    const remaining = Math.round(Number(live.remaining) || 0);
+                    const distributed = Math.round(Number(live.distributed) || 0);
                     const entryDate = item.entry_date || '';
                     const stockStatus = getStockStatus(received, remaining);
                     const statusClass = `status-${stockStatus.className}`;
@@ -2776,34 +2953,37 @@ a:focus-visible,
             let donorRefreshInProgress = false;
             let stockRefreshInProgress = false;
             function subscribeToLiveStock() {
-                supabaseClient
-                    .channel('public-stock-live-gida')
-                    .on('postgres_changes', {
-                        event: '*',
-                        schema: 'public',
-                        table: 'stock'
-                    }, () => {
-                        clearTimeout(stockRefreshTimer);
-                        stockRefreshTimer = setTimeout(async () => {
-                            if (stockRefreshInProgress) return;
-                            stockRefreshInProgress = true;
-                            try {
-                                await loadStockData();
-                            } finally {
-                                stockRefreshInProgress = false;
-                            }
-                        }, 200);
-                    })
-                    .subscribe();
+                ['stok_girisleri', 'stok_durumlari', 'kamu_dagitimlari'].forEach((table, i) => {
+                    dernekDb
+                        .channel('dernek-stock-live-gida-' + i)
+                        .on('postgres_changes', {
+                            event: '*',
+                            schema: 'public',
+                            table
+                        }, () => {
+                            clearTimeout(stockRefreshTimer);
+                            stockRefreshTimer = setTimeout(async () => {
+                                if (stockRefreshInProgress) return;
+                                stockRefreshInProgress = true;
+                                try {
+                                    await loadStockData();
+                                    await loadDistributions();
+                                } finally {
+                                    stockRefreshInProgress = false;
+                                }
+                            }, 250);
+                        })
+                        .subscribe();
+                });
             }
 
             function subscribeToLiveDonations() {
-                supabaseClient
-                    .channel('public-donations-live-gida')
+                dernekDb
+                    .channel('dernek-donations-live-gida')
                     .on('postgres_changes', {
                         event: '*',
                         schema: 'public',
-                        table: 'public_donations'
+                        table: 'kamu_bagislari'
                     }, () => {
                         clearTimeout(donorRefreshTimer);
                         donorRefreshTimer = setTimeout(async () => {
@@ -2814,7 +2994,7 @@ a:focus-visible,
                             } finally {
                                 donorRefreshInProgress = false;
                             }
-                        }, 200);
+                        }, 250);
                     })
                     .subscribe();
             }
