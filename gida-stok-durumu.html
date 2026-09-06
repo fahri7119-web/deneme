@@ -2096,7 +2096,8 @@ a:focus-visible,
                 try {
                     // Admin kontrolü
                     const isAdmin = await checkIsAdmin();
-                    const tableName = isAdmin ? 'mali_islemler' : 'mali_islemler_public';
+                    // Mali veriler için public tabloyu kullan
+const tableName = 'mali_islemler_public';
                     
                     const [
                         donorsRes,
