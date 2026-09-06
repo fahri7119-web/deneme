@@ -1,0 +1,220 @@
+# Kırıkkale Çölyak Derneği - Web Sitesi Haritası ve İçerik Özeti
+
+> Son Güncelleme: 2026-09-06
+> Web Sitesi: https://www.kirikkalecolyak.org.tr
+> Amaç: Çölyak hastalığı konusunda farkındalık yaratmak, glutensiz yaşamı desteklemek, ihtiyaç sahibi çölyak hastalarına gıda ve sosyal destek sağlamak.
+
+## HAKKINDA
+
+Kırıkkale Çölyak Derneği, 24 Nisan 2025 tarihinde resmi olarak kurulmuş, çölyak hastaları ve ailelerine yönelik faaliyet gösteren bir sivil toplum kuruluşudur. Dernek, glutensiz gıdaya erişimi kolaylaştırmak, hastalık hakkında bilinçlendirme yapmak ve ihtiyaç sahibi ailelere düzenli destek sağlamak amacıyla çalışmaktadır.
+
+### Temel Bilgiler
+- **Kuruluş Tarihi:** 24 Nisan 2025
+- **Kütük Numarası:** 71-009-102
+- **Adres:** Yenidoğan Mah. Mimar Sinan Cad. 16/43 Merkez/Kırıkkale
+- **Telefon:** 0543 295 46 71
+- **E-posta:** kirikkalecolyak@gmail.com
+- **Onursal Başkan:** Prof. Dr. Hacer Fulya Gülerman
+
+### Ana Faaliyet Alanları
+1. Çölyak hastalığı hakkında toplumu bilinçlendirmek
+2. Glutensiz gıda tedariki ve ihtiyaç sahiplerine dağıtım
+3. Üyelik ve dayanışma ağı oluşturmak
+4. Kamu kurumları nezdinde çölyak hastalarının haklarını savunmak
+5. Glutensiz yaşam rehberliği ve danışmanlık
+
+---
+
+## SAYFA LİSTESİ VE ÖZETLERİ
+
+### 1. Ana Sayfa - index.html
+**URL:** https://www.kirikkalecolyak.org.tr/
+**Amaç:** Siteye giriş sayfası; derneğin genel tanıtımı, güncel manşetler, hızlı erişim kartları ve canlı veriler.
+**İçerik Özeti:**
+- Manşet (Hero) Slider: Öne çıkan haberler ve duyurular.
+- Hızlı Erişim Kartları: Üyelik, Çölyak Rehberi, İşletme Rehberi, Bağış.
+- Köşe Yazarları: Dernek yazarlarının son yazıları.
+- Gıda Tedariği ve Dağıtım: Kayıtlı çölyaklı sayısı, dağıtılan ürün, stok durumu ve en büyük bağışçılar.
+- Yerel Rehber: Kırıkkale'deki glutensiz mekanlar ve harita.
+- Basında Biz: Dernekle ilgili haberler.
+- Video Galeri: Bilgilendirici videolar.
+- SSS: Sık sorulan sorular.
+
+---
+
+### 2. Çölyak Rehberi - colyak-rehberi.html
+**URL:** https://www.kirikkalecolyak.org.tr/colyak-rehberi.html
+**Amaç:** Çölyak hastalığı hakkında kapsamlı ve bilimsel bilgi sunmak.
+**İçerik Özeti:**
+- **Bölüm 1:** Çölyak Hastalığı Nedir? (Tanım, otoimmün mekanizma, genetik yatkınlık)
+- **Bölüm 2:** Türkiye ve Dünyada İstatistikler (Prevalans, hasta sayıları)
+- **Bölüm 3:** Çölyak Belirtileri (Yaş gruplarına göre, atipik belirtiler)
+- **Bölüm 4:** Çölyak Tanısı (Kan testleri, endoskopi, biyopsi, genetik test)
+- **Bölüm 5:** Çölyak vs Gluten Hassasiyeti vs Buğday Alerjisi
+- **Bölüm 6:** Tedavi (Glutensiz diyet, vitamin takviyeleri, yeni çalışmalar)
+- **Bölüm 7:** Glutensiz Beslenme (Yasaklı ve serbest gıdalar)
+- **Bölüm 8:** Etiket Okuma Rehberi (Logo ve içerik kontrolü)
+- **Bölüm 9:** Çapraz Bulaşma ve Önleme (Evde ve dışarıda alınacak önlemler)
+- **Bölüm 10:** Çocuklarda Çölyak (Okul yaşamı, beslenme çantası)
+- **Bölüm 11:** Psikososyal Destek (Yas süreci, depresyon, aile desteği)
+- **Bölüm 12:** Komplikasyonlar (Osteoporoz, infertilite, lenfoma riski)
+- **Bölüm 13:** Türkiye'deki Destekler (SGK, belediye, sosyal yardımlar)
+- **Bölüm 14:** ÇÖZGER Raporu (Çocuklar için özel gereksinim raporu)
+- **Bölüm 15:** Askerlik Muafiyeti
+- **Bölüm 16:** Yararlı Kaynaklar
+
+---
+
+### 3. Derneğimiz - dernegimiz.html
+**URL:** https://www.kirikkalecolyak.org.tr/dernegimiz.html
+**Amaç:** Derneğin kuruluş hikayesi, yönetim yapısı, faaliyetleri ve çağrıları.
+**İçerik Özeti:**
+- Kuruluş Hikayesi (WhatsApp grubundan resmi derneğe)
+- Kurucu Üyeler Listesi
+- Faaliyet Zaman Çizelgesi (Belediye görüşmeleri, ilk dağıtım, genel kurul)
+- Belediyeye İletilen Talepler (Gıda desteği, su indirimi, ulaşım, burs)
+- Yönetim Kurulu ve Denetim Kurulu Listesi
+- Çağrılar ve Duyurular (Glutensiz ekmek üretimi, yanıltıcı tedavilere karşı uyarı)
+
+---
+
+### 4. Haberler - haberler.html
+**URL:** https://www.kirikkalecolyak.org.tr/haberler.html
+**Amaç:** Dernek faaliyetleri, basında çıkan haberler ve video içerikler.
+**İçerik Özeti:**
+- Haber filtreleme (Çölyak Haberleri, Basında Biz, Videolar)
+- Arama ve sıralama özelliği
+- Öne çıkan haber (Featured)
+- Haber kartları ile listeleme
+- Sayfalama (Pagination)
+
+---
+
+### 5. İşletmeler - isletmeler.html
+**URL:** https://www.kirikkalecolyak.org.tr/isletmeler.html
+**Amaç:** Glutensiz ürün ve menü sunan işletmeleri listelemek ve harita üzerinde göstermek.
+**İçerik Özeti:**
+- Kategori ve şehir filtreleme
+- Arama kutusu
+- Leaflet harita entegrasyonu (Uydu görünümü)
+- İşletme kartları (isim, kategori, adres, telefon, açıklama)
+- Google Maps bağlantısı
+
+---
+
+### 6. Gıda Stok Durumu - gida-stok-durumu.html
+**URL:** https://www.kirikkalecolyak.org.tr/gida-stok-durumu.html
+**Amaç:** Bağış, gıda stoğu ve dağıtım faaliyetlerini şeffaf bir şekilde göstermek.
+**İçerik Özeti:**
+- IBAN bilgileri ve bağış butonu
+- Güven ve şeffaflık bilgileri
+- Özet istatistikler (Kayıtlı çölyaklı, toplam gelir, toplam gider, bakiye)
+- Son 10 bağışçı listesi
+- Stok durumu kartları (ürün bazında)
+- Son dağıtımlar listesi
+- Stok detay tablosu (ürün, giriş tarihi, alınan, dağıtılan)
+- SSS (Bağışlarla ilgili sorular)
+
+---
+
+### 7. Üyelik ve Başvuru - uyelik.html
+**URL:** https://www.kirikkalecolyak.org.tr/uyelik.html
+**Amaç:** Üyelik ve gıda desteği başvurusu almak.
+**İçerik Özeti:**
+- Adım adım form: Başvuru türü → Kişisel bilgiler → Sağlık bilgileri → Onay
+- Başvuru türü seçenekleri: Asıl Üyelik, Onursal Üyelik, Gıda Desteği
+- Kişisel bilgiler (Ad, TC, Telefon, Adres vb.)
+- Sağlık bilgileri (Çölyak durumu, yakın bilgisi, ihtiyaç durumu)
+- Onay ve gönderim
+- Supabase veritabanına kayıt
+
+---
+
+### 8. Yönetim Paneli (Admin) - yonetici.html
+**URL:** https://www.kirikkalecolyak.org.tr/yonetici.html
+**Amaç:** Site içeriklerini yönetmek için özel panel.
+**İçerik Yönetimi:**
+- Manşet (Hero) CRUD
+- Dernek Haberleri CRUD
+- Basında Biz (News) CRUD
+- Yazarlar CRUD
+- Köşe Yazıları CRUD
+- Videolar CRUD
+- Çölyak Bilgi Kartları CRUD
+- Üyelik Başvurularını Görüntüleme ve Durum Güncelleme
+- Mekanlar (İşletme Rehberi) CRUD
+- GitHub Actions ile sayfa yenileme
+
+---
+
+### 9. Dernek Yönetim Sistemi - dernekpanelv1.html
+**URL:** https://www.kirikkalecolyak.org.tr/dernekpanelv1.html
+**Amaç:** Dernek operasyonlarını (üye, stok, dağıtım, mali işlemler) yönetmek için özel panel.
+**İçerik Yönetimi:**
+- Üye Kayıtları (Aile no, çölyaklı bilgileri)
+- Gıda Envanteri (Stok girişi, FIFO takibi)
+- Teslim Kayıtları (Dağıtım, makbuz no, alıcılar)
+- Dağıtım Planları (Plan oluşturma, teslim etme)
+- Mali Defter (Gelir, gider, transfer, bakiye takibi)
+- Karar Destek (İstatistik ve analitik)
+- Gelişmiş Raporlama (Faaliyet, mali, üye, stok raporları)
+- Veri Yedekleme ve İçe Aktarma (JSON, CSV, Excel)
+
+---
+
+## VERİTABANI TABLOLARI (Supabase)
+
+Sitede kullanılan başlıca veritabanı tabloları:
+
+- `uyeler` - Üye bilgileri
+- `uyeler_colyaklilar` - Üyeye bağlı çölyaklı bireyler
+- `stok_girisleri` - Stok giriş kayıtları
+- `dagitimlar` - Dağıtım kayıtları
+- `dagitim_kalemleri` - Dağıtım ürün kalemleri
+- `dagitim_alicilari` - Dağıtım alıcıları
+- `dagitim_planlari` - Dağıtım planları
+- `mali_islemler` - Mali işlemler
+- `kamu_bagislari` - Kamuya açık bağışlar (anonim)
+- `kamu_dagitimlari` - Kamuya açık dağıtımlar
+- `dernek_haberleri` - Dernek haberleri
+- `news` - Basında biz haberleri
+- `videos` - Video galerisi
+- `authors` - Yazarlar
+- `articles` - Köşe yazıları
+- `hero` - Ana sayfa manşetleri
+- `colyak_bilgi_kartlari` - Çölyak bilgi kartları
+- `mekanlar` - Glutensiz işletmeler
+- `basvurular` - Üyelik başvuruları
+
+---
+
+## TEKNOLOJİ ALTYAPISI
+
+- **Frontend:** HTML5, CSS3, JavaScript (jQuery)
+- **Backend/Veritabanı:** Supabase (PostgreSQL)
+- **Harita:** Leaflet.js
+- **Grafikler:** ApexCharts
+- **Raporlama:** XLSX (Excel çıktısı)
+- **Otomasyon:** GitHub Actions (Sayfa oluşturma)
+- **Barındırma:** GitHub Pages / Statik hosting
+
+---
+
+## İLETİŞİM VE SOSYAL MEDYA
+
+- **Web:** https://www.kirikkalecolyak.org.tr/
+- **E-posta:** kirikkalecolyak@gmail.com
+- **Telefon:** 0543 295 46 71
+- **Facebook:** https://www.facebook.com/share/1D8fUfhLvk/
+- **Instagram:** https://www.instagram.com/kirikkalecolyak/
+- **WhatsApp:** https://chat.whatsapp.com/IMv1HhUNUb3LB2LyqqQvhz
+
+---
+
+## ÖNEMLİ NOTLAR
+
+- Çölyak hastalığının tek tedavisi ömür boyu **sıkı glutensiz diyettir**.
+- Tanı değerlendirmesi tamamlanmadan glutensiz beslenmeye başlanmamalıdır.
+- Dernek **ticari faaliyet** göstermez; tüm etkinlikler ücretsizdir.
+- Bağışlar şeffaf bir şekilde yönetilir ve düzenli olarak raporlanır.
+- İşletme listeleri yaklaşık konum bilgisi içerir; işletmeyle teyit edilmesi önerilir.
