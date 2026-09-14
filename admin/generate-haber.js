@@ -21,12 +21,12 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ============================================================
-// PROJE KÖK DİZİNİ - DÜZELTİLDİ
+// PROJE KÖK DİZİNİ
 // ============================================================
 const projectRoot = path.join(__dirname, '..')
 
 // ============================================================
-// ŞABLON DOSYASINI OKU - DÜZELTİLDİ
+// ŞABLON DOSYASINI OKU
 // ============================================================
 const templatePath = path.join(projectRoot, 'templates', 'haber-template.html')
 
@@ -94,7 +94,7 @@ function escapeHtml(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace("'", '&#039;')
+        .replace(/'/g, '&#039;')   // ← düzeltildi (global flag eklendi)
 }
 
 function cleanText(text) {
@@ -138,16 +138,15 @@ function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO, 
     const articleDateTag = dateISO
         ? `\n    <meta property="article:published_time" content="${escapeHtml(dateISO)}">`
         : ''
-    const type = source === 'Köşe Yazısı' ? 'article' : 'article'
 
     return `<!-- GENERATED_SOCIAL_META_START -->
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
-    <meta property="og:type" content="${type}">
+    <meta property="og:type" content="article">
     <meta property="og:title" content="${escapeHtml(title)}">
     <meta property="og:description" content="${escapeHtml(description)}">
     <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
     <meta property="og:image" content="${escapeHtml(imageUrl)}">
-    <meta property="og:image:alt" content="${escapeHtml(title)}">${siteNameTag}${articleDateTag}
+    <meta property="og:image:alt" content="\( {escapeHtml(title)}"> \){siteNameTag}${articleDateTag}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeHtml(title)}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
@@ -156,14 +155,26 @@ function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO, 
     <!-- GENERATED_SOCIAL_META_END -->`
 }
 
+// ============================================================
+// DÜZELTİLMİŞ injectSocialMeta FONKSİYONU
+// ============================================================
 function injectSocialMeta(html, meta) {
-    const withoutPreviousMeta = html.replace(
+    // Önce eski GENERATED bloğunu tamamen temizle
+    let clean = html.replace(
         /\s*<!-- GENERATED_SOCIAL_META_START -->[\s\S]*?<!-- GENERATED_SOCIAL_META_END -->/g,
         ''
     )
-    const headClose = withoutPreviousMeta.toLowerCase().lastIndexOf('</head>')
-    if (headClose === -1) return `${withoutPreviousMeta}\n${meta}\n`
-    return `${withoutPreviousMeta.slice(0, headClose)}${meta}\n${withoutPreviousMeta.slice(headClose)}`
+
+    // </head> etiketini bul (büyük/küçük harf duyarsız)
+    const match = clean.match(/<\/head>/i)
+    if (!match) {
+        // Hiç </head> yoksa en sona ekle
+        return clean + '\n' + meta + '\n'
+    }
+
+    const pos = match.index
+    // Meta bloğunu her zaman </head> ÖNCESİNE ekle (etiketi asla bozmaz)
+    return clean.slice(0, pos) + meta + '\n' + clean.slice(pos)
 }
 
 function getCategoryClass(category) {
@@ -255,7 +266,7 @@ function getContent(haber) {
 
         if (authorName || authorAvatar) {
             floatElements += `<div class="float-element author-float">`
-            floatElements += `<img src="${escapeHtml(toAbsoluteUrl(authorAvatar) || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png')}" alt="${escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
+            floatElements += `<img src="\( {escapeHtml(toAbsoluteUrl(authorAvatar) || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png')}" alt=" \){escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
             floatElements += `<div class="author-name">${escapeHtml(authorName || 'Yazar')}`
             floatElements += `<div class="author-title-small">${escapeHtml(authorTitle)}</div>`
             floatElements += `</div>`
@@ -267,7 +278,7 @@ function getContent(haber) {
         const alreadyHasThisImage = content.includes(newsImage)
         const hasFloatImg = /class=["'][^"']*detail-float-img/.test(content)
         if (!alreadyHasThisImage && !hasFloatImg) {
-            floatElements += `<img src="${escapeHtml(toAbsoluteUrl(newsImage))}" alt="${escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
+            floatElements += `<img src="\( {escapeHtml(toAbsoluteUrl(newsImage))}" alt=" \){escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
         }
     }
 
@@ -365,7 +376,7 @@ function createHeroSection(heroHaberleri, currentHaber) {
         const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
         cards += `
                 <a href="${link}" class="extra-item">
-                    <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
+                    <img src="\( {img}" alt=" \){escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                     <div class="body">
                         <span class="tag">Öne Çıkan</span>
                         <h4>${escapeHtml(getTitle(item))}</h4>
@@ -401,7 +412,7 @@ function createDernekSection(dernekHaberleri, currentHaber) {
         const itemDate = formatDate(getDateValue(item))
         cards += `
                 <a href="${link}" class="extra-item">
-                    <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
+                    <img src="\( {img}" alt=" \){escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                     <div class="body">
                         <span class="tag">Dernek Haberi</span>
                         <h4>${escapeHtml(getTitle(item))}</h4>
@@ -438,11 +449,11 @@ function createArticlesSection(articles, currentHaber) {
         const itemDate = formatDate(getDateValue(item))
         cards += `
                 <a href="${link}" class="extra-item">
-                    <img src="${img}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
+                    <img src="\( {img}" alt=" \){escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                     <div class="body">
                         <span class="tag">${escapeHtml(authorName)}</span>
                         <h4>${escapeHtml(item.title)}</h4>
-                        ${item.summary ? `<div class="description">${escapeHtml(item.summary)}</div>` : ''}
+                        \( {item.summary ? `<div class="description"> \){escapeHtml(item.summary)}</div>` : ''}
                         <span class="date">${itemDate}</span>
                     </div>
                 </a>
@@ -498,7 +509,7 @@ function createAuthorPostsSection(articles, currentHaber) {
                             <li>
                                 <span class="post-index">${String(index + 1).padStart(2, '0')}</span>
                                 <span class="post-date">${formatDate(getDateValue(p))}</span>
-                                <a href="${link}">${escapeHtml(p.title)}</a>
+                                <a href="\( {link}"> \){escapeHtml(p.title)}</a>
                                 <span class="post-arrow"><i class="fas fa-chevron-right"></i></span>
                             </li>
                         `
@@ -589,8 +600,8 @@ async function generateHaberPages() {
             const urlPath = sourceTable === 'articles' ? 'yazilar' : 'haber'
             
             const canonicalUrl = getSiteUrl()
-                ? `${getSiteUrl()}/${urlPath}/${encodeURIComponent(slug)}.html`
-                : `/${urlPath}/${encodeURIComponent(slug)}.html`
+                ? `\( {getSiteUrl()}/ \){urlPath}/${encodeURIComponent(slug)}.html`
+                : `/\( {urlPath}/ \){encodeURIComponent(slug)}.html`
             const socialImageUrl = toAbsoluteUrl(imageUrl) || imageUrl
             const socialMeta = buildSocialMeta({
                 title: cleanText(title),
@@ -623,7 +634,7 @@ async function generateHaberPages() {
             let html = template.replace(/\{\{(\w+)\}\}/g, (_, key) => replacements[key] ?? '')
             html = injectSocialMeta(html, socialMeta)
             
-            // DOSYA KAYDET - DÜZELTİLDİ
+            // DOSYA KAYDET
             let outputDir
             if (sourceTable === 'articles') {
                 outputDir = path.join(projectRoot, 'yazilar')
@@ -640,7 +651,7 @@ async function generateHaberPages() {
             fs.writeFileSync(outputPath, html, 'utf-8')
             
             const folderName = sourceTable === 'articles' ? 'yazilar' : 'haber'
-            console.log(`✅ ${folderName}/${slug}.html (${category})`)
+            console.log(`✅ \( {folderName}/ \){slug}.html (${category})`)
             createdCount++
             
         } catch (err) {
