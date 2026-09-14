@@ -185,7 +185,6 @@ function getContent(haber) {
         const authorName = haber.author_name || haber.author || null
         const authorAvatar = haber.author_avatar || null
         const authorTitle = haber.author_title || 'Köşe Yazarı'
-        const authorEmail = haber.author_email || null
 
         if (authorName || authorAvatar) {
             floatElements += `<div class="float-element author-float">`
@@ -193,9 +192,6 @@ function getContent(haber) {
             floatElements += `<div class="author-name">${escapeHtml(authorName || 'Yazar')}`
             floatElements += `<div class="author-title-small">${escapeHtml(authorTitle)}</div>`
             floatElements += `</div>`
-            if (authorEmail) {
-                floatElements += `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.2rem;">${escapeHtml(authorEmail)}</div>`
-            }
             floatElements += `</div>`
         }
     }
