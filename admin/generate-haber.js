@@ -94,7 +94,76 @@ function escapeHtml(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')
+        .replace("'", '&#039;')
+}
+
+function cleanText(text) {
+    return String(text || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+}
+
+function truncateText(text, maxLength = 160) {
+    const clean = cleanText(text)
+    if (clean.length <= maxLength) return clean
+    return `${clean.slice(0, maxLength - 1).trimEnd()}…`
+}
+
+function getDateValue(haber) {
+    return haber.tarih || haber.pub_date || haber.pubDate || haber.created_at || ''
+}
+
+function getSiteUrl() {
+    return (process.env.SITE_URL || process.env.PUBLIC_SITE_URL || '').replace(/\/$/, '')
+}
+
+function toAbsoluteUrl(value) {
+    if (!value) return ''
+    try {
+        const siteUrl = getSiteUrl()
+        const url = siteUrl ? new URL(value, `${siteUrl}/`) : new URL(value)
+        if (!['http:', 'https:'].includes(url.protocol)) return ''
+        return url.toString()
+    } catch {
+        return ''
+    }
+}
+
+function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO, source }) {
+    const siteName = process.env.SITE_NAME || ''
+    const siteNameTag = siteName
+        ? `\n    <meta property="og:site_name" content="${escapeHtml(siteName)}">`
+        : ''
+    const articleDateTag = dateISO
+        ? `\n    <meta property="article:published_time" content="${escapeHtml(dateISO)}">`
+        : ''
+    const type = source === 'Köşe Yazısı' ? 'article' : 'article'
+
+    return `<!-- GENERATED_SOCIAL_META_START -->
+    <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
+    <meta property="og:type" content="${type}">
+    <meta property="og:title" content="${escapeHtml(title)}">
+    <meta property="og:description" content="${escapeHtml(description)}">
+    <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
+    <meta property="og:image" content="${escapeHtml(imageUrl)}">
+    <meta property="og:image:alt" content="${escapeHtml(title)}">${siteNameTag}${articleDateTag}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${escapeHtml(title)}">
+    <meta name="twitter:description" content="${escapeHtml(description)}">
+    <meta name="twitter:image" content="${escapeHtml(imageUrl)}">
+    <meta name="twitter:image:alt" content="${escapeHtml(title)}">
+    <!-- GENERATED_SOCIAL_META_END -->`
+}
+
+function injectSocialMeta(html, meta) {
+    const withoutPreviousMeta = html.replace(
+        /\s*<!-- GENERATED_SOCIAL_META_START -->[\s\S]*?<!-- GENERATED_SOCIAL_META_END -->/g,
+        ''
+    )
+    const headClose = withoutPreviousMeta.toLowerCase().lastIndexOf('</head>')
+    if (headClose === -1) return `${withoutPreviousMeta}\n${meta}\n`
+    return `${withoutPreviousMeta.slice(0, headClose)}${meta}\n${withoutPreviousMeta.slice(headClose)}`
 }
 
 function getCategoryClass(category) {
@@ -143,9 +212,7 @@ function getTitle(haber) {
 
 function getDescription(haber) {
     const desc = haber.ozet || haber.summary || haber.excerpt || haber.description || haber.meta_description || ''
-    const clean = String(desc).replace(/<[^>]*>/g, '').trim()
-    if (clean.length > 160) return clean.slice(0, 157) + '…'
-    return clean || getTitle(haber)
+    return truncateText(desc || getTitle(haber), 160)
 }
 
 function getContent(haber) {
@@ -185,17 +252,13 @@ function getContent(haber) {
         const authorName = haber.author_name || haber.author || null
         const authorAvatar = haber.author_avatar || null
         const authorTitle = haber.author_title || 'Köşe Yazarı'
-        const authorEmail = haber.author_email || null
 
         if (authorName || authorAvatar) {
             floatElements += `<div class="float-element author-float">`
-            floatElements += `<img src="${authorAvatar || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'}" alt="${escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
+            floatElements += `<img src="${escapeHtml(toAbsoluteUrl(authorAvatar) || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png')}" alt="${escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
             floatElements += `<div class="author-name">${escapeHtml(authorName || 'Yazar')}`
             floatElements += `<div class="author-title-small">${escapeHtml(authorTitle)}</div>`
             floatElements += `</div>`
-            if (authorEmail) {
-                floatElements += `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.2rem;">${escapeHtml(authorEmail)}</div>`
-            }
             floatElements += `</div>`
         }
     }
@@ -204,7 +267,7 @@ function getContent(haber) {
         const alreadyHasThisImage = content.includes(newsImage)
         const hasFloatImg = /class=["'][^"']*detail-float-img/.test(content)
         if (!alreadyHasThisImage && !hasFloatImg) {
-            floatElements += `<img src="${newsImage}" alt="${escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
+            floatElements += `<img src="${escapeHtml(toAbsoluteUrl(newsImage))}" alt="${escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
         }
     }
 
@@ -335,7 +398,7 @@ function createDernekSection(dernekHaberleri, currentHaber) {
         const img = getImage(item, 'dernek_haberleri')
         const itemSlug = item.slug || slugify(getTitle(item))
         const link = `../haber/${itemSlug}.html`
-        const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
+        const itemDate = formatDate(getDateValue(item))
         cards += `
                 <a href="${link}" class="extra-item">
                     <img src="${img}" alt="${escapeHtml(getTitle(item))}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
@@ -372,7 +435,7 @@ function createArticlesSection(articles, currentHaber) {
         const itemSlug = item.slug || slugify(item.title)
         const link = `../yazilar/${itemSlug}.html`
         const authorName = item.author_name || item.author || 'Yazar'
-        const itemDate = formatDate(item.pubDate || item.created_at)
+        const itemDate = formatDate(getDateValue(item))
         cards += `
                 <a href="${link}" class="extra-item">
                     <img src="${img}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
@@ -422,7 +485,7 @@ function createAuthorPostsSection(articles, currentHaber) {
     }
 
     otherPosts = otherPosts
-        .sort((a, b) => new Date(b.pubDate || b.created_at || 0) - new Date(a.pubDate || a.created_at || 0))
+        .sort((a, b) => new Date(getDateValue(b) || 0) - new Date(getDateValue(a) || 0))
         .slice(0, 10)
 
     if (otherPosts.length === 0) return ''
@@ -434,7 +497,7 @@ function createAuthorPostsSection(articles, currentHaber) {
         postList += `
                             <li>
                                 <span class="post-index">${String(index + 1).padStart(2, '0')}</span>
-                                <span class="post-date">${formatDate(p.pubDate || p.created_at)}</span>
+                                <span class="post-date">${formatDate(getDateValue(p))}</span>
                                 <a href="${link}">${escapeHtml(p.title)}</a>
                                 <span class="post-arrow"><i class="fas fa-chevron-right"></i></span>
                             </li>
@@ -505,7 +568,7 @@ async function generateHaberPages() {
     
     for (const haber of tümHaberler) {
         try {
-            const slug = haber.slug || slugify(getTitle(haber))
+            const slug = slugify(haber.slug || getTitle(haber)) || `haber-${haber.id || Date.now()}`
             const sourceTable = haber._source || 'unknown'
             const category = getCategory(sourceTable)
             const categoryClass = getCategoryClass(category)
@@ -513,8 +576,9 @@ async function generateHaberPages() {
             const content = getContent(haber)
             const title = getTitle(haber)
             const description = getDescription(haber)
-            const date = formatDate(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
-            const dateISO = formatDateISO(haber.tarih || haber.pub_date || haber.created_at || haber.pubDate)
+            const dateValue = getDateValue(haber)
+            const date = formatDate(dateValue)
+            const dateISO = formatDateISO(dateValue)
             const source = getSource(sourceTable)
             
             const authorPostsHTML = createAuthorPostsSection(articles, haber)
@@ -524,23 +588,40 @@ async function generateHaberPages() {
             const emptySectionHTML = (authorPostsHTML || heroSectionHTML || dernekSectionHTML || articlesSectionHTML) ? '' : createEmptySection()
             const urlPath = sourceTable === 'articles' ? 'yazilar' : 'haber'
             
-            let html = template
-                .replace(/\{\{title\}\}/g, title)
-                .replace(/\{\{description\}\}/g, description)
-                .replace(/\{\{image_url\}\}/g, imageUrl)
-                .replace(/\{\{slug\}\}/g, slug)
-                .replace(/\{\{url_path\}\}/g, urlPath)
-                .replace(/\{\{date\}\}/g, date)
-                .replace(/\{\{date_iso\}\}/g, dateISO)
-                .replace(/\{\{category\}\}/g, category)
-                .replace(/\{\{category_class\}\}/g, categoryClass)
-                .replace(/\{\{source\}\}/g, source)
-                .replace(/\{\{content\}\}/g, content)
-                .replace(/\{\{author_posts\}\}/g, authorPostsHTML)
-                .replace(/\{\{hero_section\}\}/g, heroSectionHTML)
-                .replace(/\{\{dernek_section\}\}/g, dernekSectionHTML)
-                .replace(/\{\{articles_section\}\}/g, articlesSectionHTML)
-                .replace(/\{\{empty_section\}\}/g, emptySectionHTML)
+            const canonicalUrl = getSiteUrl()
+                ? `${getSiteUrl()}/${urlPath}/${encodeURIComponent(slug)}.html`
+                : `/${urlPath}/${encodeURIComponent(slug)}.html`
+            const socialImageUrl = toAbsoluteUrl(imageUrl) || imageUrl
+            const socialMeta = buildSocialMeta({
+                title: cleanText(title),
+                description,
+                imageUrl: socialImageUrl,
+                canonicalUrl,
+                dateISO,
+                source
+            })
+
+            const replacements = {
+                title: escapeHtml(title),
+                description: escapeHtml(description),
+                image_url: escapeHtml(socialImageUrl),
+                slug: escapeHtml(slug),
+                url_path: escapeHtml(urlPath),
+                date: escapeHtml(date),
+                date_iso: escapeHtml(dateISO),
+                category: escapeHtml(category),
+                category_class: escapeHtml(categoryClass),
+                source: escapeHtml(source),
+                content,
+                author_posts: authorPostsHTML,
+                hero_section: heroSectionHTML,
+                dernek_section: dernekSectionHTML,
+                articles_section: articlesSectionHTML,
+                empty_section: emptySectionHTML
+            }
+
+            let html = template.replace(/\{\{(\w+)\}\}/g, (_, key) => replacements[key] ?? '')
+            html = injectSocialMeta(html, socialMeta)
             
             // DOSYA KAYDET - DÜZELTİLDİ
             let outputDir
