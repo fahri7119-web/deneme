@@ -440,16 +440,23 @@ function createArticlesSection(articles, currentHaber) {
     otherArticles.forEach(item => {
         const img = getImage(item, 'articles')
         const itemSlug = item.slug || slugify(item.title)
-        const link = `../yazilar/${itemSlug}.html`
+        const link = '../yazilar/' + itemSlug + '.html'
         const authorName = item.author_name || item.author || 'Yazar'
         const itemDate = formatDate(getDateValue(item))
+
+        // summary kısmını ayrı tutuyoruz (backtick sorunu yaşamamak için)
+        let summaryHtml = ''
+        if (item.summary) {
+            summaryHtml = '<div class="description">' + escapeHtml(item.summary) + '</div>'
+        }
+
         cards += `
                 <a href="${link}" class="extra-item">
                     <img src="\( {img}" alt=" \){escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">
                     <div class="body">
                         <span class="tag">${escapeHtml(authorName)}</span>
                         <h4>${escapeHtml(item.title)}</h4>
-                        \( {item.summary ? `<div class="description"> \){escapeHtml(item.summary)}</div>` : ''}
+                        ${summaryHtml}
                         <span class="date">${itemDate}</span>
                     </div>
                 </a>
@@ -466,6 +473,8 @@ function createArticlesSection(articles, currentHaber) {
             </div>
         `
 }
+
+
 
 function createEmptySection() {
     return `
