@@ -107,7 +107,7 @@ function cleanText(text) {
 function truncateText(text, maxLength = 160) {
     const clean = cleanText(text)
     if (clean.length <= maxLength) return clean
-    return `${clean.slice(0, maxLength - 1).trimEnd()}…`
+    return clean.slice(0, maxLength - 1).trimEnd() + '…'
 }
 
 function getDateValue(haber) {
@@ -122,7 +122,7 @@ function toAbsoluteUrl(value) {
     if (!value) return ''
     try {
         const siteUrl = getSiteUrl()
-        const url = siteUrl ? new URL(value, `${siteUrl}/`) : new URL(value)
+        const url = siteUrl ? new URL(value, siteUrl + '/') : new URL(value)
         if (!['http:', 'https:'].includes(url.protocol)) return ''
         return url.toString()
     } catch {
@@ -130,46 +130,50 @@ function toAbsoluteUrl(value) {
     }
 }
 
-function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO, source }) {
+function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO }) {
     const siteName = process.env.SITE_NAME || ''
-    const siteNameTag = siteName
-        ? `\n    <meta property="og:site_name" content="${escapeHtml(siteName)}">`
-        : ''
-    const articleDateTag = dateISO
-        ? `\n    <meta property="article:published_time" content="${escapeHtml(dateISO)}">`
-        : ''
 
-    return `<!-- GENERATED_SOCIAL_META_START -->
-    <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="${escapeHtml(title)}">
-    <meta property="og:description" content="${escapeHtml(description)}">
-    <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
-    <meta property="og:image" content="${escapeHtml(imageUrl)}">
-    <meta property="og:image:alt" content="\( {escapeHtml(title)}"> \){siteNameTag}${articleDateTag}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${escapeHtml(title)}">
-    <meta name="twitter:description" content="${escapeHtml(description)}">
-    <meta name="twitter:image" content="${escapeHtml(imageUrl)}">
-    <meta name="twitter:image:alt" content="${escapeHtml(title)}">
-    <!-- GENERATED_SOCIAL_META_END -->`
+    let meta = '<!-- GENERATED_SOCIAL_META_START -->\n'
+    meta += '    <link rel="canonical" href="' + escapeHtml(canonicalUrl) + '">\n'
+    meta += '    <meta property="og:type" content="article">\n'
+    meta += '    <meta property="og:title" content="' + escapeHtml(title) + '">\n'
+    meta += '    <meta property="og:description" content="' + escapeHtml(description) + '">\n'
+    meta += '    <meta property="og:url" content="' + escapeHtml(canonicalUrl) + '">\n'
+    meta += '    <meta property="og:image" content="' + escapeHtml(imageUrl) + '">\n'
+    meta += '    <meta property="og:image:alt" content="' + escapeHtml(title) + '">\n'
+
+    if (siteName) {
+        meta += '    <meta property="og:site_name" content="' + escapeHtml(siteName) + '">\n'
+    }
+
+    if (dateISO) {
+        meta += '    <meta property="article:published_time" content="' + escapeHtml(dateISO) + '">\n'
+    }
+
+    meta += '    <meta name="twitter:card" content="summary_large_image">\n'
+    meta += '    <meta name="twitter:title" content="' + escapeHtml(title) + '">\n'
+    meta += '    <meta name="twitter:description" content="' + escapeHtml(description) + '">\n'
+    meta += '    <meta name="twitter:image" content="' + escapeHtml(imageUrl) + '">\n'
+    meta += '    <meta name="twitter:image:alt" content="' + escapeHtml(title) + '">\n'
+    meta += '    <!-- GENERATED_SOCIAL_META_END -->'
+
+    return meta
 }
 
 function injectSocialMeta(html, meta) {
-    // Önce eski GENERATED bloğunu tamamen temizle
+    // Eski GENERATED bloğunu temizle
     let clean = html.replace(
         /\s*<!-- GENERATED_SOCIAL_META_START -->[\s\S]*?<!-- GENERATED_SOCIAL_META_END -->/g,
         ''
     )
 
-    // </head> etiketini bul (büyük/küçük harf duyarsız)
+    // </head> bul
     const match = clean.match(/<\/head>/i)
     if (!match) {
         return clean + '\n' + meta + '\n'
     }
 
     const pos = match.index
-    // Meta bloğunu her zaman </head> ÖNCESİNE ekle
     return clean.slice(0, pos) + meta + '\n' + clean.slice(pos)
 }
 
@@ -197,18 +201,15 @@ function getSource(sourceTable) {
 
 function getImage(haber, sourceTable) {
     const defaultImage = 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'
-    
+
     if (sourceTable === 'dernek_haberleri') {
-        const img = haber.gorsel_url || haber.image_url || haber.resim || haber.foto || null
-        return img || defaultImage
+        return haber.gorsel_url || haber.image_url || haber.resim || haber.foto || defaultImage
     }
     if (sourceTable === 'hero') {
-        const img = haber.bg_image || haber.gorsel_url || haber.image_url || haber.resim || null
-        return img || defaultImage
+        return haber.bg_image || haber.gorsel_url || haber.image_url || haber.resim || defaultImage
     }
     if (sourceTable === 'articles') {
-        const img = haber.featured_image || haber.image_url || haber.author_avatar || haber.resim || haber.foto || null
-        return img || defaultImage
+        return haber.featured_image || haber.image_url || haber.resim || haber.foto || defaultImage
     }
     return defaultImage
 }
@@ -246,35 +247,40 @@ function getContent(haber) {
 
     if (!content || !content.trim()) {
         if (sourceTable === 'hero') {
-            content = `<p><strong>${escapeHtml(title)}</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>
-                    <p><a href="../index.html" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>`
+            content = '<p><strong>' + escapeHtml(title) + '</strong> — Bu içerik yalnızca yönlendirme amaçlıdır. Detaylı bilgi için lütfen ana sayfayı ziyaret edin.</p>' +
+                      '<p><a href="../index.html" style="color:var(--primary);font-weight:600;">Ana Sayfaya Dön →</a></p>'
         } else {
-            content = `<p>İçerik bulunamadı.</p>`
+            content = '<p>İçerik bulunamadı.</p>'
         }
     }
 
     let floatElements = ''
 
+    // Yazar fotoğrafı (sadece gerçek avatar varsa göster)
     if (sourceTable === 'articles') {
         const authorName = haber.author_name || haber.author || null
-        const authorAvatar = haber.author_avatar || null
+        const authorAvatar = haber.author_avatar || haber.avatar || null
         const authorTitle = haber.author_title || 'Köşe Yazarı'
+        const avatarSrc = toAbsoluteUrl(authorAvatar)
 
-        if (authorName || authorAvatar) {
-            floatElements += `<div class="float-element author-float">`
-            floatElements += `<img src="\( {escapeHtml(toAbsoluteUrl(authorAvatar) || 'https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png')}" alt=" \){escapeHtml(authorName || 'Yazar')}" class="author-photo" onerror="this.src='https://tmtdpykzmdvxszxwyege.supabase.co/storage/v1/object/public/icerikler/logo.png'">`
-            floatElements += `<div class="author-name">${escapeHtml(authorName || 'Yazar')}`
-            floatElements += `<div class="author-title-small">${escapeHtml(authorTitle)}</div>`
-            floatElements += `</div>`
-            floatElements += `</div>`
+        if (authorName || avatarSrc) {
+            floatElements += '<div class="float-element author-float">'
+            if (avatarSrc) {
+                floatElements += '<img src="' + escapeHtml(avatarSrc) + '" alt="' + escapeHtml(authorName || 'Yazar') + '" class="author-photo" loading="lazy" onerror="this.style.display=\'none\'">'
+            }
+            floatElements += '<div class="author-name">' + escapeHtml(authorName || 'Yazar')
+            floatElements += '<div class="author-title-small">' + escapeHtml(authorTitle) + '</div>'
+            floatElements += '</div></div>'
         }
     }
 
+    // Haber görseli
     if (newsImage) {
         const alreadyHasThisImage = content.includes(newsImage)
         const hasFloatImg = /class=["'][^"']*detail-float-img/.test(content)
         if (!alreadyHasThisImage && !hasFloatImg) {
-            floatElements += `<img src="\( {escapeHtml(toAbsoluteUrl(newsImage))}" alt=" \){escapeHtml(title)}" class="float-element detail-float-img" loading="lazy" onerror="this.style.display='none'">`
+            const absImg = toAbsoluteUrl(newsImage) || newsImage
+            floatElements += '<img src="' + escapeHtml(absImg) + '" alt="' + escapeHtml(title) + '" class="float-element detail-float-img" loading="lazy" onerror="this.style.display=\'none\'">'
         }
     }
 
@@ -288,7 +294,6 @@ function getContent(haber) {
 // ============================================================
 // VERİ ÇEKME FONKSİYONLARI
 // ============================================================
-
 async function fetchHeroHaberleri() {
     console.log('🔍 Hero tablosu sorgulanıyor...')
     try {
@@ -297,12 +302,12 @@ async function fetchHeroHaberleri() {
             .select('*')
             .eq('is_active', true)
             .order('order', { ascending: true })
-        
+
         if (error) {
             console.error('❌ Hero tablosu hatası:', error.message)
             return []
         }
-        console.log(`✅ Hero: ${data?.length || 0} kayıt bulundu`)
+        console.log('✅ Hero: ' + (data?.length || 0) + ' kayıt bulundu')
         return data || []
     } catch (err) {
         console.error('❌ Hero tablosu bağlantı hatası:', err.message)
@@ -319,12 +324,12 @@ async function fetchDernekHaberleri() {
             .eq('is_active', true)
             .order('order', { ascending: true })
             .order('pub_date', { ascending: false })
-        
+
         if (error) {
             console.error('❌ Dernek haberleri tablosu hatası:', error.message)
             return []
         }
-        console.log(`✅ Dernek Haberleri: ${data?.length || 0} kayıt bulundu`)
+        console.log('✅ Dernek Haberleri: ' + (data?.length || 0) + ' kayıt bulundu')
         return data || []
     } catch (err) {
         console.error('❌ Dernek haberleri tablosu bağlantı hatası:', err.message)
@@ -340,12 +345,12 @@ async function fetchArticles() {
             .select('*')
             .eq('is_published', true)
             .order('pubDate', { ascending: false })
-        
+
         if (error) {
             console.log('ℹ️ Articles tablosu hatası (tablo mevcut olmayabilir):', error.message)
             return []
         }
-        console.log(`✅ Articles: ${data?.length || 0} kayıt bulundu`)
+        console.log('✅ Articles: ' + (data?.length || 0) + ' kayıt bulundu')
         return data || []
     } catch (err) {
         console.log('ℹ️ Articles tablosu bulunamadı veya bağlantı hatası:', err.message)
@@ -356,19 +361,18 @@ async function fetchArticles() {
 // ============================================================
 // ALT BÖLÜM OLUŞTURMA FONKSİYONLARI
 // ============================================================
-
 function createHeroSection(heroHaberleri, currentHaber) {
     const otherHero = heroHaberleri
         .filter(h => h.id !== currentHaber.id)
         .slice(0, 3)
-    
+
     if (otherHero.length === 0) return ''
-    
+
     let cards = ''
     otherHero.forEach(item => {
         const img = getImage(item, 'hero')
         const itemSlug = item.slug || slugify(getTitle(item))
-        const link = `../haber/${itemSlug}.html`
+        const link = '../haber/' + itemSlug + '.html'
         const itemDate = formatDate(item.tarih || item.pub_date || item.created_at)
         cards += `
                 <a href="${link}" class="extra-item">
@@ -378,10 +382,9 @@ function createHeroSection(heroHaberleri, currentHaber) {
                         <h4>${escapeHtml(getTitle(item))}</h4>
                         <span class="date">${itemDate}</span>
                     </div>
-                </a>
-            `
+                </a>`
     })
-    
+
     return `
             <div class="extra-section">
                 <div class="section-head">
@@ -389,22 +392,21 @@ function createHeroSection(heroHaberleri, currentHaber) {
                     <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
-            </div>
-        `
+            </div>`
 }
 
 function createDernekSection(dernekHaberleri, currentHaber) {
     const otherDernek = dernekHaberleri
         .filter(h => h.id !== currentHaber.id)
         .slice(0, 3)
-    
+
     if (otherDernek.length === 0) return ''
-    
+
     let cards = ''
     otherDernek.forEach(item => {
         const img = getImage(item, 'dernek_haberleri')
         const itemSlug = item.slug || slugify(getTitle(item))
-        const link = `../haber/${itemSlug}.html`
+        const link = '../haber/' + itemSlug + '.html'
         const itemDate = formatDate(getDateValue(item))
         cards += `
                 <a href="${link}" class="extra-item">
@@ -414,10 +416,9 @@ function createDernekSection(dernekHaberleri, currentHaber) {
                         <h4>${escapeHtml(getTitle(item))}</h4>
                         <span class="date">${itemDate}</span>
                     </div>
-                </a>
-            `
+                </a>`
     })
-    
+
     return `
             <div class="extra-section">
                 <div class="section-head">
@@ -425,17 +426,16 @@ function createDernekSection(dernekHaberleri, currentHaber) {
                     <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
-            </div>
-        `
+            </div>`
 }
 
 function createArticlesSection(articles, currentHaber) {
     const otherArticles = articles
         .filter(a => a.id !== currentHaber.id)
         .slice(0, 3)
-    
+
     if (otherArticles.length === 0) return ''
-    
+
     let cards = ''
     otherArticles.forEach(item => {
         const img = getImage(item, 'articles')
@@ -444,7 +444,6 @@ function createArticlesSection(articles, currentHaber) {
         const authorName = item.author_name || item.author || 'Yazar'
         const itemDate = formatDate(getDateValue(item))
 
-        // summary kısmını ayrı tutuyoruz (backtick sorunu yaşamamak için)
         let summaryHtml = ''
         if (item.summary) {
             summaryHtml = '<div class="description">' + escapeHtml(item.summary) + '</div>'
@@ -459,10 +458,9 @@ function createArticlesSection(articles, currentHaber) {
                         ${summaryHtml}
                         <span class="date">${itemDate}</span>
                     </div>
-                </a>
-            `
+                </a>`
     })
-    
+
     return `
             <div class="extra-section">
                 <div class="section-head">
@@ -470,19 +468,15 @@ function createArticlesSection(articles, currentHaber) {
                     <a href="../haberler.html">Tümü →</a>
                 </div>
                 <div class="extra-grid">${cards}</div>
-            </div>
-        `
+            </div>`
 }
-
-
 
 function createEmptySection() {
     return `
             <div style="text-align:center; padding:2rem 0; color:var(--text-muted);">
                 <p>Diğer içerikler bulunmuyor.</p>
                 <a href="../index.html" style="display:inline-block; margin-top:1rem; background:var(--primary); color:#fff; padding:0.5rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none;">Ana Sayfa</a>
-            </div>
-        `
+            </div>`
 }
 
 function createAuthorPostsSection(articles, currentHaber) {
@@ -509,15 +503,14 @@ function createAuthorPostsSection(articles, currentHaber) {
     let postList = ''
     otherPosts.forEach((p, index) => {
         const itemSlug = p.slug || slugify(p.title)
-        const link = `../yazilar/${itemSlug}.html`
+        const link = '../yazilar/' + itemSlug + '.html'
         postList += `
                             <li>
                                 <span class="post-index">${String(index + 1).padStart(2, '0')}</span>
                                 <span class="post-date">${formatDate(getDateValue(p))}</span>
                                 <a href="\( {link}"> \){escapeHtml(p.title)}</a>
                                 <span class="post-arrow"><i class="fas fa-chevron-right"></i></span>
-                            </li>
-                        `
+                            </li>`
     })
 
     return `
@@ -532,8 +525,7 @@ function createAuthorPostsSection(articles, currentHaber) {
                             <ul class="author-post-list">
                                 ${postList}
                             </ul>
-                        </div>
-                    `
+                        </div>`
 }
 
 // ============================================================
@@ -543,27 +535,27 @@ async function generateHaberPages() {
     console.log('\n🚀 =========================================')
     console.log('🚀 HABER SAYFALARI OLUŞTURULUYOR')
     console.log('🚀 =========================================\n')
-    console.log(`📁 Çalışma dizini: ${__dirname}`)
-    console.log(`📁 Proje kökü: ${projectRoot}`)
-    console.log(`📄 Şablon: ${templatePath}\n`)
-    
+    console.log('📁 Çalışma dizini: ' + __dirname)
+    console.log('📁 Proje kökü: ' + projectRoot)
+    console.log('📄 Şablon: ' + templatePath + '\n')
+
     console.log('📡 Veritabanı sorgulanıyor...\n')
-    
+
     const [dernekHaberleri, heroHaberleri, articles] = await Promise.all([
         fetchDernekHaberleri(),
         fetchHeroHaberleri(),
         fetchArticles()
     ])
-    
+
     console.log('\n📊 İstatistikler:')
-    console.log(`   📰 Dernek Haberleri: ${dernekHaberleri.length}`)
-    console.log(`   ⭐ Öne Çıkan (Hero): ${heroHaberleri.length}`)
-    console.log(`   ✍️ Köşe Yazıları: ${articles.length}`)
-    
+    console.log('   📰 Dernek Haberleri: ' + dernekHaberleri.length)
+    console.log('   ⭐ Öne Çıkan (Hero): ' + heroHaberleri.length)
+    console.log('   ✍️ Köşe Yazıları: ' + articles.length)
+
     const taggedDernek = dernekHaberleri.map(h => ({ ...h, _source: 'dernek_haberleri' }))
     const taggedHero = heroHaberleri.map(h => ({ ...h, _source: 'hero' }))
     const taggedArticles = articles.map(h => ({ ...h, _source: 'articles' }))
-    
+
     let tümHaberler = [...taggedDernek, ...taggedHero, ...taggedArticles]
 
     tümHaberler.sort((a, b) => {
@@ -571,20 +563,20 @@ async function generateHaberPages() {
         const dateB = b.tarih || b.pub_date || b.created_at || b.pubDate || 0
         return new Date(dateB) - new Date(dateA)
     })
-    
-    console.log(`\n📊 Toplam ${tümHaberler.length} aktif içerik bulundu.\n`)
-    
+
+    console.log('\n📊 Toplam ' + tümHaberler.length + ' aktif içerik bulundu.\n')
+
     if (tümHaberler.length === 0) {
         console.log('⚠️ Hiç içerik bulunamadı! Çıkılıyor...')
         return
     }
-    
+
     let createdCount = 0
     const errors = []
-    
+
     for (const haber of tümHaberler) {
         try {
-            const slug = slugify(haber.slug || getTitle(haber)) || `haber-${haber.id || Date.now()}`
+            const slug = slugify(haber.slug || getTitle(haber)) || ('haber-' + (haber.id || Date.now()))
             const sourceTable = haber._source || 'unknown'
             const category = getCategory(sourceTable)
             const categoryClass = getCategoryClass(category)
@@ -596,25 +588,25 @@ async function generateHaberPages() {
             const date = formatDate(dateValue)
             const dateISO = formatDateISO(dateValue)
             const source = getSource(sourceTable)
-            
+
             const authorPostsHTML = createAuthorPostsSection(articles, haber)
             const heroSectionHTML = createHeroSection(heroHaberleri, haber)
             const dernekSectionHTML = createDernekSection(dernekHaberleri, haber)
             const articlesSectionHTML = createArticlesSection(articles, haber)
             const emptySectionHTML = (authorPostsHTML || heroSectionHTML || dernekSectionHTML || articlesSectionHTML) ? '' : createEmptySection()
             const urlPath = sourceTable === 'articles' ? 'yazilar' : 'haber'
-            
+
             const canonicalUrl = getSiteUrl()
-                ? `\( {getSiteUrl()}/ \){urlPath}/${encodeURIComponent(slug)}.html`
-                : `/\( {urlPath}/ \){encodeURIComponent(slug)}.html`
+                ? getSiteUrl() + '/' + urlPath + '/' + encodeURIComponent(slug) + '.html'
+                : '/' + urlPath + '/' + encodeURIComponent(slug) + '.html'
+
             const socialImageUrl = toAbsoluteUrl(imageUrl) || imageUrl
             const socialMeta = buildSocialMeta({
                 title: cleanText(title),
                 description,
                 imageUrl: socialImageUrl,
                 canonicalUrl,
-                dateISO,
-                source
+                dateISO
             })
 
             const replacements = {
@@ -638,38 +630,37 @@ async function generateHaberPages() {
 
             let html = template.replace(/\{\{(\w+)\}\}/g, (_, key) => replacements[key] ?? '')
             html = injectSocialMeta(html, socialMeta)
-            
-            // DOSYA KAYDET
+
             let outputDir
             if (sourceTable === 'articles') {
                 outputDir = path.join(projectRoot, 'yazilar')
             } else {
                 outputDir = path.join(projectRoot, 'haber')
             }
-            
+
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true })
-                console.log(`📁 Klasör oluşturuldu: ${path.basename(outputDir)}/`)
+                console.log('📁 Klasör oluşturuldu: ' + path.basename(outputDir) + '/')
             }
-            
-            const outputPath = path.join(outputDir, `${slug}.html`)
+
+            const outputPath = path.join(outputDir, slug + '.html')
             fs.writeFileSync(outputPath, html, 'utf-8')
-            
+
             const folderName = sourceTable === 'articles' ? 'yazilar' : 'haber'
-            console.log(`✅ \( {folderName}/ \){slug}.html (${category})`)
+            console.log('✅ ' + folderName + '/' + slug + '.html (' + category + ')')
             createdCount++
-            
+
         } catch (err) {
-            console.error(`❌ Hata: ${getTitle(haber)} - ${err.message}`)
+            console.error('❌ Hata: ' + getTitle(haber) + ' - ' + err.message)
             errors.push({ title: getTitle(haber), error: err.message })
         }
     }
-    
+
     console.log('\n📊 =========================================')
-    console.log(`📊 ${createdCount} sayfa başarıyla oluşturuldu!`)
+    console.log('📊 ' + createdCount + ' sayfa başarıyla oluşturuldu!')
     if (errors.length > 0) {
-        console.log(`⚠️ ${errors.length} hata oluştu:`)
-        errors.forEach(e => console.log(`   ❌ ${e.title}: ${e.error}`))
+        console.log('⚠️ ' + errors.length + ' hata oluştu:')
+        errors.forEach(e => console.log('   ❌ ' + e.title + ': ' + e.error))
     }
     console.log('📊 =========================================\n')
 }
