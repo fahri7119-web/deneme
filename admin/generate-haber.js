@@ -94,7 +94,7 @@ function escapeHtml(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')   // ← düzeltildi (global flag eklendi)
+        .replace(/'/g, '&#039;')
 }
 
 function cleanText(text) {
@@ -155,9 +155,6 @@ function buildSocialMeta({ title, description, imageUrl, canonicalUrl, dateISO, 
     <!-- GENERATED_SOCIAL_META_END -->`
 }
 
-// ============================================================
-// DÜZELTİLMİŞ injectSocialMeta FONKSİYONU
-// ============================================================
 function injectSocialMeta(html, meta) {
     // Önce eski GENERATED bloğunu tamamen temizle
     let clean = html.replace(
@@ -168,12 +165,11 @@ function injectSocialMeta(html, meta) {
     // </head> etiketini bul (büyük/küçük harf duyarsız)
     const match = clean.match(/<\/head>/i)
     if (!match) {
-        // Hiç </head> yoksa en sona ekle
         return clean + '\n' + meta + '\n'
     }
 
     const pos = match.index
-    // Meta bloğunu her zaman </head> ÖNCESİNE ekle (etiketi asla bozmaz)
+    // Meta bloğunu her zaman </head> ÖNCESİNE ekle
     return clean.slice(0, pos) + meta + '\n' + clean.slice(pos)
 }
 
