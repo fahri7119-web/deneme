@@ -1430,18 +1430,19 @@
 .hub-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.9rem;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 .hub-card {
   background: var(--white, #fff);
   border-radius: 14px;
-  padding: 1.1rem 1.15rem;
+  padding: 1.15rem 1.2rem 1.05rem;
   border: 1px solid rgba(0,0,0,0.04);
   box-shadow: 0 4px 16px rgba(15,90,62,0.06);
   transition: all 0.25s ease;
-  display: flex; flex-direction: column; gap: 0.45rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
   text-decoration: none; color: inherit;
+  min-height: 168px;
 }
 .hub-card:hover {
   transform: translateY(-3px);
@@ -1459,12 +1460,22 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 0.85rem; flex-shrink: 0;
 }
-.hub-card h3 { font-size: 0.9rem; font-weight: 750; color: var(--text, #1A2E2A); line-height: 1.3; flex: 1; }
-.hub-card p { font-size: 0.75rem; color: var(--text-light, #5A6E6A); line-height: 1.45; flex: 1; }
+.hub-card h3 { font-size: 0.92rem; font-weight: 750; color: var(--text, #1A2E2A); line-height: 1.3; flex: 1; }
+.hub-card p {
+  font-size: 0.78rem;
+  color: var(--text-light, #5A6E6A);
+  line-height: 1.5;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .hub-card-arrow {
   display: inline-flex; align-items: center; gap: 0.25rem;
   font-size: 0.75rem; font-weight: 700; color: var(--primary, #1A7A5A);
-  margin-top: 0.15rem;
+  margin-top: auto;
+  padding-top: 0.15rem;
 }
 .hub-card:hover .hub-card-arrow { gap: 0.45rem; }
 
@@ -1527,7 +1538,9 @@
 .btn-hub-pdf:hover { background: var(--primary-dark, #0F5A3E); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,122,90,0.3); }
 
 @media (max-width: 900px) {
-  .hub-cards { grid-template-columns: repeat(2, 1fr); }
+  .hub-cards { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+  .hub-card { min-height: 158px; padding: 1.05rem 1.1rem 0.95rem; }
+  .hub-card p { -webkit-line-clamp: 3; font-size: 0.76rem; }
   .rehber-hero-inner { grid-template-columns: 1fr; text-align: center; }
   .rehber-hero .hero-desc { margin-left: auto; margin-right: auto; }
   .rehber-pills { justify-content: center; }
@@ -1541,6 +1554,7 @@
   .hub-card {
     flex-direction: row; align-items: center; gap: 0.75rem;
     padding: 0.85rem 1rem;
+    min-height: 0;
   }
   .hub-card-top { flex: 1; }
   .hub-card p, .hub-card-arrow { display: none; }
@@ -1560,6 +1574,310 @@ body.dark-mode .hub-section-head h2 { color: #4ade80; }
 </style>
 
 <link href="assets/css/site.css" rel="stylesheet"/>
+
+<style id="mobil-rehber-overrides">
+/* Mobil bilgi merkezi düzeni: kart görünümü, hızlı başlangıç ve daha kompakt hero */
+.quick-start {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .7rem;
+  margin: 0 0 1.35rem;
+}
+.quick-start a {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  min-height: 58px;
+  padding: .75rem .85rem;
+  background: var(--white, #fff);
+  color: var(--text, #1A2E2A);
+  border: 1px solid rgba(26,122,90,.12);
+  border-radius: 13px;
+  box-shadow: 0 4px 14px rgba(15,90,62,.06);
+  text-decoration: none;
+  font-size: .8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.quick-start a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(26,122,90,.3);
+  box-shadow: 0 8px 20px rgba(15,90,62,.12);
+}
+.quick-start i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  border-radius: 9px;
+  background: #E8F5F0;
+  color: var(--primary, #1A7A5A);
+}
+
+@media (max-width: 900px) {
+  .rehber-hero-inner { grid-template-columns: 1fr; }
+  .rehber-visual { order: 0; }
+  .rehber-visual-card { max-width: 240px; }
+}
+
+@media (max-width: 560px) {
+  .rehber-hero {
+    padding: 1.15rem .9rem 1rem;
+    margin-top: .35rem;
+    border-radius: 15px;
+  }
+  .rehber-hero-inner { gap: .9rem; }
+  .rehber-visual-card {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: .65rem .8rem;
+    border-radius: 13px;
+    text-align: left;
+  }
+  .rehber-visual-card .big-emoji { font-size: 2rem; margin: 0; }
+  .rehber-visual-card .card-title { font-size: .86rem; }
+  .rehber-visual-card .card-sub { font-size: .68rem; }
+  .rehber-hero h1 { font-size: 1.65rem; }
+  .rehber-hero .hero-desc { font-size: .82rem; line-height: 1.5; margin-bottom: .75rem; }
+  .rehber-pills { gap: .35rem; }
+  .rehber-pill { padding: .28rem .6rem; font-size: .68rem; }
+
+  .quick-start {
+    grid-template-columns: 1fr;
+    gap: .55rem;
+    margin-bottom: 1.1rem;
+  }
+  .quick-start a {
+    min-height: 0;
+    padding: .72rem .8rem;
+    font-size: .8rem;
+  }
+  .quick-start a::after {
+    content: '\f054';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #AAB8B3;
+    margin-left: auto;
+    font-size: .7rem;
+  }
+
+  .hub-section-head {
+    margin-bottom: .8rem;
+    gap: .55rem;
+  }
+  .hub-section-head-left { gap: .5rem; }
+  .hub-icon-box { width: 34px; height: 34px; font-size: .95rem; }
+  .hub-section-head h2 { font-size: 1rem; }
+  .hub-section-head p { font-size: .75rem; line-height: 1.4; }
+  .hub-badge-count { font-size: .7rem; padding: .28rem .65rem; }
+
+  /* Açıklamalı mini kartlar: içindekiler listesi yerine bilgi merkezi görünümü */
+  .hub-cards { grid-template-columns: 1fr; gap: .65rem; }
+  .hub-card {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "num title arrow"
+      "num desc arrow";
+    align-items: center;
+    column-gap: .65rem;
+    padding: .78rem .75rem;
+    min-height: 66px;
+    border-radius: 13px;
+  }
+  .hub-card-top { display: contents; }
+  .hub-card-num { grid-area: num; width: 30px; height: 30px; font-size: .72rem; }
+  .hub-card-icon { display: none; }
+  .hub-card h3 { grid-area: title; font-size: .88rem; line-height: 1.25; }
+  .hub-card p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    grid-area: desc;
+    margin: 0;
+    font-size: .7rem;
+    line-height: 1.35;
+    color: #667873;
+  }
+  .hub-card-arrow {
+    display: inline-flex;
+    grid-area: arrow;
+    margin: 0;
+    font-size: 0;
+    color: #AAB8B3;
+  }
+  .hub-card-arrow i { font-size: .75rem; }
+  .hub-card::after { display: none; }
+  .hub-card:hover { transform: none; }
+
+  .hub-cta { margin-top: 1.15rem; }
+}
+body.dark-mode .quick-start a { background: #1F2937; border-color: rgba(255,255,255,.08); color: #F3F4F6; }
+body.dark-mode .quick-start i { background: rgba(74,222,128,.12); color: #4ade80; }
+
+body.dark-mode .hub-card p { color: #A7B5B0; }
+
+/* ===== MOBİL BÖLÜM GÖRSEL KARTLARI =====
+   Her bölüm adı, kendine ait renkli bir örnek görsel alanı ile gösterilir.
+   İçerik ve bağlantılar değiştirilmez. */
+@media (max-width: 560px) {
+  .hub-cards { gap: .72rem; }
+
+  .hub-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 72px minmax(0,1fr) 18px;
+    grid-template-areas:
+      "visual title arrow"
+      "visual desc arrow";
+    column-gap: .78rem;
+    min-height: 76px;
+    padding: .62rem .65rem .62rem .62rem;
+    border-radius: 15px;
+    overflow: hidden;
+    background: var(--white, #fff);
+  }
+
+  .hub-card::before {
+    grid-area: visual;
+    content: "";
+    width: 72px;
+    height: 62px;
+    align-self: center;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1.65rem;
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18),
+                0 5px 12px rgba(15,90,62,.10);
+    position: relative;
+    background-position: center;
+    background-size: cover;
+  }
+
+  /* Bölüme göre örnek görsel/ikon */
+  .hc1::before  { content: "\f05a"; background: linear-gradient(135deg,#10B981,#047857); }
+  .hc2::before  { content: "\f080"; background: linear-gradient(135deg,#3B82F6,#1D4ED8); }
+  .hc3::before  { content: "\f0f1"; background: linear-gradient(135deg,#8B5CF6,#6D28D9); }
+  .hc4::before  { content: "\f0f0"; background: linear-gradient(135deg,#F59E0B,#D97706); }
+  .hc5::before  { content: "\f24e"; background: linear-gradient(135deg,#06B6D4,#0E7490); }
+  .hc6::before  { content: "\f0fa"; background: linear-gradient(135deg,#EF4444,#B91C1C); }
+  .hc7::before  { content: "\f2e7"; background: linear-gradient(135deg,#22C55E,#15803D); }
+  .hc8::before  { content: "\f02b"; background: linear-gradient(135deg,#6366F1,#4338CA); }
+  .hc9::before  { content: "\f362"; background: linear-gradient(135deg,#A855F7,#7E22CE); }
+  .hc10::before { content: "\f1ae"; background: linear-gradient(135deg,#F97316,#C2410C); }
+  .hc11::before { content: "\f4c4"; background: linear-gradient(135deg,#14B8A6,#0F766E); }
+  .hc12::before { content: "\f071"; background: linear-gradient(135deg,#EC4899,#BE185D); }
+  .hc13::before { content: "\f19c"; background: linear-gradient(135deg,#84CC16,#4D7C0F); }
+  .hc14::before { content: "\f46d"; background: linear-gradient(135deg,#0EA5E9,#0369A1); }
+  .hc15::before { content: "\f3ed"; background: linear-gradient(135deg,#7C3AED,#5B21B6); }
+  .hc16::before { content: "\f02d"; background: linear-gradient(135deg,#64748B,#334155); }
+
+  .hub-card::after {
+    grid-area: visual;
+    content: attr(data-section);
+    align-self: end;
+    justify-self: start;
+    z-index: 2;
+    margin: 0 0 .18rem .18rem;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 .22rem;
+    border-radius: 20px;
+    background: rgba(255,255,255,.92);
+    color: #1A7A5A;
+    font-size: .58rem;
+    font-weight: 800;
+    line-height: 19px;
+    text-align: center;
+    box-shadow: 0 2px 7px rgba(0,0,0,.14);
+  }
+
+  .hub-card-top { display: contents; }
+  .hub-card-num { display: none; }
+  .hub-card-icon { display: none; }
+
+  .hub-card h3 {
+    grid-area: title;
+    align-self: end;
+    margin: 0;
+    font-size: .9rem;
+    line-height: 1.2;
+    color: var(--text, #1A2E2A);
+  }
+
+  .hub-card p {
+    grid-area: desc;
+    align-self: start;
+    margin: .18rem 0 0;
+    font-size: .69rem;
+    line-height: 1.35;
+    color: #667873;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hub-card-arrow {
+    grid-area: arrow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-size: 0;
+    color: #91A39D;
+  }
+
+  .hub-card-arrow i { font-size: .75rem; }
+
+  .hub-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(15,90,62,.10);
+  }
+
+  body.dark-mode .hub-card {
+    background: #1F2937;
+  }
+  body.dark-mode .hub-card h3 { color: #F3F4F6; }
+  body.dark-mode .hub-card::after {
+    background: rgba(31,41,55,.94);
+    color: #4ade80;
+  }
+}
+
+/* Çok dar ekranlarda görseli biraz küçült */
+@media (max-width: 360px) {
+  .hub-card {
+    grid-template-columns: 62px minmax(0,1fr) 16px;
+    column-gap: .62rem;
+    min-height: 70px;
+  }
+  .hub-card::before {
+    width: 62px;
+    height: 56px;
+    font-size: 1.4rem;
+  }
+  .hub-card h3 { font-size: .84rem; }
+  .hub-card p { font-size: .65rem; }
+}
+</style>
+
+<style id="guide-group-layout">
+.guide-groups{display:flex;flex-direction:column;gap:1.6rem;margin-bottom:1.5rem}.guide-group{position:relative;border-radius:22px;padding:1.2rem 1.2rem 1.05rem;border:1px solid rgba(15,90,62,.08);overflow:hidden}.guide-group::before{content:"";position:absolute;right:-50px;bottom:-70px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}.guide-group-green{background:linear-gradient(135deg,#f0fdf4,#ecfdf5)}.guide-group-blue{background:linear-gradient(135deg,#eff6ff,#ecfeff)}.guide-group-purple{background:linear-gradient(135deg,#f5f3ff,#fdf2f8)}.guide-group-orange{background:linear-gradient(135deg,#fffbeb,#fff7ed)}.guide-group-head{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.9rem}.guide-group-title-wrap{display:flex;align-items:center;gap:.75rem;min-width:0}.guide-group-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:0 0 46px;color:#fff;box-shadow:0 7px 18px rgba(15,90,62,.12)}.guide-group-green .guide-group-icon{background:linear-gradient(135deg,#10b981,#047857)}.guide-group-blue .guide-group-icon{background:linear-gradient(135deg,#3b82f6,#0891b2)}.guide-group-purple .guide-group-icon{background:linear-gradient(135deg,#8b5cf6,#db2777)}.guide-group-orange .guide-group-icon{background:linear-gradient(135deg,#f59e0b,#ea580c)}.guide-group-head h2{font-size:1.12rem;font-weight:800;line-height:1.2;margin:0;color:#0f5a3e}.guide-group-head p{font-size:.76rem;line-height:1.4;margin:.18rem 0 0;color:#526a63;max-width:600px}.guide-group-count{font-size:.7rem;font-weight:800;white-space:nowrap;padding:.35rem .7rem;border-radius:30px;background:rgba(255,255,255,.7);color:#35665a;border:1px solid rgba(15,90,62,.08)}.guide-group .hub-cards{position:relative;z-index:1;grid-template-columns:repeat(4,1fr);margin:0;gap:.8rem}.guide-group .hub-card{min-height:160px;background:rgba(255,255,255,.88);backdrop-filter:blur(5px);border-color:rgba(15,90,62,.07)}.guide-group .hub-card:hover{transform:translateY(-3px) scale(1.005)}@media(max-width:900px){.guide-group .hub-cards{grid-template-columns:repeat(2,1fr)}.guide-group .hub-card{min-height:150px}}@media(max-width:560px){.guide-groups{gap:1rem}.guide-group{padding:.85rem .7rem .7rem;border-radius:17px}.guide-group-head{align-items:flex-start;margin-bottom:.65rem}.guide-group-title-wrap{gap:.55rem}.guide-group-icon{width:38px;height:38px;flex-basis:38px;border-radius:11px;font-size:.95rem}.guide-group-head h2{font-size:.95rem}.guide-group-head p{font-size:.68rem;line-height:1.35}.guide-group-count{font-size:.62rem;padding:.28rem .5rem}.guide-group .hub-cards{grid-template-columns:1fr;gap:.55rem}.guide-group .hub-card{min-height:76px}}body.dark-mode .guide-group-green{background:linear-gradient(135deg,#10251d,#123326)}body.dark-mode .guide-group-blue{background:linear-gradient(135deg,#111f35,#12303a)}body.dark-mode .guide-group-purple{background:linear-gradient(135deg,#211a35,#321c2b)}body.dark-mode .guide-group-orange{background:linear-gradient(135deg,#332814,#342015)}body.dark-mode .guide-group-head h2{color:#86efac}body.dark-mode .guide-group-head p{color:#a7b5b0}body.dark-mode .guide-group-count{background:rgba(31,41,55,.55);color:#a7f3d0}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main-content">İçeriğe geç</a>
@@ -1629,174 +1947,192 @@ body.dark-mode .hub-section-head h2 { color: #4ade80; }
     <div class="rehber-visual">
       <div class="rehber-visual-card">
         <div class="big-emoji">🥗</div>
-        <div class="card-title">Çölyak Hakkında<br/>Bilgiler</div>
+        <div class="card-title">Glutensiz Yaşam<br/>Sağlıklıdır</div>
         <div class="card-sub">♥ Doğru bilgi, güçlü destek</div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="hub-section-head">
-  <div class="hub-section-head-left">
-    <div class="hub-icon-box"><i class="fas fa-book-open"></i></div>
-    <div>
-      <h2>Glutensiz Yaşam Rehberi</h2>
-      <p>Aşağıdaki 16 bölümden istediğinizi seçerek çölyak hakkında detaylı bilgi alabilirsiniz.</p>
-    </div>
-  </div>
-  <span class="hub-badge-count"><i class="fas fa-list"></i> Toplam 16 Bölüm</span>
+<div class="quick-start" aria-label="Hızlı başlangıç">
+  <a href="rehber/colyak-nedir.html"><i class="fas fa-info-circle"></i><span>Çölyak nedir?</span></a>
+  <a href="rehber/colyak-belirtileri.html"><i class="fas fa-notes-medical"></i><span>Belirtileri öğren</span></a>
+  <a href="rehber/glutensiz-beslenme.html"><i class="fas fa-utensils"></i><span>Glutensiz beslenme</span></a>
 </div>
-<div class="hub-cards" id="kartlar">
-<a href="rehber/colyak-nedir.html" class="hub-card hc1">
+
+<div class="guide-groups">
+<section class="guide-group guide-group-green">
+<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-book-open"></i></span><div><h2>Temel Bilgiler</h2><p>Çölyak hakkında temel kavramlar, belirtiler ve tanı süreci.</p></div></div><span class="guide-group-count">5 Bölüm</span></div>
+<div class="hub-cards">
+<a href="rehber/colyak-nedir.html" class="hub-card hc1" data-section="1">
   <div class="hub-card-top">
     <span class="hub-card-num">1</span>
     <span class="hub-card-icon"><i class="fas fa-info-circle"></i></span>
     <h3>Çölyak Nedir?</h3>
   </div>
-  <p>Hastalığın tanımı, nedenleri ve temel bilgiler</p>
+  <p>Çölyak sadece karın ağrısı değildir; bağışıklık sisteminin glutene karşı başlattığı bir iç savaştır. Genetik yatkınlık yaşamın herhangi bir anında ortaya çıkabilir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/colyak-istatistikler.html" class="hub-card hc2">
+<a href="rehber/colyak-istatistikler.html" class="hub-card hc2" data-section="2">
   <div class="hub-card-top">
     <span class="hub-card-num">2</span>
     <span class="hub-card-icon"><i class="fas fa-chart-bar"></i></span>
     <h3>İstatistikler</h3>
   </div>
-  <p>Türkiye ve dünyada çölyak görülme sıklığı</p>
+  <p>Dünya genelinde her 100 kişiden 1’i çölyaklıdır. Çoğu kişi belirtileri yorgunluk sanır; tanı koymak bazen dedektiflik gerektirir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/colyak-belirtileri.html" class="hub-card hc3">
+<a href="rehber/colyak-belirtileri.html" class="hub-card hc3" data-section="3">
   <div class="hub-card-top">
     <span class="hub-card-num">3</span>
     <span class="hub-card-icon"><i class="fas fa-notes-medical"></i></span>
     <h3>Belirtiler</h3>
   </div>
-  <p>Bebek, çocuk ve yetişkinlerde semptomlar</p>
+  <p>Demir eksikliğinden depresyona, cilt döküntüsünden eklem ağrısına kadar birçok kılığa girer. Tıp dünyasının “bukalemunu” sayılır.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/colyak-tanisi.html" class="hub-card hc4">
+<a href="rehber/colyak-tanisi.html" class="hub-card hc4" data-section="4">
   <div class="hub-card-top">
     <span class="hub-card-num">4</span>
     <span class="hub-card-icon"><i class="fas fa-stethoscope"></i></span>
     <h3>Tanı</h3>
   </div>
-  <p>Kan testi, endoskopi ve biyopsi süreci</p>
+  <p>Tanı tamamlanmadan glutensiz diyete başlanmamalıdır. Süreç kan testleri, klinik değerlendirme ve gerektiğinde biyopsi ile yürütülür.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/colyak-gluten-hassasiyeti.html" class="hub-card hc5">
+<a href="rehber/colyak-gluten-hassasiyeti.html" class="hub-card hc5" data-section="5">
   <div class="hub-card-top">
     <span class="hub-card-num">5</span>
     <span class="hub-card-icon"><i class="fas fa-balance-scale"></i></span>
     <h3>Gluten Hassasiyeti</h3>
   </div>
-  <p>Çölyak, hassasiyet ve buğday alerjisi farkları</p>
+  <p>Gluten hassasiyeti ve çölyak aynı şey değildir. Çölyak bağışıklık sisteminin bağırsaklara saldırdığı ciddi bir durumdur.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/colyak-tedavisi.html" class="hub-card hc6">
+</div>
+</section>
+
+<section class="guide-group guide-group-blue">
+<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-utensils"></i></span><div><h2>Tedavi & Beslenme</h2><p>Tedavi yaklaşımı ve günlük glutensiz beslenmenin temel adımları.</p></div></div><span class="guide-group-count">4 Bölüm</span></div>
+<div class="hub-cards">
+<a href="rehber/colyak-tedavisi.html" class="hub-card hc6" data-section="6">
   <div class="hub-card-top">
     <span class="hub-card-num">6</span>
     <span class="hub-card-icon"><i class="fas fa-pills"></i></span>
     <h3>Tedavi</h3>
   </div>
-  <p>Glutensiz diyet, izlem ve takviyeler</p>
+  <p>Tek kanıtlanmış tedavi ömür boyu sıkı glutensiz diyettir. Az miktarda tekrarlayan gluten bile bağırsak iltihabını sürdürebilir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/glutensiz-beslenme.html" class="hub-card hc7">
+<a href="rehber/glutensiz-beslenme.html" class="hub-card hc7" data-section="7">
   <div class="hub-card-top">
     <span class="hub-card-num">7</span>
     <span class="hub-card-icon"><i class="fas fa-utensils"></i></span>
     <h3>Glutensiz Beslenme</h3>
   </div>
-  <p>Yasaklı ve güvenli gıdalar listesi</p>
+  <p>“Glutensiz” yazan her şey süper sağlıklı değildir. Etiket okumak çölyaklılar için hobi değil, hayatta kalma sanatıdır.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/etiket-okuma.html" class="hub-card hc8">
+<a href="rehber/etiket-okuma.html" class="hub-card hc8" data-section="8">
   <div class="hub-card-top">
     <span class="hub-card-num">8</span>
     <span class="hub-card-icon"><i class="fas fa-tags"></i></span>
     <h3>Etiket Okuma</h3>
   </div>
-  <p>20 ppm kuralı, logolar ve sertifikalar</p>
+  <p>Market rafı günlük muharebe alanıdır. Asıl rehber içindekiler listesi ve güvenilir glutensiz ifadesidir (≤20 mg/kg).</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/capraz-bulasma.html" class="hub-card hc9">
+<a href="rehber/capraz-bulasma.html" class="hub-card hc9" data-section="9">
   <div class="hub-card-top">
     <span class="hub-card-num">9</span>
     <span class="hub-card-icon"><i class="fas fa-exchange-alt"></i></span>
     <h3>Çapraz Bulaşma</h3>
   </div>
-  <p>Mutfakta ve dışarıda önleme yöntemleri</p>
+  <p>Gözle görülmeyen gluten güvenli gıdaya taşınabilir. Ortak kesme tahtası, tost makinesi ve sürme ürünleri riski artırır.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/cocuklarda-colyak.html" class="hub-card hc10">
+</div>
+</section>
+
+<section class="guide-group guide-group-purple">
+<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-heart"></i></span><div><h2>Yaşam & Destek</h2><p>Çölyakla günlük yaşam, çocukluk dönemi ve psikososyal destek.</p></div></div><span class="guide-group-count">3 Bölüm</span></div>
+<div class="hub-cards">
+<a href="rehber/cocuklarda-colyak.html" class="hub-card hc10" data-section="10">
   <div class="hub-card-top">
     <span class="hub-card-num">10</span>
     <span class="hub-card-icon"><i class="fas fa-child"></i></span>
     <h3>Çocuklarda Çölyak</h3>
   </div>
-  <p>Okul yaşamı, beslenme çantası ve aile</p>
+  <p>Okulda güvenli yaşam; öğretmen, yönetim, kantin ve aile arasındaki iletişime bağlıdır. Amaç çapraz bulaşmayı azaltmaktır.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/psikososyal-destek.html" class="hub-card hc11">
+<a href="rehber/psikososyal-destek.html" class="hub-card hc11" data-section="11">
   <div class="hub-card-top">
     <span class="hub-card-num">11</span>
     <span class="hub-card-icon"><i class="fas fa-hands-helping"></i></span>
     <h3>Psikososyal Destek</h3>
   </div>
-  <p>Yas süreci, aile desteği ve motivasyon</p>
+  <p>Ömür boyu süren kronik hastalıkta uzman desteği diyete uyumu artırır, aile üzerindeki psikolojik baskıyı hafifletir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/komplikasyonlar.html" class="hub-card hc12">
+<a href="rehber/komplikasyonlar.html" class="hub-card hc12" data-section="12">
   <div class="hub-card-top">
     <span class="hub-card-num">12</span>
     <span class="hub-card-icon"><i class="fas fa-exclamation-triangle"></i></span>
     <h3>Komplikasyonlar</h3>
   </div>
-  <p>Uzun vadeli riskler ve izlem planı</p>
+  <p>Komplikasyonların çoğu glutensiz diyete başlandıktan sonra önlenebilir veya geri döndürülebilir. Erken tanı hayat kurtarır.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/turkiye-destekler.html" class="hub-card hc13">
+</div>
+</section>
+
+<section class="guide-group guide-group-orange">
+<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-scale-balanced"></i></span><div><h2>Haklar & Kaynaklar</h2><p>Destekler, raporlar, askerlik ve güvenilir bilgi kaynakları.</p></div></div><span class="guide-group-count">4 Bölüm</span></div>
+<div class="hub-cards">
+<a href="rehber/turkiye-destekler.html" class="hub-card hc13" data-section="13">
   <div class="hub-card-top">
     <span class="hub-card-num">13</span>
     <span class="hub-card-icon"><i class="fas fa-landmark"></i></span>
     <h3>Türkiye Destekleri</h3>
   </div>
-  <p>SGK, belediye ve sosyal haklar rehberi</p>
+  <p>SGK başvuru sürecinde derneğimiz rehberlik sunar. Güncel haklar ve dilekçe örnekleri için duyuruları takip edin.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/cozger-raporu.html" class="hub-card hc14">
+<a href="rehber/cozger-raporu.html" class="hub-card hc14" data-section="14">
   <div class="hub-card-top">
     <span class="hub-card-num">14</span>
     <span class="hub-card-icon"><i class="fas fa-file-medical-alt"></i></span>
     <h3>ÇÖZGER Raporu</h3>
   </div>
-  <p>Çocuklar için özel gereksinim raporu</p>
+  <p>18 yaş altı çocukların özel gereksinimlerinin değerlendirildiği gereksinim temelli rapordur. Kapsam bireysel duruma göre değişir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/askerlik-muafiyeti.html" class="hub-card hc15">
+<a href="rehber/askerlik-muafiyeti.html" class="hub-card hc15" data-section="15">
   <div class="hub-card-top">
     <span class="hub-card-num">15</span>
     <span class="hub-card-icon"><i class="fas fa-shield-alt"></i></span>
     <h3>Askerlik Muafiyeti</h3>
   </div>
-  <p>Sağlık kurulu süreci ve belgeler</p>
+  <p>Elverişlilik kararı herkes için aynı değildir; güncel mevzuat ve sağlık kurulunun bireysel değerlendirmesiyle verilir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-<a href="rehber/yararli-kaynaklar.html" class="hub-card hc16">
+<a href="rehber/yararli-kaynaklar.html" class="hub-card hc16" data-section="16">
   <div class="hub-card-top">
     <span class="hub-card-num">16</span>
     <span class="hub-card-icon"><i class="fas fa-book"></i></span>
     <h3>Yararlı Kaynaklar</h3>
   </div>
-  <p>Güvenilir kurumlar ve resmi siteler</p>
+  <p>İnternetteki bilgi kirliliğinde bilimsel kaynaklara ulaşmak hayati önem taşır. Güvenilir kurumlar ve resmi siteler listelenir.</p>
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
-
+</div>
+</section>
 </div>
 <div class="hub-cta">
   <div>
     <div class="quote-mark">"Bilgi Güçtür" ♥</div>
-    <p>Çölyak'ın bilinen tek tedavisi glutensiz beslenmedir. Doğru bilgi, doğru beslenme ve güçlü bir destekle daha sağlıklı bir yaşam mümkün.</p>
+    <p>Çölyakla yaşamak zorunda değilsiniz. Doğru bilgi, doğru beslenme ve güçlü bir destekle daha sağlıklı bir yaşam mümkün.</p>
   </div>
   <a href="https://hsgm.saglik.gov.tr/depo/birimler/saglikli-beslenme-ve-hareketli-hayat-db/Dokumanlar/Kitaplar/Colyak_Hastaliginda_Aile_Hekimleri_Icin_Tani_Tedavi_ve_Izlem_Rehberi.pdf" class="btn-hub-pdf" target="_blank" rel="noopener">
     <i class="fas fa-file-pdf"></i> Rehberi İndir
