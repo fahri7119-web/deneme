@@ -1878,6 +1878,36 @@ body.dark-mode .hub-card p { color: #A7B5B0; }
 
 <style id="guide-group-layout">
 .guide-groups{display:flex;flex-direction:column;gap:1.6rem;margin-bottom:1.5rem}.guide-group{position:relative;border-radius:22px;padding:1.2rem 1.2rem 1.05rem;border:1px solid rgba(15,90,62,.08);overflow:hidden}.guide-group::before{content:"";position:absolute;right:-50px;bottom:-70px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}.guide-group-green{background:linear-gradient(135deg,#f0fdf4,#ecfdf5)}.guide-group-blue{background:linear-gradient(135deg,#eff6ff,#ecfeff)}.guide-group-purple{background:linear-gradient(135deg,#f5f3ff,#fdf2f8)}.guide-group-orange{background:linear-gradient(135deg,#fffbeb,#fff7ed)}.guide-group-head{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.9rem}.guide-group-title-wrap{display:flex;align-items:center;gap:.75rem;min-width:0}.guide-group-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:0 0 46px;color:#fff;box-shadow:0 7px 18px rgba(15,90,62,.12)}.guide-group-green .guide-group-icon{background:linear-gradient(135deg,#10b981,#047857)}.guide-group-blue .guide-group-icon{background:linear-gradient(135deg,#3b82f6,#0891b2)}.guide-group-purple .guide-group-icon{background:linear-gradient(135deg,#8b5cf6,#db2777)}.guide-group-orange .guide-group-icon{background:linear-gradient(135deg,#f59e0b,#ea580c)}.guide-group-head h2{font-size:1.12rem;font-weight:800;line-height:1.2;margin:0;color:#0f5a3e}.guide-group-head p{font-size:.76rem;line-height:1.4;margin:.18rem 0 0;color:#526a63;max-width:600px}.guide-group-count{font-size:.7rem;font-weight:800;white-space:nowrap;padding:.35rem .7rem;border-radius:30px;background:rgba(255,255,255,.7);color:#35665a;border:1px solid rgba(15,90,62,.08)}.guide-group .hub-cards{position:relative;z-index:1;grid-template-columns:repeat(4,1fr);margin:0;gap:.8rem}.guide-group .hub-card{min-height:160px;background:rgba(255,255,255,.88);backdrop-filter:blur(5px);border-color:rgba(15,90,62,.07)}.guide-group .hub-card:hover{transform:translateY(-3px) scale(1.005)}@media(max-width:900px){.guide-group .hub-cards{grid-template-columns:repeat(2,1fr)}.guide-group .hub-card{min-height:150px}}@media(max-width:560px){.guide-groups{gap:1rem}.guide-group{padding:.85rem .7rem .7rem;border-radius:17px}.guide-group-head{align-items:flex-start;margin-bottom:.65rem}.guide-group-title-wrap{gap:.55rem}.guide-group-icon{width:38px;height:38px;flex-basis:38px;border-radius:11px;font-size:.95rem}.guide-group-head h2{font-size:.95rem}.guide-group-head p{font-size:.68rem;line-height:1.35}.guide-group-count{font-size:.62rem;padding:.28rem .5rem}.guide-group .hub-cards{grid-template-columns:1fr;gap:.55rem}.guide-group .hub-card{min-height:76px}}body.dark-mode .guide-group-green{background:linear-gradient(135deg,#10251d,#123326)}body.dark-mode .guide-group-blue{background:linear-gradient(135deg,#111f35,#12303a)}body.dark-mode .guide-group-purple{background:linear-gradient(135deg,#211a35,#321c2b)}body.dark-mode .guide-group-orange{background:linear-gradient(135deg,#332814,#342015)}body.dark-mode .guide-group-head h2{color:#86efac}body.dark-mode .guide-group-head p{color:#a7b5b0}body.dark-mode .guide-group-count{background:rgba(31,41,55,.55);color:#a7f3d0}
+
+/* Haklar araştırma dosyası banner */
+.hub-haklar-banner{
+  position:relative;z-index:1;display:flex;align-items:center;gap:1rem;
+  margin-top:1rem;padding:1rem 1.15rem;border-radius:16px;
+  background:linear-gradient(135deg,#0F5A3E,#1A7A5A);color:#fff;
+  text-decoration:none;box-shadow:0 8px 24px rgba(15,90,62,.22);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.hub-haklar-banner:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,90,62,.3);color:#fff}
+.hub-haklar-banner-icon{
+  flex:0 0 44px;width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;
+}
+.hub-haklar-banner-text{flex:1;min-width:0}
+.hub-haklar-banner-text strong{display:block;font-size:.92rem;font-weight:800;line-height:1.25;margin-bottom:.2rem}
+.hub-haklar-banner-text span{display:block;font-size:.75rem;opacity:.9;line-height:1.45}
+.hub-haklar-banner-cta{
+  flex-shrink:0;display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.8rem;font-weight:700;white-space:nowrap;
+  background:rgba(255,255,255,.18);padding:.4rem .85rem;border-radius:30px;
+}
+@media (max-width:560px){
+  .hub-haklar-banner{flex-wrap:wrap;gap:.65rem;padding:.85rem .9rem}
+  .hub-haklar-banner-text strong{font-size:.86rem}
+  .hub-haklar-banner-text span{font-size:.7rem}
+  .hub-haklar-banner-cta{width:100%;justify-content:center}
+}
+body.dark-mode .hub-haklar-banner{background:linear-gradient(135deg,#0a3d2a,#145c42)}
 </style>
 </head>
 <body>
@@ -1953,12 +1983,6 @@ body.dark-mode .hub-card p { color: #A7B5B0; }
       </div>
     </div>
   </div>
-</div>
-
-<div class="quick-start" aria-label="Hızlı başlangıç">
-  <a href="rehber/colyak-nedir.html"><i class="fas fa-info-circle"></i><span>Çölyak nedir?</span></a>
-  <a href="rehber/colyak-belirtileri.html"><i class="fas fa-notes-medical"></i><span>Belirtileri öğren</span></a>
-  <a href="rehber/glutensiz-beslenme.html"><i class="fas fa-utensils"></i><span>Glutensiz beslenme</span></a>
 </div>
 
 <div class="guide-groups">
@@ -2089,7 +2113,7 @@ body.dark-mode .hub-card p { color: #A7B5B0; }
 </section>
 
 <section class="guide-group guide-group-orange">
-<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-scale-balanced"></i></span><div><h2>Haklar & Kaynaklar</h2><p>Destekler, raporlar, askerlik ve güvenilir bilgi kaynakları.</p></div></div><span class="guide-group-count">4 Bölüm</span></div>
+<div class="guide-group-head"><div class="guide-group-title-wrap"><span class="guide-group-icon"><i class="fas fa-scale-balanced"></i></span><div><h2>Haklar & Kaynaklar</h2><p>Destekler, raporlar, askerlik ve güvenilir bilgi kaynakları.</p></div></div><span class="guide-group-count">4 Bölüm + Araştırma</span></div>
 <div class="hub-cards">
 <a href="rehber/turkiye-destekler.html" class="hub-card hc13" data-section="13">
   <div class="hub-card-top">
@@ -2128,6 +2152,14 @@ body.dark-mode .hub-card p { color: #A7B5B0; }
   <span class="hub-card-arrow">Devamını oku <i class="fas fa-arrow-right"></i></span>
 </a>
 </div>
+<a href="colyak-haklari.html" class="hub-haklar-banner" aria-label="Çölyak Hakları ve Sosyal Politikalar araştırma dosyası">
+  <div class="hub-haklar-banner-icon"><i class="fas fa-balance-scale"></i></div>
+  <div class="hub-haklar-banner-text">
+    <strong>Çölyak Hakları ve Sosyal Politikalar (2017–2026)</strong>
+    <span>SGK ödemeleri, mevzuat, okul ve gıda erişimi, belediye destekleri, uluslararası karşılaştırma ve politika önerileri — kaynaklı araştırma dosyası.</span>
+  </div>
+  <span class="hub-haklar-banner-cta">İncele <i class="fas fa-arrow-right"></i></span>
+</a>
 </section>
 </div>
 <div class="hub-cta">
