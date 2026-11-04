@@ -3152,7 +3152,6 @@ const tableName = 'mali_islemler_public';
                                 <th>Dağıtılan</th>
                                 <th>Kalan</th>
                                 <th>Birim Maliyeti</th>
-                                <th>Piyasa Fiyatı</th>
                                 <th>Durum</th>
                             </tr>
                         </thead>
@@ -3172,10 +3171,6 @@ const tableName = 'mali_islemler_public';
                     const unitCostText = (unitCost !== null && unitCost !== undefined && Number.isFinite(Number(unitCost)))
                         ? '₺' + Number(unitCost).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                         : '—';
-                    const marketPrice = item.market_price;
-                    const marketPriceText = (marketPrice !== null && marketPrice !== undefined && Number.isFinite(Number(marketPrice)))
-                        ? '₺' + Number(marketPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                        : '—';
 
                     html += `
                         <tr>
@@ -3185,7 +3180,6 @@ const tableName = 'mali_islemler_public';
                             <td class="stock-detail-distributed" style="color:#d97706;">${distributed}</td>
                             <td class="stock-detail-remaining">${remaining}</td>
                             <td class="stock-detail-unit-cost" style="font-weight:700;white-space:nowrap;">${unitCostText}</td>
-                            <td class="stock-detail-market-price" style="font-weight:700;white-space:nowrap;">${marketPriceText}</td>
                             <td><span class="stock-detail-status ${statusClass}">${statusText}</span></td>
                         </tr>
                     `;
@@ -3193,7 +3187,7 @@ const tableName = 'mali_islemler_public';
                 html += `</tbody></table>`;
                 html += `
                     <div class="stock-detail-note" style="margin-top:0.85rem;padding:0.75rem 0.9rem;border-left:3px solid var(--accent);background:#fff8e5;border-radius:0 8px 8px 0;font-size:0.72rem;color:#705b29;line-height:1.55;">
-                        <strong>Not:</strong> Birim maliyeti, derneğimizce alınan ürünün adet olarak maliyetini göstermekte olup fiyat farklılıkları firmanın alış tarihindeki indirim oranları, indirim kuponları ve kampanyalarından kaynaklanmaktadır. Piyasa fiyatı, alınan ürünün alınma tarihindeki indirimsiz fiyatını göstermektedir. Derneğimizce, alınan ürünün en ucuz maliyetle alınmasına özen gösterilmektedir.
+                        <strong>Not:</strong> Birim maliyeti, derneğimizce alınan ürünün adet olarak maliyetini göstermekte olup fiyat farklılıkları firmanın alış tarihindeki indirim oranları, indirim kuponları ve kampanyalarından kaynaklanmaktadır. Derneğimizce, alınan ürünün en ucuz maliyetle alınmasına özen gösterilmektedir.
                     </div>
                 `;
                 return html;
